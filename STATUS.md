@@ -1,18 +1,18 @@
 # Time Candle
-### Рассмотрение ближайших аналогов ![test](http://i99.fastpic.ru/big/2018/0308/3e/e89ebb8915c6ddc552e7432c62a4d03e.png = 100):
+### Рассмотрение ближайших аналогов ![test](http://i99.fastpic.ru/big/2018/0308/3e/e89ebb8915c6ddc552e7432c62a4d03e.png =100):
 * [Google calendar](https://calendar.google.com/calendar/r)
 * [Centrallo](https://centrallo.com/)
 * [Todoist](https://ru.todoist.com/)
 * [TickTick](https://ticktick.com/)
 ### Рассмотренные проекты:
-##### Google calendar ![test](http://i99.fastpic.ru/big/2018/0308/3e/e89ebb8915c6ddc552e7432c62a4d03e.png = 100)
+##### Google calendar ![test](http://i99.fastpic.ru/big/2018/0308/3e/e89ebb8915c6ddc552e7432c62a4d03e.png =100)
 * minus:
   * Отсутствие командного планирования
 * plus:
   * Очень гибкая работа с датами и промежутками времени
   * Дезигн
 - - - -
-##### Centrallo ![test](http://i99.fastpic.ru/big/2018/0308/3e/e89ebb8915c6ddc552e7432c62a4d03e.png = 100)
+##### Centrallo ![test](http://i99.fastpic.ru/big/2018/0308/3e/e89ebb8915c6ddc552e7432c62a4d03e.png =100)
 * minus:
   * Много платного контента, например количество записок, гибкая работа с датами
 * plus:
