@@ -1,4 +1,4 @@
-from src import enums
+import enums
 
 
 class Status(enums.Enum):
