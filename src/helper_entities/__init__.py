@@ -6,6 +6,9 @@ __all__ = []
 
 import pkgutil
 import inspect
+from datetime import datetime
+
+predefined_time = datetime.today()
 
 for loader, name, is_pkg in pkgutil.walk_packages(__path__):
     module = loader.find_module(name).load_module(name)
