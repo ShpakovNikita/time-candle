@@ -1,8 +1,7 @@
 from src import adapters as a
-from task import Task
+from main_instances.task import Task
 from enums.priority import Priority
 from helper_entities.controllers import BehaviorController
-import  json
 
 TASK_FILE = "task_"
 
