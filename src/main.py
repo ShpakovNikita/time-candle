@@ -1,6 +1,7 @@
 from adapters import task_adapter
 from main_instances.task import Task
 from main_instances.user import User
+import config_parser
 
 # TODO: cut down lower part of the code from this module
 
@@ -12,7 +13,7 @@ def main():
     print(created_task.__dict__)
     task_adapter.save(created_task)
     """
-    usr = User.new_user("Sanya")
+    usr = config_parser.run_config()['user']
     usr.say_hi()
 
 
