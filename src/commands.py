@@ -1,4 +1,14 @@
-def login():
+import config_parser
+from main_instances.user import User
+
+
+def login(user, password):
+    """
+    Writes current user to the config.ini
+    :param user: string
+    :param password: string
+    :return: Nothing
+    """
     pass
 
 

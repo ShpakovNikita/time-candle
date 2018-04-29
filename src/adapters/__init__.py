@@ -20,7 +20,6 @@ for loader, name, is_pkg in pkgutil.walk_packages(__path__):
         globals()[name] = value
         __all__.append(name)
 
-print(__all__)
 
 # Database will be represented as directories with multiple files, each file
 # contains data for a specific object. Later it will be, maybe, divided by

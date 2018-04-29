@@ -85,7 +85,7 @@ def run():
 
     if parsed.action == _Args.LOGIN.long:
         print(parsed.login, parsed.password)
-        commands.login()
+        commands.login(parsed.login, parsed.password)
 
     # _test_help()
 
@@ -119,18 +119,25 @@ commands parser module.
 
 
 def _init_add_user_parser(root_args):
+    # create new parser for adduser command
     user = root_args.add_parser(_Args.ADD_USER.long,
                                 help=_Args.ADD_USER.docstring)
+
+    # define two positional arguments login password
     user.add_argument('login', help='user login')
     user.add_argument('password', help='user password')
 
 
 def _init_add_task_parser(root_args):
+    # create new parser for addtask command
     root_args.add_parser(_Args.ADD_TASK.long, help=_Args.ADD_TASK.docstring)
 
 
 def _init_login_parser(root_args):
+    # create new parser for login command
     user = root_args.add_parser(_Args.LOGIN.long,
                                 help=_Args.LOGIN.docstring)
+
+    # define two positional arguments login password
     user.add_argument('login', help='user login')
     user.add_argument('password', help='user password')

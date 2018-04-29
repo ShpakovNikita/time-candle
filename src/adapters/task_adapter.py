@@ -2,8 +2,13 @@ import adapters as a
 from main_instances.task import Task
 from enums.priority import Priority
 from helper_entities.controllers import BehaviorController
+from peewee import *
 
 TASK_FILE = "task_"
+
+
+class Task(Model):
+    pass
 
 
 def save(task, intend=4):
