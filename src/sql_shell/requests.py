@@ -7,12 +7,12 @@ def get_last_id():
     return 1
 
 
-def find_name(name):
+def find_user(login):
     """
     Find name of the user in database. If not, return None
     :return:
     """
     if True:
-        return name
+        return {'uid': 1, 'preferences': {'password': '1111'}}
     else:
         return None

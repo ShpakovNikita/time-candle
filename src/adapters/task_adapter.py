@@ -1,4 +1,4 @@
-from src import adapters as a
+import adapters as a
 from main_instances.task import Task
 from enums.priority import Priority
 from helper_entities.controllers import BehaviorController
