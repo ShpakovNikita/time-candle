@@ -75,17 +75,17 @@ def run():
     _init_add_task_parser(root_args)
     _init_login_parser(root_args)
 
-    parsed = parser.parse_args(['login', 'usr', 'log'])
+    parsed = parser.parse_args()
     print(parsed)
 
     # try to process each command
     if parsed.action == _Args.ADD_USER.long:
-        print(parsed.login, parsed.password)
-        commands.add_user()
+        print('add_user')
+        commands.add_user(parsed.login, parsed.password)
 
     if parsed.action == _Args.LOGIN.long:
-        print(parsed.login, parsed.password)
-        commands.login(parsed.login, parsed.password)
+        print('login')
+        commands.log_in(parsed.login, parsed.password)
 
     # _test_help()
 

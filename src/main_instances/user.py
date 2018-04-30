@@ -1,5 +1,5 @@
 import sql_shell.requests
-import sql_shell.exceptions
+import exceptions.exceptions
 from helper_entities.settings import Settings
 
 
@@ -34,7 +34,7 @@ class User:
 
         # uid = sql_shell.requests.get_last_id() + 1
         if field_dict is None:
-            raise sql_shell.exceptions.InvalidLoginException()
+            raise exceptions.exceptions.InvalidLoginException()
 
         preferences = Settings(field_dict['preferences']['password'],
                                None, None, None, None)

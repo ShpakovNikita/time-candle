@@ -1,6 +1,6 @@
 import configparser
 from main_instances.user import User
-import sql_shell.exceptions
+import exceptions.exceptions
 
 CONFIG_NAME = 'config.ini'
 
@@ -31,7 +31,7 @@ def run_config():
         return config_dict
 
     except KeyError:
-        raise sql_shell.exceptions.InvalidLoginException
+        raise exceptions.exceptions.InvalidLoginException
 
 
 def write_config(user):
@@ -39,3 +39,15 @@ def write_config(user):
     config = configparser.ConfigParser()
     config['user'] = user.login
     config['password'] = user.password
+
+
+def write_user(login, password):
+    config = configparser.ConfigParser()
+    config.read(CONFIG_NAME)
+
+    config['user']['name'] = login
+    config['user']['password'] = password
+
+    with open(CONFIG_NAME, 'w') as configfile:
+        config.write(configfile)
+

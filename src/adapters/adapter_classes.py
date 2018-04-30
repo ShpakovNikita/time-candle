@@ -1,5 +1,7 @@
 from peewee import *
+import exceptions.db_exceptions as db_e
 import os
+import config_parser
 # from adapters.project_adapter import Project
 
 db_filename = 'data.db'
@@ -18,12 +20,12 @@ class User(Model):
 
     # settings field
     password = CharField()
-    mail = CharField(unique=True)
-    nickname = CharField()
+    mail = CharField(null=True)
+    nickname = CharField(default='')
 
     # time_zone will be saved in the form of shift in milliseconds
-    time_zone = IntegerField()
-    about = CharField()
+    time_zone = IntegerField(default=0)
+    about = CharField(default='')
 
     class Meta:
         database = db
@@ -39,7 +41,7 @@ class Task(Model):
     project = ForeignKeyField(User, related_name='project', null=True)
     status = SmallIntegerField()
     # TODO: Nani???
-    # parent = ForeignKeyField(Task, related_name='parent')
+    parent = ForeignKeyField('self', related_name='parent', null=True)
 
     parent = BigIntegerField()
     priority = SmallIntegerField()
@@ -97,9 +99,30 @@ class TagTaskRelation(Model):
 # but for not we have only deadline time. So simple.
 
 
-# only test functions
-def _test():
-    user1 = User.create()
+# only test functions. They will be changed or removed
+def _test_add_user(login, password):
+    if User.select().where(User.login == login).exists():
+        raise db_e.InvalidLoginError(db_e.LoginMessages.USER_EXISTS)
+
+    user = User.create(login=login,
+                       password=password,
+                       about='Hello, it\'s me, {}'.format(login))
+    if not user.nickname:
+        user.nickname = user.login
+        user.save()
+
+
+def _test_login(login, password):
+    query = User.select().where(User.login == login)
+    if not query.exists():
+        raise db_e.InvalidLoginError(db_e.LoginMessages.USER_NOT_EXISTS)
+
+    elif query.get().password != password:
+        raise db_e.InvalidPasswordError(db_e.PasswordMessages.
+                                        PASSWORD_IS_NOT_MATCH)
+
+    else:
+        config_parser.write_user(login, password)
 
 
 def _run():
@@ -110,8 +133,8 @@ def _run():
     Task.create_table()
     print("Database created!")
 
-    _test()
-
 
 if new_db_flag:
     _run()
+
+# _test_add_user('Not_Andy', 'Drowathlon666')
