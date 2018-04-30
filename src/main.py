@@ -1,5 +1,3 @@
-
-from adapters import task_adapter
 from main_instances.task import Task
 from main_instances.user import User
 import commands_parser

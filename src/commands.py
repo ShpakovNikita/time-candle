@@ -1,5 +1,7 @@
 import config_parser
 from main_instances.user import User
+import os
+from adapters import *
 
 
 def login(user, password):

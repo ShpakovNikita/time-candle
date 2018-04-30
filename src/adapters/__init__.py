@@ -4,11 +4,12 @@ to remove, store, pull and add data to the DB.
 
 """
 
-__all__ = []
 
 import pkgutil
 import inspect
 import os
+
+__all__ = []
 
 for loader, name, is_pkg in pkgutil.walk_packages(__path__):
     module = loader.find_module(name).load_module(name)
