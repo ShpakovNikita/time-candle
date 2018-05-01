@@ -1,7 +1,8 @@
 from enums.priority import Priority
+from enums.status import Status
 from helper_entities import controllers
-from datetime import datetime, date, time as t
-import json
+from datetime import datetime, date, time
+import app_logger
 
 
 class Task:
@@ -10,30 +11,36 @@ class Task:
     """
 
     def __init__(self,
-                 uid=-1,
-                 creator_uid=-1,
-                 tid=-1,
-                 pid=-1,
-                 t_status=None,
-                 tags=[],
-                 childs=[],
-                 t_priority=Priority.MEDIUM,
-                 parent=None,
-                 controller=None,
-                 comment='',
-                 chat=None):
-        self._uid = uid
-        self._creator_uid = creator_uid
-        self._tid = tid
-        self._pid = pid
-        self._status = t_status
-        self._tags = tags
-        self._childs = childs
-        self._priority = t_priority
-        self._parent = parent
-        self._controller = controller
-        self._comment = comment
-        self._chat = chat
+                 uid_,
+                 creator_uid_,
+                 tid_,
+                 # Replace later with the controller
+                 deadline_,
+                 title_,
+                 pid_=None,
+                 status_=Status.IN_PROGRESS,
+                 priority_=Priority.MEDIUM,
+                 parent_=None,
+                 # instead of controller for now we have only deadline
+                 # controller=None
+                 comment_='',
+                 chat_=None):
+        app_logger.custom_logger('model').debug('creating a task...')
+
+        self.uid = uid_
+        self.creator_uid = creator_uid_
+        self.tid = tid_
+        self.pid = pid_
+        self.title = title_
+        self.status = status_
+        self.tags = []
+        self.childs = []
+        self.priority = priority_
+        self.parent = parent_
+        # self._controller = controller
+        self.deadline = deadline_
+        self.comment = comment_
+        self.chat = chat_
 
     def __call__(self, *args, **kwargs):
         pass
@@ -57,5 +64,5 @@ class Task:
         else:
             raise ValueError("Time must be an object of type datetime")
 
-        return cls(controller=controller, t_priority=t_priority)
+        return None
 

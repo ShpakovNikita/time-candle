@@ -11,7 +11,7 @@ def custom_logger(logger_name):
     stylish and useful messages in our app
     :param logger_name: name of the logger in the logging.conf
     :type logger_name: String
-    :return:
+    :return: Logger, in which you may call all needed logging module functions
     """
     global _loggers
 

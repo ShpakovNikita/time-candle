@@ -4,20 +4,20 @@ class User:
     you must be sure that your data is RIGHT and CLEAR (i.e validated)
     """
     def __init__(self,
-                 uid,
-                 login,
-                 password,
-                 time_zone,
-                 nickname,
-                 about):
-        self._own_tasks = []
-        self._projects = []
-        self._uid = uid
-        self._login = login
-        self._nickname = nickname
-        self._password = password
-        self._time_zone = time_zone
-        self._about = about
+                 uid_,
+                 login_,
+                 password_,
+                 time_zone_,
+                 nickname_,
+                 about_):
+        self.own_tasks = []
+        self.projects = []
+        self.uid = uid_
+        self.login = login_
+        self.nickname = nickname_
+        self.password = password_
+        self.time_zone = time_zone_
+        self.about = about_
 
     def say_hi(self):
-        print('hello, I\'m {}'.format(self._nickname))
+        print('hello, I\'m {}'.format(self.nickname))

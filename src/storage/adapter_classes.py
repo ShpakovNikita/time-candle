@@ -51,10 +51,12 @@ class Task(Model):
     # TODO: Nani???
     parent = ForeignKeyField('self', related_name='parent', null=True)
 
+    title = CharField()
     priority = SmallIntegerField()
-    # Time in milliseconds
-    deadline_time = BigIntegerField()
-    comment = CharField()
+
+    # Time in milliseconds. Nullable for further functionality TODO:
+    deadline_time = BigIntegerField(null=True)
+    comment = CharField(default='')
 
     # Chat will be organized later. But we are planning to create a new
     # relations table that will be holding task id, message id (not necessary),
@@ -97,6 +99,8 @@ class TagTaskRelation(Model):
 
 # Maybe it is wise to create another relations table with the time rules and etc
 # but for not we have only deadline time. So simple.
+
+# TODO: chat task relations table witch maybe messages
 
 
 # only test functions. They will be changed or removed
@@ -156,5 +160,3 @@ def _run():
 
 if new_db_flag:
     _run()
-
-# _test_add_user('Not_Andy', 'Drowathlon666')

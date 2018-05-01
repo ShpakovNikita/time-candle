@@ -1,4 +1,5 @@
 import re
+from datetime import datetime, date, time
 
 
 def check_mail(mail):
@@ -22,3 +23,21 @@ def check_mail(mail):
 
     if re.match(raw_mail_pattern, mail) is None:
         raise ValueError("Please, input correct email")
+
+
+def get_milliseconds(formatted_time):
+    """
+    This function returns time in milliseconds according to the given formatted
+    time
+    :param formatted_time: Time in following format: YYYY-MM-DD HH:MM:SS
+    :type formatted_time: String
+    :return: Int
+    """
+
+    # TODO: Real validator
+    try:
+        return datetime.strptime(formatted_time, "%Y-%m-%d")
+    except ValueError:
+        msg = "Not a valid date: '{0}'.".format(formatted_time)
+        raise ValueError(msg)
+        # TODO: own exception

@@ -136,7 +136,15 @@ def _init_add_user_parser(root_args):
 
 def _init_add_task_parser(root_args):
     # create new parser for addtask command
-    root_args.add_parser(_Args.ADD_TASK.long, help=_Args.ADD_TASK.docstring)
+    task = root_args.add_parser(_Args.ADD_TASK.long,
+                                help=_Args.ADD_TASK.docstring)
+    task.add_argument('title', help='task\'s title')
+    task.add_argument('--priority', nargs=1, help='task\'s priority, that can '
+                                                  'be changed later')
+    task.add_argument('--status', nargs=1, help='task\'s status, that can be '
+                                                'changed later')
+    task.add_argument('--time', nargs=2, help='task\'s time, that cannot be '
+                                              'changed later')
 
 
 def _init_login_parser(root_args):
@@ -150,6 +158,7 @@ def _init_login_parser(root_args):
 
 
 # Process parsed arguments
+# TODO: Change everything on getattr
 
 
 def _process_login(parsed_args):
@@ -159,7 +168,10 @@ def _process_login(parsed_args):
 
 def _process_add_task(parsed_args):
     app_logger.custom_logger(MODULE_LOGGER_NAME).debug('add_task')
-    commands.add_task()
+    commands.add_task(parsed_args.title,
+                      parsed_args.priority,
+                      parsed_args.status,
+                      parsed_args.time)
 
 
 def _process_add_user(parsed_args):

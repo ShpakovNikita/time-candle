@@ -28,7 +28,8 @@ def run_config():
 
         # Create user by it's name and password. If it exists, we will get it
         # from database
-        app_logger.custom_logger('model').debug('{} {}'.format(login, password))
+        app_logger.custom_logger('model').debug('login has been set {} {}'.
+                                                format(login, password))
         config_dict['user'] = storage.user_adapter.get_user(login, password)
         return config_dict
 
