@@ -101,18 +101,36 @@ class TagTaskRelation(Model):
 
 # only test functions. They will be changed or removed
 def _test_add_user(login, password):
+    """
+    This function if checking is current user exists, and if so we are raising
+    an exception. Or we are adding it to the database.
+    :param login: String
+    :param password: String
+    :return: None
+    """
     if User.select().where(User.login == login).exists():
         raise db_e.InvalidLoginError(db_e.LoginMessages.USER_EXISTS)
 
     user = User.create(login=login,
                        password=password,
                        about='Hello, it\'s me, {}'.format(login))
+
+    # Maybe it is better to fix it in another way. Here we are defining nickname
+    # same as the login
     if not user.nickname:
         user.nickname = user.login
         user.save()
 
 
 def _test_login(login, password):
+    """
+    This function checking if selected login and password matches to the
+    database and if so, we make next session from the logged user's name (user
+    data is written to the config file). Or we are raising an exception.
+    :param login: String
+    :param password: String
+    :return: None
+    """
     query = User.select().where(User.login == login)
     if not query.exists():
         raise db_e.InvalidLoginError(db_e.LoginMessages.USER_NOT_EXISTS)
@@ -121,6 +139,8 @@ def _test_login(login, password):
         raise db_e.InvalidPasswordError(db_e.PasswordMessages.
                                         PASSWORD_IS_NOT_MATCH)
 
+    # Due to this function is just for checking, it is wise to relocate lower
+    # code to the inner function
     else:
         config_parser.write_user(login, password)
 

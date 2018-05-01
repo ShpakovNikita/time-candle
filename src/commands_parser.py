@@ -1,6 +1,10 @@
 import argparse
 from collections import namedtuple
 import commands
+import app_logger
+
+
+MODULE_LOGGER_NAME = 'controller'
 
 
 class _Args:
@@ -61,7 +65,7 @@ def run():
     """
     This function runs parser module to parse command line arguments and form
     specific requests to our main model
-    :return: Nothing
+    :return: None
     """
     parser = argparse.ArgumentParser(prog='time_candle')
 
@@ -76,16 +80,17 @@ def run():
     _init_login_parser(root_args)
 
     parsed = parser.parse_args()
-    print(parsed)
+    app_logger.custom_logger(MODULE_LOGGER_NAME).debug(parsed)
 
     # try to process each command
     if parsed.action == _Args.ADD_USER.long:
-        print('add_user')
-        commands.add_user(parsed.login, parsed.password)
+        _process_add_user(parsed)
 
     if parsed.action == _Args.LOGIN.long:
-        print('login')
-        commands.log_in(parsed.login, parsed.password)
+        _process_login(parsed)
+
+    if parsed.action == _Args.ADD_TASK.long:
+        _process_add_task(parsed)
 
     # _test_help()
 
@@ -116,6 +121,7 @@ def _test_help():
 The functions below are private. So do not use it int any cases outside this 
 commands parser module.
 """
+# Initialize parsers
 
 
 def _init_add_user_parser(root_args):
@@ -141,3 +147,21 @@ def _init_login_parser(root_args):
     # define two positional arguments login password
     user.add_argument('login', help='user login')
     user.add_argument('password', help='user password')
+
+
+# Process parsed arguments
+
+
+def _process_login(parsed_args):
+    app_logger.custom_logger(MODULE_LOGGER_NAME).debug('login')
+    commands.log_in(parsed_args.login, parsed_args.password)
+
+
+def _process_add_task(parsed_args):
+    app_logger.custom_logger(MODULE_LOGGER_NAME).debug('add_task')
+    commands.add_task()
+
+
+def _process_add_user(parsed_args):
+    app_logger.custom_logger(MODULE_LOGGER_NAME).debug('add_user')
+    commands.add_user(parsed_args.login, parsed_args.password)
