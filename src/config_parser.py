@@ -1,6 +1,7 @@
 import configparser
-from main_instances.user import User
+import app_logger
 import exceptions.exceptions
+import storage.user_adapter
 
 CONFIG_NAME = 'config.ini'
 
@@ -22,12 +23,13 @@ def run_config():
     # initialized instances
     config_dict = {}
     try:
-        user_name = config['user']['name']
+        login = config['user']['name']
         password = config['user']['password']
 
         # Create user by it's name and password. If it exists, we will get it
         # from database
-        config_dict['user'] = User.create_user(user_name, password)
+        app_logger.custom_logger('model').debug('{} {}'.format(login, password))
+        config_dict['user'] = storage.user_adapter.get_user(login, password)
         return config_dict
 
     except KeyError:
@@ -50,4 +52,3 @@ def write_user(login, password):
 
     with open(CONFIG_NAME, 'w') as configfile:
         config.write(configfile)
-

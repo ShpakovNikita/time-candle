@@ -2,7 +2,8 @@ from peewee import *
 import exceptions.db_exceptions as db_e
 import os
 import config_parser
-# from adapters.project_adapter import Project
+import app_logger
+# from storage.project_adapter import Project
 
 db_filename = 'data.db'
 new_db_flag = not os.path.exists(db_filename)
@@ -12,7 +13,7 @@ db = SqliteDatabase(db_filename)
 class User(Model):
     # user fields
     # for UserModel's own_tasks we have a relation field in Task class from
-    # adapters.task_adapter
+    # storage.task_adapter
 
     # TODO: Nani???
     # projects [] -> see the UserProjectRelation table
@@ -31,6 +32,13 @@ class User(Model):
         database = db
 
 
+class Project(Model):
+    admin = ForeignKeyField(User, related_name='admin')
+
+    class Meta:
+        database = db
+
+
 class Task(Model):
     creator = ForeignKeyField(User, related_name='creator')
 
@@ -43,7 +51,6 @@ class Task(Model):
     # TODO: Nani???
     parent = ForeignKeyField('self', related_name='parent', null=True)
 
-    parent = BigIntegerField()
     priority = SmallIntegerField()
     # Time in milliseconds
     deadline_time = BigIntegerField()
@@ -57,13 +64,6 @@ class Task(Model):
         database = db
 
 
-class Project(Model):
-    admin = ForeignKeyField(User, related_name='admin')
-
-    class Meta:
-        database = db
-
-
 class UserProjectRelation(Model):
     """
     This class is class for connecting projects and users, because one user can
@@ -72,7 +72,7 @@ class UserProjectRelation(Model):
     project have.
     """
 
-    user = ForeignKeyField(User, related_name='user')
+    user = ForeignKeyField(User, related_name='user', primary_key=True)
     project = ForeignKeyField(Project, related_name='projects')
     rights = SmallIntegerField()
 
@@ -151,7 +151,7 @@ def _run():
     UserProjectRelation.create_table()
     TagTaskRelation.create_table()
     Task.create_table()
-    print("Database created!")
+    app_logger.custom_logger('storage').debug("Database created")
 
 
 if new_db_flag:
