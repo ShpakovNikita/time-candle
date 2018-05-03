@@ -2,7 +2,7 @@ import storage.adapter_classes
 from main_instances.user import User as UserInstance
 from storage.adapter_classes import User, Task
 import exceptions.db_exceptions as db_e
-
+from peewee import *
 
 def get_user(login, password):
     """
@@ -15,7 +15,13 @@ def get_user(login, password):
     :return: User
     """
     query = User.select().where(User.login == login)
-    obj = query.get()
+    try:
+        obj = query.get()
+
+    except DoesNotExist:
+        raise db_e.InvalidLoginError(str(db_e.LoginMessages.USER_NOT_EXISTS) +
+                                     ', try to login again')
+
     if not query.exists():
         raise db_e.InvalidLoginError(db_e.LoginMessages.USER_NOT_EXISTS)
 

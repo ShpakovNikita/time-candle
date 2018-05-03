@@ -37,7 +37,7 @@ class _Args:
                         or project""")
     # task priority
     PRIORITY = Argument(long='priority',
-                        short='p',
+                        short='r',
                         docstring="""task\'s priority, that can be changed 
                         later""")
 
@@ -51,6 +51,21 @@ class _Args:
     STATUS = Argument(long='status',
                       short='s',
                       docstring="""task\'s status, that can be changed later""")
+
+    # task comment
+    COMMENT = Argument(long='comment',
+                       short='m',
+                       docstring="""task\'s comment for short explanations, up 
+                       to 255 symbols""")
+
+    # task parent
+    # TODO: low planks of priority and status
+    PARENT = Argument(long='parent',
+                      short='p',
+                      docstring="""task\'s parent. This is need for dividing
+                      tasks on sub tusks. Parent's low plank of priority and
+                      status marks on it's all childs. To create parent task
+                      pass parent's id to this argument""")
 
     # clear_log tree arguments
     CLEAR_LOG = Argument(long='clearlog',
@@ -148,13 +163,27 @@ def _init_add_task_parser(root_args):
                       _Args.prefix().PRIORITY.short,
                       help=_Args.PRIORITY.docstring,
                       nargs=1)
+
     task.add_argument(_Args.prefix().STATUS.long,
                       _Args.prefix().STATUS.short,
                       help=_Args.STATUS.docstring,
                       nargs=1)
+
     task.add_argument(_Args.prefix().TIME.long,
                       _Args.prefix().TIME.short,
                       help=_Args.TIME.docstring,
+                      nargs=1)
+
+    task.add_argument(_Args.prefix().PARENT.long,
+                      _Args.prefix().PARENT.short,
+                      help=_Args.PARENT.docstring,
+                      type=int,
+                      nargs=1)
+
+    task.add_argument(_Args.prefix().COMMENT.long,
+                      _Args.prefix().COMMENT.short,
+                      help=_Args.COMMENT.docstring,
+                      default=[''],
                       nargs=1)
 
 
@@ -179,10 +208,22 @@ def _process_login(parsed_args):
 
 def _process_add_task(parsed_args):
     app_logger.custom_logger(MODULE_LOGGER_NAME).debug('add_task')
+
+    # time, parent and comment is list value, so we have to extract data from it
+    time = None
+    if parsed_args.time is not None:
+        time = parsed_args.time[0]
+
+    parent = None
+    if parsed_args.parent is not None:
+        parent = parsed_args.parent[0]
+
     commands.add_task(parsed_args.title,
                       parsed_args.priority,
                       parsed_args.status,
-                      parsed_args.time)
+                      time,
+                      parent,
+                      parsed_args.comment[0])
 
 
 def _process_add_user(parsed_args):

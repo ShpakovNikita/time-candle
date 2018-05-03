@@ -2,6 +2,8 @@ from storage.adapter_classes import Task, User
 import storage
 from main_instances.task import Task as TaskInstance
 import app_logger
+import exceptions.db_exceptions
+from singleton import Singleton
 from peewee import *
 
 
@@ -14,15 +16,25 @@ def save(task):
     :type task: TaskInstance
     :return: None
     """
-    Task.create(creator=task.creator_uid,
-                receiver=task.uid,
-                project=None,
-                status=task.status,
-                # TODO change on id or normal task_adapter
-                parent=task.parent,
-                title=task.title,
-                priority=task.priority,
-                deadline_time=task.deadline)
+
+    # This code is checking is our parent tid exists in the database for logged
+    # user
+    if task.parent is not None:
+        _get_task_by_id(task.parent)
+
+    table_task = Task.create(creator=task.creator_uid,
+                             receiver=task.uid,
+                             project=None,
+                             status=task.status,
+                             # task.parent looks more beautiful then tid
+                             parent=task.parent,
+                             title=task.title,
+                             priority=task.priority,
+                             deadline_time=task.deadline,
+                             comment=task.comment)
+
+    app_logger.custom_logger('storage').debug('taks\'s parent %s' %
+                                              table_task.parent)
 
     app_logger.custom_logger('storage').debug('task saved to database')
 
@@ -47,3 +59,23 @@ def last_id():
     except:
         return 1
 
+
+def _get_task_by_id(tid):
+    """
+    This function finds task by id and current user in database and returns it,
+    or raise error due to incorrect request
+    :param tid: Task id to find
+    :type tid: Int
+    :return: Task (storage class)
+    """
+    # TODO: more flexible user dependency find for projects
+    task = Task.select().where((Task.id == tid) &
+                               ((Task.creator == Singleton.GLOBAL_USER.uid) |
+                                (Task.receiver == Singleton.GLOBAL_USER.uid)))
+    try:
+        return task.get()
+
+    # Yes, bad exception
+    except:
+        msg = 'There is no such tid %s in the database for your user' % tid
+        raise exceptions.db_exceptions.InvalidTidError(msg)

@@ -10,6 +10,7 @@ import storage.adapter_classes
 import storage.task_adapter
 import storage.user_adapter
 import validators
+from singleton import Singleton
 """
 This is commands module. Commands from argparse and django will go to this 
 module and it will help to separate argparser from the model. In this module 
@@ -34,14 +35,18 @@ def add_user(login, password):
     pass
 
 
-def add_task(title, priority, status, time):
+def add_task(title, priority, status, time, parent_id, comment):
     """
     This function will add passed task to the database, with the creator and
     executor that named in the config.ini (i.e current logged user)
+    :param comment: Task's comment for some detailed explanation
+    :param parent_id: Parent's task id
     :param time: Time in following format: YYYY-MM-DD HH:MM:SS
     :param title: Tasks title
     :param priority: Tasks priority (enum from Priority)
     :param status: Tasks status (enum from Status)
+    :type comment: String
+    :type parent_id: Int
     :type time: String
     :type title: String
     :type priority: Int
@@ -58,16 +63,17 @@ def add_task(title, priority, status, time):
 
     # get user from config.ini to make our task from it's name
     user = _login()
+    Singleton.GLOBAL_USER = user
 
     deadline_time = None
 
     if time is not None:
-        # time is list value, so we have to extract string from it
-        deadline_time = validators.get_milliseconds(time[0])
+        deadline_time = validators.get_milliseconds(time)
 
     app_logger.custom_logger('model').debug('time in milliseconds %s' %
                                             deadline_time)
 
+    # TODO: much status, priority fix
     task = TaskInstance(user.uid,
                         user.uid,
                         storage.task_adapter.last_id() + 1,
@@ -76,7 +82,9 @@ def add_task(title, priority, status, time):
                         title,
                         None,
                         status,
-                        priority)
+                        priority,
+                        parent_id,
+                        comment)
 
     app_logger.custom_logger('model').debug('task configured and ready to save'
                                             ', the task id is %s' % task.tid)

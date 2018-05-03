@@ -49,7 +49,7 @@ class Task(Model):
     project = ForeignKeyField(User, related_name='project', null=True)
     status = SmallIntegerField()
     # TODO: Nani???
-    parent = ForeignKeyField('self', related_name='parent', null=True)
+    parent = ForeignKeyField('self', null=True)
 
     title = CharField()
     priority = SmallIntegerField()
@@ -101,6 +101,7 @@ class TagTaskRelation(Model):
 # but for not we have only deadline time. So simple.
 
 # TODO: chat task relations table witch maybe messages
+# TODO: role tags relations?
 
 
 # only test functions. They will be changed or removed

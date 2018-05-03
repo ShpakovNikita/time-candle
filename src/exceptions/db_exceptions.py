@@ -33,3 +33,10 @@ class InvalidMailError(Exception):
     def __init__(self, message='The mail is invalid! {}', errors=None):
         super().__init__(message.format(errors))
         self.errors = errors
+
+
+# Task related things
+class InvalidTidError(Exception):
+    def __init__(self, message='The tid is invalid! {}', errors=None):
+        super().__init__(message.format(errors))
+        self.errors = errors
