@@ -3,6 +3,7 @@ import logging.config
 
 
 _loggers = []
+LOG_FILENAME = 'config.log'
 
 
 def custom_logger(logger_name):

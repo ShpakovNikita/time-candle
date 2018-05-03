@@ -1,5 +1,11 @@
 import re
 from datetime import datetime, date, time
+import app_logger
+import exceptions.exceptions
+
+
+# We will be storing data only from 1970 year
+epoch = datetime.utcfromtimestamp(1970)
 
 
 def check_mail(mail):
@@ -25,19 +31,75 @@ def check_mail(mail):
         raise ValueError("Please, input correct email")
 
 
+# This format is given only for example, you should specify it from the call
 def get_milliseconds(formatted_time):
     """
     This function returns time in milliseconds according to the given formatted
     time
-    :param formatted_time: Time in following format: YYYY-MM-DD HH:MM:SS
+    :param formatted_time: Time in following format of date_format
+    (%Y-%m-%d %H:%M:%S)
     :type formatted_time: String
     :return: Int
     """
 
-    # TODO: Real validator
+    date_format = '%Y-%m-%d %H:%M:%S'
+    app_logger.custom_logger('model').debug('passed time %s' % formatted_time)
+
     try:
-        return datetime.strptime(formatted_time, "%Y-%m-%d")
+        date_time = datetime.strptime(_time_get_formatted(formatted_time),
+                                      date_format)
+        app_logger.custom_logger('model').debug('date converted')
+
+        # Note that here we are subtracting 1970's to define them as lower point
+        final_time = (date_time - epoch).total_seconds() * 1000
+        if final_time < 0:
+            raise exceptions.exceptions.InvalidArgumentFormat('date must be '
+                                                              'from 1970\'s')
+
+        return int(final_time)
     except ValueError:
+        app_logger.custom_logger('model').warning('the date must be '
+                                                  + date_format)
         msg = "Not a valid date: '{0}'.".format(formatted_time)
-        raise ValueError(msg)
-        # TODO: own exception
+        raise exceptions.exceptions.InvalidArgumentFormat(msg)
+
+
+def _time_get_formatted(formatted_time):
+    """
+    This function returns formatted_time, but with the now's date if the date
+    is not pointed
+    :param formatted_time: string of formatted time
+    :type formatted_time: String
+    :return: String of format %Y-%m-%d %H:%M:%S to the strptime function
+    """
+    long_pattern = r'(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})'
+    short_pattern = r'(\d{2}):(\d{2}):(\d{2})'
+    if re.match(long_pattern, formatted_time):
+        app_logger.custom_logger('model').debug('date matched long pattern')
+        return formatted_time
+    elif re.match(short_pattern, formatted_time):
+        app_logger.custom_logger('model').debug('date matched short pattern')
+        date_string = datetime.strftime(datetime.now(), '%Y-%m-%d')
+        return date_string + ' ' + formatted_time
+    else:
+        app_logger.custom_logger('model').warning('the date must be '
+                                                  '%Y-%m-%d or %Y-%m-%d '
+                                                  '%H:%M:%S')
+        msg = "Not a valid date: '{0}'.".format(formatted_time)
+        raise exceptions.exceptions.InvalidArgumentFormat(msg)
+
+
+def get_datetime(milliseconds_time):
+    """
+    This function converts given data from database to the normal datetime class
+    according to the epoch variable
+    :param milliseconds_time: Time in milliseconds
+    :type milliseconds_time: Int
+    :return: DateTime
+    """
+
+    # we also have to add epoch to convert it to a normal datetime due to we
+    # store date time in milliseconds
+    final_time = datetime.fromtimestamp((milliseconds_time +
+                                         epoch.timestamp() * 1000) / 1000)
+    return final_time

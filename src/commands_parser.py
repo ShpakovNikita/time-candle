@@ -35,6 +35,27 @@ class _Args:
                         short='t',
                         docstring="""This argument adds a new task to the user 
                         or project""")
+    # task priority
+    PRIORITY = Argument(long='priority',
+                        short='p',
+                        docstring="""task\'s priority, that can be changed 
+                        later""")
+
+    # task time
+    TIME = Argument(long='time',
+                    short='t',
+                    docstring="""task\'s time, cannot be changed later. If
+                    not passed, then time is not determent""")
+
+    # task status
+    STATUS = Argument(long='status',
+                      short='s',
+                      docstring="""task\'s status, that can be changed later""")
+
+    # clear_log tree arguments
+    CLEAR_LOG = Argument(long='clearlog',
+                         short='l',
+                         docstring="""This argument clears output logs""")
 
     _with_prefix = None
 
@@ -79,6 +100,10 @@ def run():
     _init_add_task_parser(root_args)
     _init_login_parser(root_args)
 
+    # simple clear log arg
+    root_args.add_parser(_Args.CLEAR_LOG.long,
+                         help=_Args.CLEAR_LOG.docstring)
+
     parsed = parser.parse_args()
     app_logger.custom_logger(MODULE_LOGGER_NAME).debug(parsed)
 
@@ -92,29 +117,9 @@ def run():
     if parsed.action == _Args.ADD_TASK.long:
         _process_add_task(parsed)
 
-    # _test_help()
-
-
-def _test_help():
-    # Just for tip
-    # create the top-level parser
-    parser = argparse.ArgumentParser(prog='PROG', prefix_chars='--')
-    # root_subparsers = parser.add_subparsers(dest=ParseArguments.action)
-    parser.add_argument('--foo', action='store_true', help='foo help')
-    subparsers = parser.add_subparsers(help='sub-command help')
-
-    # create the parser for the "a" command
-    parser_a = subparsers.add_parser('a', help='a help')
-    parser_a.add_argument('--bar', type=int, help='bar help')
-
-    # create the parser for the "b" command
-    parser_b = subparsers.add_parser('b', help='b help')
-    parser_b.add_argument('baz', choices='XYZ', help='baz help')
-
-    # parse some argument lists
-    print(parser.parse_args(['--foo', 'a', '--bar', '12']))
-
-    print(parser.parse_args(['--foo', 'b', 'Z']))
+    if parsed.action == _Args.CLEAR_LOG.long:
+        open(app_logger.LOG_FILENAME, 'w').close()
+        app_logger.custom_logger('controller').info('log has been cleared')
 
 
 """
@@ -139,12 +144,18 @@ def _init_add_task_parser(root_args):
     task = root_args.add_parser(_Args.ADD_TASK.long,
                                 help=_Args.ADD_TASK.docstring)
     task.add_argument('title', help='task\'s title')
-    task.add_argument('--priority', nargs=1, help='task\'s priority, that can '
-                                                  'be changed later')
-    task.add_argument('--status', nargs=1, help='task\'s status, that can be '
-                                                'changed later')
-    task.add_argument('--time', nargs=2, help='task\'s time, that cannot be '
-                                              'changed later')
+    task.add_argument(_Args.prefix().PRIORITY.long,
+                      _Args.prefix().PRIORITY.short,
+                      help=_Args.PRIORITY.docstring,
+                      nargs=1)
+    task.add_argument(_Args.prefix().STATUS.long,
+                      _Args.prefix().STATUS.short,
+                      help=_Args.STATUS.docstring,
+                      nargs=1)
+    task.add_argument(_Args.prefix().TIME.long,
+                      _Args.prefix().TIME.short,
+                      help=_Args.TIME.docstring,
+                      nargs=1)
 
 
 def _init_login_parser(root_args):

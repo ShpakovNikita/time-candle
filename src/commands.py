@@ -9,6 +9,7 @@ from storage import *
 import storage.adapter_classes
 import storage.task_adapter
 import storage.user_adapter
+import validators
 """
 This is commands module. Commands from argparse and django will go to this 
 module and it will help to separate argparser from the model. In this module 
@@ -58,18 +59,27 @@ def add_task(title, priority, status, time):
     # get user from config.ini to make our task from it's name
     user = _login()
 
+    deadline_time = None
+
+    if time is not None:
+        # time is list value, so we have to extract string from it
+        deadline_time = validators.get_milliseconds(time[0])
+
+    app_logger.custom_logger('model').debug('time in milliseconds %s' %
+                                            deadline_time)
+
     task = TaskInstance(user.uid,
                         user.uid,
-                        storage.task_adapter.last_id(),
+                        storage.task_adapter.last_id() + 1,
                         # TODO: real time
-                        0,
+                        deadline_time,
                         title,
                         None,
                         status,
                         priority)
 
-    print(task.uid)
-    app_logger.custom_logger('model').debug('task configured and ready to save')
+    app_logger.custom_logger('model').debug('task configured and ready to save'
+                                            ', the task id is %s' % task.tid)
 
     storage.task_adapter.save(task)
 

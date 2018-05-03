@@ -21,7 +21,8 @@ def save(task):
                 # TODO change on id or normal task_adapter
                 parent=task.parent,
                 title=task.title,
-                priority=task.priority)
+                priority=task.priority,
+                deadline_time=task.deadline)
 
     app_logger.custom_logger('storage').debug('task saved to database')
 
