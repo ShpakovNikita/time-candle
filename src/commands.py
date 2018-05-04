@@ -4,11 +4,13 @@ from enums.status import Status
 from enums.priority import Priority
 from main_instances.user import User
 from main_instances.task import Task as TaskInstance
+from main_instances.project import Project as ProjectInstance
 import os
 from storage import *
 import storage.adapter_classes
 import storage.task_adapter
 import storage.user_adapter
+import storage.project_adapter
 import validators
 from singleton import Singleton
 """
@@ -20,19 +22,46 @@ also we have a validation for each case and conversion to the primary entities.
 
 def log_in(login, password):
     """
-    Writes current user to the config.ini
-    :param login: string
-    :param password: string
-    :return: Nothing
+    This function writes current user to the config.ini
+    :type login: String
+    :type password: String
+    :return: None
     """
     # TODO: Yes, it is protected member and it is bad to use it
     storage.adapter_classes._test_login(login, password)
 
 
 def add_user(login, password):
+    """
+    This function adds user to the database, if there is no users with given
+    login
+    :type login: String
+    :type password: String
+    :return: None
+    """
     # TODO: Yes, it is protected member and it is bad to use it
     storage.adapter_classes._test_add_user(login, password)
     pass
+
+
+def add_project(title, members):
+    """
+    This function adds a new project to the database with the creator from
+    logged user
+    :param title:
+    :param members:
+    :return: None
+    """
+
+    # TODO: make it to the final!
+    # get user from config.ini to make our project from it's name
+    user = _login()
+    Singleton.GLOBAL_USER = _login()
+
+    project = ProjectInstance(storage.project_adapter.last_id(),
+                              user.uid)
+
+    storage.project_adapter.save(project)
 
 
 def add_task(title, priority, status, time, parent_id, comment):

@@ -24,11 +24,30 @@ class _Args:
                         database or project, according to the given login and 
                         password, if it possible""")
 
+    PROJECT = Argument(long='project',
+                       short='p',
+                       docstring="""This argument adds a selected user from 
+                       database by login to the selected project. Specify by 
+                       project's id""")
+
     # login tree arguments
     LOGIN = Argument(long='login',
                      short='l',
                      docstring="""This argument make next sessions from the 
                      logged users, i. e. add tasks, show their tasks etc.""")
+
+    # add_project tree arguments
+    ADD_PROJECT = Argument(long='addproject',
+                           short='p',
+                           docstring="""This argument adds a new project with 
+                           the admin from the name of current user""")
+    # TODO: maybe delete creator id to have more flexible rights (but it's hard)
+
+    # project members
+    MEMBERS = Argument(long='members',
+                       short='m',
+                       docstring="""This argument specify logins of the users
+                       that will be added to the project""")
 
     # add_task tree arguments
     ADD_TASK = Argument(long='addtask',
@@ -114,6 +133,7 @@ def run():
     _init_add_user_parser(root_args)
     _init_add_task_parser(root_args)
     _init_login_parser(root_args)
+    _init_add_project_parser(root_args)
 
     # simple clear log arg
     root_args.add_parser(_Args.CLEAR_LOG.long,
@@ -135,6 +155,9 @@ def run():
     if parsed.action == _Args.CLEAR_LOG.long:
         open(app_logger.LOG_FILENAME, 'w').close()
         app_logger.custom_logger('controller').info('log has been cleared')
+
+    if parsed.action == _Args.ADD_PROJECT.long:
+        _process_add_project(parsed)
 
 
 """
@@ -158,6 +181,7 @@ def _init_add_task_parser(root_args):
     # create new parser for addtask command
     task = root_args.add_parser(_Args.ADD_TASK.long,
                                 help=_Args.ADD_TASK.docstring)
+
     task.add_argument('title', help='task\'s title')
     task.add_argument(_Args.prefix().PRIORITY.long,
                       _Args.prefix().PRIORITY.short,
@@ -185,6 +209,18 @@ def _init_add_task_parser(root_args):
                       help=_Args.COMMENT.docstring,
                       default=[''],
                       nargs=1)
+
+
+def _init_add_project_parser(root_args):
+    # create new parser for addproject command
+    project = root_args.add_parser(_Args.ADD_PROJECT.long,
+                                   help=_Args.ADD_PROJECT.docstring)
+
+    project.add_argument('title', help='project\'s title')
+    project.add_argument(_Args.prefix().MEMBERS.long,
+                         _Args.prefix().MEMBERS.short,
+                         help=_Args.MEMBERS.docstring,
+                         nargs='+')
 
 
 def _init_login_parser(root_args):
@@ -229,3 +265,9 @@ def _process_add_task(parsed_args):
 def _process_add_user(parsed_args):
     app_logger.custom_logger(MODULE_LOGGER_NAME).debug('add_user')
     commands.add_user(parsed_args.login, parsed_args.password)
+
+
+def _process_add_project(parsed_args):
+    app_logger.custom_logger(MODULE_LOGGER_NAME).debug('add_project')
+    commands.add_project(parsed_args.title,
+                         parsed_args.members)

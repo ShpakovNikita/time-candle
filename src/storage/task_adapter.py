@@ -55,8 +55,7 @@ def last_id():
     try:
         return query.get().id
 
-    # Yes, it is bad to make exceptions like this
-    except:
+    except DoesNotExist:
         return 1
 
 
@@ -75,7 +74,6 @@ def _get_task_by_id(tid):
     try:
         return task.get()
 
-    # Yes, bad exception
-    except:
+    except DoesNotExist:
         msg = 'There is no such tid %s in the database for your user' % tid
         raise exceptions.db_exceptions.InvalidTidError(msg)

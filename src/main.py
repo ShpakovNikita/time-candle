@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import commands_parser
 import app_logger
 import config_parser

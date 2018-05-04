@@ -4,6 +4,7 @@ from storage.adapter_classes import User, Task
 import exceptions.db_exceptions as db_e
 from peewee import *
 
+
 def get_user(login, password):
     """
     This function is like head function for all adapters. From this start point
