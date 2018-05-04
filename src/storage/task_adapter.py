@@ -16,17 +16,18 @@ def save(task):
     :type task: TaskInstance
     :return: None
     """
+    try:
+        Task.select().where(Task.id == task.tid).get()
+        update()
+        app_logger.custom_logger('storage').debug('task updated')
 
-    # This code is checking is our parent tid exists in the database for logged
-    # user
-    if task.parent is not None:
-        _get_task_by_id(task.parent)
+    except DoesNotExist:
+        app_logger.custom_logger('storage').debug('adding task...')
 
     table_task = Task.create(creator=task.creator_uid,
                              receiver=task.uid,
                              project=None,
                              status=task.status,
-                             # task.parent looks more beautiful then tid
                              parent=task.parent,
                              title=task.title,
                              priority=task.priority,
@@ -59,21 +60,53 @@ def last_id():
         return 1
 
 
-def _get_task_by_id(tid):
+def get_task_by_id(tid):
     """
     This function finds task by id and current user in database and returns it,
     or raise error due to incorrect request
     :param tid: Task id to find
     :type tid: Int
-    :return: Task (storage class)
+    :return: Task
     """
     # TODO: more flexible user dependency find for projects
     task = Task.select().where((Task.id == tid) &
                                ((Task.creator == Singleton.GLOBAL_USER.uid) |
                                 (Task.receiver == Singleton.GLOBAL_USER.uid)))
     try:
-        return task.get()
+        return _storage_to_model(task.get())
 
     except DoesNotExist:
         msg = 'There is no such tid %s in the database for your user' % tid
         raise exceptions.db_exceptions.InvalidTidError(msg)
+
+
+def update():
+    pass
+
+
+def _storage_to_model(storage_task):
+    """
+    This function converts storage task to model task
+    :type storage_task: Task
+    :return: TaskInstance
+    """
+    app_logger.custom_logger('storage').debug('convert storage to model task')
+    # we can have a None parent, so we have to determine this to take it's id or
+    # not
+    if storage_task.parent is None:
+        parent_id = None
+    else:
+        parent_id = storage_task.parent.id
+
+    model_task = TaskInstance(storage_task.receiver.id,
+                              storage_task.creator.id,
+                              storage_task.id,
+                              storage_task.deadline_time,
+                              storage_task.title,
+                              None,
+                              storage_task.status,
+                              storage_task.priority,
+                              parent_id,
+                              storage_task.comment)
+
+    return model_task

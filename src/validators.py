@@ -103,3 +103,10 @@ def get_datetime(milliseconds_time):
     final_time = datetime.fromtimestamp((milliseconds_time +
                                          epoch.timestamp() * 1000) / 1000)
     return final_time
+
+
+def not_null_do_action(arg1, arg2, action):
+    if arg1 is not None and arg2 is not None:
+        return action(arg1, arg2)
+    else:
+        return arg1

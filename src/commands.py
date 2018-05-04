@@ -17,6 +17,7 @@ from singleton import Singleton
 This is commands module. Commands from argparse and django will go to this 
 module and it will help to separate argparser from the model. In this module 
 also we have a validation for each case and conversion to the primary entities.
+Note, that we have to login anytime firstly before the actions from the user
 """
 
 
@@ -82,17 +83,24 @@ def add_task(title, priority, status, time, parent_id, comment):
     :type status: Int
     :return: None
     """
-    if priority is None:
-        app_logger.custom_logger('model').debug('Default priority has been set')
-        priority = Priority.MEDIUM
-
-    if status is None:
-        app_logger.custom_logger('model').debug('Default status has been set')
-        status = Status.IN_PROGRESS
-
     # get user from config.ini to make our task from it's name
     user = _login()
     Singleton.GLOBAL_USER = user
+
+    # This code is also checking is our parent tid exists in the database for
+    # logged user
+    if parent_id is not None:
+        parent_task = storage.task_adapter.get_task_by_id(parent_id)
+
+    if priority is None:
+        app_logger.custom_logger('model').debug('Default priority has been set')
+        priority = validators.not_null_do_action(Priority.MEDIUM,
+                                                 parent_task.priority, max)
+
+    if status is None:
+        app_logger.custom_logger('model').debug('Default status has been set')
+        status = validators.not_null_do_action(Status.IN_PROGRESS,
+                                               parent_task.status, max)
 
     deadline_time = None
 
@@ -106,7 +114,6 @@ def add_task(title, priority, status, time, parent_id, comment):
     task = TaskInstance(user.uid,
                         user.uid,
                         storage.task_adapter.last_id() + 1,
-                        # TODO: real time
                         deadline_time,
                         title,
                         None,

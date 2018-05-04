@@ -63,8 +63,8 @@ class _Args:
     # task time
     TIME = Argument(long='time',
                     short='t',
-                    docstring="""task\'s time, cannot be changed later. If
-                    not passed, then time is not determent""")
+                    docstring="""task\'s time, can be changed later. If not 
+                    passed, then time is not determent""")
 
     # task status
     STATUS = Argument(long='status',
@@ -86,11 +86,23 @@ class _Args:
                       status marks on it's all childs. To create parent task
                       pass parent's id to this argument""")
 
+    # remove task
+    REMOVE_TASK = Argument(long='removetask',
+                           short='rm',
+                           docstring="""Remove task from the database by id""")
+
+    # change task
+    CHANGE_TASK = Argument(long='changetask',
+                           short='c',
+                           docstring="""Changing one of the possible values to 
+                           the task by it's id and optional parameters""")
+
     # clear_log tree arguments
     CLEAR_LOG = Argument(long='clearlog',
                          short='l',
                          docstring="""This argument clears output logs""")
 
+    # TODO: split_task?
     _with_prefix = None
 
     @staticmethod
@@ -134,6 +146,8 @@ def run():
     _init_add_task_parser(root_args)
     _init_login_parser(root_args)
     _init_add_project_parser(root_args)
+    _init_change_task_parser(root_args)
+    _init_remove_task_parser(root_args)
 
     # simple clear log arg
     root_args.add_parser(_Args.CLEAR_LOG.long,
@@ -146,18 +160,24 @@ def run():
     if parsed.action == _Args.ADD_USER.long:
         _process_add_user(parsed)
 
-    if parsed.action == _Args.LOGIN.long:
+    elif parsed.action == _Args.LOGIN.long:
         _process_login(parsed)
 
-    if parsed.action == _Args.ADD_TASK.long:
+    elif parsed.action == _Args.ADD_TASK.long:
         _process_add_task(parsed)
 
-    if parsed.action == _Args.CLEAR_LOG.long:
+    elif parsed.action == _Args.CLEAR_LOG.long:
         open(app_logger.LOG_FILENAME, 'w').close()
         app_logger.custom_logger('controller').info('log has been cleared')
 
-    if parsed.action == _Args.ADD_PROJECT.long:
+    elif parsed.action == _Args.ADD_PROJECT.long:
         _process_add_project(parsed)
+
+    elif parsed.action == _Args.CHANGE_TASK.long:
+        _process_change_task(parsed)
+
+    elif parsed.action == _Args.REMOVE_TASK.long:
+        _process_remove_task(parsed)
 
 
 """
@@ -202,6 +222,42 @@ def _init_add_task_parser(root_args):
                       _Args.prefix().PARENT.short,
                       help=_Args.PARENT.docstring,
                       type=int,
+                      nargs=1)
+
+    task.add_argument(_Args.prefix().COMMENT.long,
+                      _Args.prefix().COMMENT.short,
+                      help=_Args.COMMENT.docstring,
+                      default=[''],
+                      nargs=1)
+
+
+def _init_remove_task_parser(root_args):
+    # create new parser for removetask command
+    task = root_args.add_parser(_Args.REMOVE_TASK.long,
+                                help=_Args.REMOVE_TASK.docstring)
+
+    task.add_argument('id', help='task\'s id to delete from database')
+
+
+def _init_change_task_parser(root_args):
+    # create new parser for changetask command
+    task = root_args.add_parser(_Args.CHANGE_TASK.long,
+                                help=_Args.CHANGE_TASK.docstring)
+
+    task.add_argument('id', help='task\'s id to change from database')
+    task.add_argument(_Args.prefix().PRIORITY.long,
+                      _Args.prefix().PRIORITY.short,
+                      help=_Args.PRIORITY.docstring,
+                      nargs=1)
+
+    task.add_argument(_Args.prefix().STATUS.long,
+                      _Args.prefix().STATUS.short,
+                      help=_Args.STATUS.docstring,
+                      nargs=1)
+
+    task.add_argument(_Args.prefix().TIME.long,
+                      _Args.prefix().TIME.short,
+                      help=_Args.TIME.docstring,
                       nargs=1)
 
     task.add_argument(_Args.prefix().COMMENT.long,
@@ -260,6 +316,14 @@ def _process_add_task(parsed_args):
                       time,
                       parent,
                       parsed_args.comment[0])
+
+
+def _process_change_task(parsed_args):
+    pass
+
+
+def _process_remove_task(parsed_args):
+    pass
 
 
 def _process_add_user(parsed_args):

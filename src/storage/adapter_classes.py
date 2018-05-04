@@ -3,7 +3,6 @@ import exceptions.db_exceptions as db_e
 import os
 import config_parser
 import app_logger
-# from storage.project_adapter import Project
 
 db_filename = 'data.db'
 new_db_flag = not os.path.exists(db_filename)
