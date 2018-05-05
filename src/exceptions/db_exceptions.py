@@ -12,7 +12,7 @@ class LoginMessages(Enum):
     # This is pre defined messages that will be associated with user all over
     # the project
     USER_EXISTS = 'Current user is already exists.'
-    USER_NOT_EXISTS = 'Current user is not exists.'
+    USER_DOES_NOT_EXISTS = 'Current user is not exists.'
     # TODO: ALREADY_LOGGED_IN
 
 
@@ -40,3 +40,9 @@ class InvalidTidError(Exception):
     def __init__(self, message='The tid is invalid! {}', errors=None):
         super().__init__(message.format(errors))
         self.errors = errors
+
+
+class TaskMessages(Enum):
+    # This is pre defined messages that will be associated with task all over
+    # the project
+    TASK_DOES_NOT_EXISTS = 'Selected task does not exists'

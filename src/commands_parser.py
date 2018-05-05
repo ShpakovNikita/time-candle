@@ -310,6 +310,7 @@ def _process_add_task(parsed_args):
     if parsed_args.parent is not None:
         parent = parsed_args.parent[0]
 
+    # TODO: multiple times
     commands.add_task(parsed_args.title,
                       parsed_args.priority,
                       parsed_args.status,
@@ -323,7 +324,8 @@ def _process_change_task(parsed_args):
 
 
 def _process_remove_task(parsed_args):
-    pass
+    app_logger.custom_logger(MODULE_LOGGER_NAME).debug('remove_task')
+    commands.remove_task(parsed_args.id)
 
 
 def _process_add_user(parsed_args):

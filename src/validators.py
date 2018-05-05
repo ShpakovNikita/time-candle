@@ -2,8 +2,10 @@ import re
 from datetime import datetime, date, time
 import app_logger
 import exceptions.exceptions
-
-
+"""
+This module is module for most validations some inner values and conversions. 
+Also it has some other mini helper functions.
+"""
 # We will be storing data only from 1970 year
 epoch = datetime.utcfromtimestamp(1970)
 
@@ -106,7 +108,9 @@ def get_datetime(milliseconds_time):
 
 
 def not_null_do_action(arg1, arg2, action):
-    if arg1 is not None and arg2 is not None:
+    # if the first argument is not none then return action of two args, else
+    # return first arg
+    if arg1 is not None:
         return action(arg1, arg2)
     else:
         return arg1

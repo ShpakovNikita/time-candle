@@ -128,6 +128,16 @@ def add_task(title, priority, status, time, parent_id, comment):
     storage.task_adapter.save(task)
 
 
+def remove_task(tid):
+    """
+    This function removes selected task and it's all childs recursively or
+    raises an exception if task does not exists
+    :param tid: Tasks id
+    :return: None
+    """
+    storage.task_adapter.remove_task_by_id(tid)
+
+
 def _login():
     """
     Returns loaded user to make some actions from it's name. User will be

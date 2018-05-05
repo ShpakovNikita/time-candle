@@ -20,15 +20,15 @@ def get_user(login, password):
         obj = query.get()
 
     except DoesNotExist:
-        raise db_e.InvalidLoginError(str(db_e.LoginMessages.USER_NOT_EXISTS) +
-                                     ', try to login again')
+        raise db_e.InvalidLoginError(str(db_e.LoginMessages.USER_DOES_NOT_EXISTS
+                                         ) + ', try to login again')
 
     if not query.exists():
-        raise db_e.InvalidLoginError(db_e.LoginMessages.USER_NOT_EXISTS)
+        raise db_e.InvalidLoginError(db_e.LoginMessages.USER_DOES_NOT_EXISTS)
 
     elif obj.password != password:
         raise db_e.InvalidPasswordError(db_e.PasswordMessages.
-                                        PASSWORD_IS_NOT_MATCH)
+                                        PASSWORD_DOES_IS_NOT_MATCH)
 
     return UserInstance(obj.id,
                         obj.login,

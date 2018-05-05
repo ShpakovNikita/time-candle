@@ -2,7 +2,7 @@ from storage.adapter_classes import Task, User
 import storage
 from main_instances.task import Task as TaskInstance
 import app_logger
-import exceptions.db_exceptions
+import exceptions.db_exceptions as db_e
 from singleton import Singleton
 from peewee import *
 
@@ -60,6 +60,29 @@ def last_id():
         return 1
 
 
+def remove_task_by_id(tid):
+    """
+    This function removes selected task and it's all childs recursively or
+    raises an exception if task does not exists
+    :param tid: Tasks id
+    :return: None
+    """
+    # TODO: Is that good to have a recursive try except?
+    try:
+        query = Task.select().where(Task.parent == tid)
+        for task in query:
+            remove_task_by_id(task.id)
+
+        app_logger.custom_logger('storage').info('removing task by tid %s' %
+                                                 tid)
+        Task.delete().where(Task.id == tid).execute()
+    except DoesNotExist:
+        app_logger.custom_logger('storage').info('There is no such tid %s in '
+                                                 'the database for your user' %
+                                                 tid)
+        raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
+
+
 def get_task_by_id(tid):
     """
     This function finds task by id and current user in database and returns it,
@@ -76,8 +99,10 @@ def get_task_by_id(tid):
         return _storage_to_model(task.get())
 
     except DoesNotExist:
-        msg = 'There is no such tid %s in the database for your user' % tid
-        raise exceptions.db_exceptions.InvalidTidError(msg)
+        app_logger.custom_logger('storage').info('There is no such tid %s in '
+                                                 'the database for your user' %
+                                                 tid)
+        raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
 
 
 def update():
