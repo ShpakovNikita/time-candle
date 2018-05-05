@@ -49,6 +49,12 @@ class _Args:
                        docstring="""This argument specify logins of the users
                        that will be added to the project""")
 
+    # project description
+    DESCRIPTION = Argument(long='description',
+                           short='d',
+                           docstring="""This argument allows to specify project's
+                           description""")
+
     # add_task tree arguments
     ADD_TASK = Argument(long='addtask',
                         short='t',
@@ -103,11 +109,11 @@ class _Args:
     # show tasks
     # TODO: special parser syntax?
     SHOW_TASKS = Argument(long='showtasks',
-                           short='s',
-                           docstring="""Show all available tasks to the current 
-                           person, including tasks where he is a creator. To 
-                           show some type of sorted tasks, see the special 
-                           parser syntax.""")
+                          short='s',
+                          docstring="""Show all available tasks to the current 
+                          person, including tasks where he is a creator. To 
+                          show some type of sorted tasks, see the special 
+                          parser syntax.""")
 
     # show tasks filter
     FILTERS = Argument(long='filters',
@@ -311,6 +317,12 @@ def _init_add_project_parser(root_args):
                          help=_Args.MEMBERS.docstring,
                          nargs='+')
 
+    project.add_argument(_Args.prefix().DESCRIPTION.long,
+                         _Args.prefix().DESCRIPTION.short,
+                         help=_Args.DESCRIPTION.docstring,
+                         nargs=1,
+                         default=[''])
+
 
 def _init_login_parser(root_args):
     # create new parser for login command
@@ -327,6 +339,7 @@ def _init_show_tasks_parser(root_args):
     show = root_args.add_parser(_Args.SHOW_TASKS.long,
                                 help=_Args.SHOW_TASKS.docstring)
 
+    # TODO: now we count nargs + as 1
     show.add_argument(_Args.prefix().PROJECT.long,
                       _Args.prefix().PROJECT.short,
                       help=_Args.PROJECT.docstring,
@@ -395,8 +408,9 @@ def _process_add_user(parsed_args):
 def _process_add_project(parsed_args):
     app_logger.custom_logger(MODULE_LOGGER_NAME).debug('add_project')
     commands.add_project(parsed_args.title,
+                         parsed_args.description,
                          parsed_args.members)
 
 
 def _process_show_tasks(parsed_args):
-    pass
+    commands.show_tasks(parsed_args.project[0])

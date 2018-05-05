@@ -45,12 +45,13 @@ def add_user(login, password):
     pass
 
 
-def add_project(title, members):
+def add_project(title, description, members):
     """
     This function adds a new project to the database with the creator from
     logged user
-    :param title:
-    :param members:
+    :param description: Project's description
+    :param title: Project's title
+    :param members: Users that will be added automatically with the creator
     :return: None
     """
 
@@ -60,7 +61,9 @@ def add_project(title, members):
     Singleton.GLOBAL_USER = _login()
 
     project = ProjectInstance(storage.project_adapter.last_id(),
-                              user.uid)
+                              user.uid,
+                              title,
+                              description)
 
     storage.project_adapter.save(project)
 
@@ -162,6 +165,35 @@ def change_task(tid, priority, status, time, comment):
     # get user from config.ini to make our task from it's name
     user = _login()
     Singleton.GLOBAL_USER = user
+    pass
+
+
+def show_tasks(projects, all_flag):
+    """
+    This function prints the tasks for
+    :param projects: all projects that will be visited to print the task
+    :param all_flag: this flag shows, is we are going to show all related to you
+    tasks
+    :return: None
+    """
+    # TODO: This function
+    # get user from config.ini to make our task from it's name
+    user = _login()
+    Singleton.GLOBAL_USER = user
+
+    if projects is None:
+        # change on user logger
+        pass
+    else:
+        if all_flag:
+            pass
+
+        for project in projects:
+
+            _print_project_tasks(project)
+
+
+def _print_project_tasks(pid):
     pass
 
 

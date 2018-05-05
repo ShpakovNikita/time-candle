@@ -32,7 +32,9 @@ class User(Model):
 
 
 class Project(Model):
+    title = CharField()
     admin = ForeignKeyField(User, related_name='admin')
+    description = TextField()
 
     class Meta:
         database = db
