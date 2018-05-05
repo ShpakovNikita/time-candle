@@ -320,7 +320,18 @@ def _process_add_task(parsed_args):
 
 
 def _process_change_task(parsed_args):
-    pass
+    app_logger.custom_logger(MODULE_LOGGER_NAME).debug('change_task')
+
+    # time and comment is list value, so we have to extract data from it
+    time = None
+    if parsed_args.time is not None:
+        time = parsed_args.time[0]
+
+    commands.change_task(parsed_args.id,
+                         parsed_args.priority,
+                         parsed_args.status,
+                         time,
+                         parsed_args.comment[0])
 
 
 def _process_remove_task(parsed_args):

@@ -30,14 +30,14 @@ class PasswordMessages(Enum):
 
 
 class InvalidMailError(Exception):
-    def __init__(self, message='The mail is invalid! {}', errors=None):
+    def __init__(self, errors=None, message='The mail is invalid! {}'):
         super().__init__(message.format(errors))
         self.errors = errors
 
 
 # Task related things
 class InvalidTidError(Exception):
-    def __init__(self, message='The tid is invalid! {}', errors=None):
+    def __init__(self, errors=None, message='The tid is invalid! {}'):
         super().__init__(message.format(errors))
         self.errors = errors
 

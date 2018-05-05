@@ -87,20 +87,24 @@ def add_task(title, priority, status, time, parent_id, comment):
     user = _login()
     Singleton.GLOBAL_USER = user
 
-    # This code is also checking is our parent tid exists in the database for
-    # logged user
-    if parent_id is not None:
-        parent_task = storage.task_adapter.get_task_by_id(parent_id)
-
+    # This max func needed to set tasks status and priority not lower then
+    # parent's
     if priority is None:
         app_logger.custom_logger('model').debug('Default priority has been set')
-        priority = validators.not_null_do_action(Priority.MEDIUM,
-                                                 parent_task.priority, max)
+        priority = Priority.MEDIUM
 
     if status is None:
         app_logger.custom_logger('model').debug('Default status has been set')
-        status = validators.not_null_do_action(Status.IN_PROGRESS,
-                                               parent_task.status, max)
+        status = Status.IN_PROGRESS
+
+    # This code is also checking is our parent tid exists in the database for
+    # logged user. The max func needed to set tasks status and priority not
+    # lower then parent's
+
+    if parent_id is not None:
+        parent_task = storage.task_adapter.get_task_by_id(parent_id)
+        status = max(status, parent_task.status)
+        priority = max(priority, parent_task.priority)
 
     deadline_time = None
 
@@ -136,6 +140,29 @@ def remove_task(tid):
     :return: None
     """
     storage.task_adapter.remove_task_by_id(tid)
+
+
+def change_task(tid, priority, status, time, comment):
+    """
+    This function will change task in the database, with the creator and
+    executor that named in the config.ini (i.e current logged user)
+    :param tid: Task's id
+    :param comment: Task's comment for some detailed explanation
+    :param time: Time in following format: YYYY-MM-DD HH:MM:SS
+    :param priority: Tasks priority (enum from Priority)
+    :param status: Tasks status (enum from Status)
+    :type tid: Int
+    :type comment: String
+    :type time: String
+    :type priority: Int
+    :type status: Int
+    :return: None
+    """
+    # TODO: This function
+    # get user from config.ini to make our task from it's name
+    user = _login()
+    Singleton.GLOBAL_USER = user
+    pass
 
 
 def _login():
