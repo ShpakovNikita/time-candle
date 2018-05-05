@@ -25,7 +25,7 @@ class _Args:
                         password, if it possible""")
 
     PROJECT = Argument(long='project',
-                       short='p',
+                       short='o',
                        docstring="""This argument adds a selected user from 
                        database by login to the selected project. Specify by 
                        project's id""")
@@ -78,13 +78,16 @@ class _Args:
                        to 255 symbols""")
 
     # task parent
-    # TODO: low planks of priority and status
     PARENT = Argument(long='parent',
                       short='p',
                       docstring="""task\'s parent. This is need for dividing
                       tasks on sub tusks. Parent's low plank of priority and
                       status marks on it's all childs. To create parent task
                       pass parent's id to this argument""")
+
+    """
+    Also project argument
+    """
 
     # remove task
     REMOVE_TASK = Argument(long='removetask',
@@ -97,12 +100,31 @@ class _Args:
                            docstring="""Changing one of the possible values to 
                            the task by it's id and optional parameters""")
 
+    # show tasks
+    # TODO: special parser syntax?
+    SHOW_TASKS = Argument(long='showtasks',
+                           short='s',
+                           docstring="""Show all available tasks to the current 
+                           person, including tasks where he is a creator. To 
+                           show some type of sorted tasks, see the special 
+                           parser syntax.""")
+
+    # show tasks filter
+    FILTERS = Argument(long='filters',
+                       short='f',
+                       docstring="""Filter all available tasks by one 
+                       expression with own syntax""")
+    """
+    Also project argument
+    """
+
     # clear_log tree arguments
     CLEAR_LOG = Argument(long='clearlog',
                          short='l',
                          docstring="""This argument clears output logs""")
 
     # TODO: split_task?
+    # TODO: alias
     _with_prefix = None
 
     @staticmethod
@@ -148,6 +170,7 @@ def run():
     _init_add_project_parser(root_args)
     _init_change_task_parser(root_args)
     _init_remove_task_parser(root_args)
+    _init_show_tasks_parser(root_args)
 
     # simple clear log arg
     root_args.add_parser(_Args.CLEAR_LOG.long,
@@ -178,6 +201,9 @@ def run():
 
     elif parsed.action == _Args.REMOVE_TASK.long:
         _process_remove_task(parsed)
+
+    elif parsed.action == _Args.SHOW_TASKS.long:
+        _process_show_tasks(parsed)
 
 
 """
@@ -221,6 +247,13 @@ def _init_add_task_parser(root_args):
     task.add_argument(_Args.prefix().PARENT.long,
                       _Args.prefix().PARENT.short,
                       help=_Args.PARENT.docstring,
+                      type=int,
+                      nargs=1)
+
+    # TODO: todo, you know?
+    task.add_argument(_Args.prefix().PROJECT.long,
+                      _Args.prefix().PROJECT.short,
+                      help=_Args.PROJECT.docstring,
                       type=int,
                       nargs=1)
 
@@ -289,6 +322,21 @@ def _init_login_parser(root_args):
     user.add_argument('password', help='user password')
 
 
+def _init_show_tasks_parser(root_args):
+    # create new parser for login command
+    show = root_args.add_parser(_Args.SHOW_TASKS.long,
+                                help=_Args.SHOW_TASKS.docstring)
+
+    show.add_argument(_Args.prefix().PROJECT.long,
+                      _Args.prefix().PROJECT.short,
+                      help=_Args.PROJECT.docstring,
+                      nargs='+')
+
+    show.add_argument(_Args.prefix().FILTERS.long,
+                      _Args.prefix().FILTERS.short,
+                      help=_Args.FILTERS.docstring,
+                      nargs=1)
+
 # Process parsed arguments
 # TODO: Change everything on getattr
 
@@ -348,3 +396,7 @@ def _process_add_project(parsed_args):
     app_logger.custom_logger(MODULE_LOGGER_NAME).debug('add_project')
     commands.add_project(parsed_args.title,
                          parsed_args.members)
+
+
+def _process_show_tasks(parsed_args):
+    pass
