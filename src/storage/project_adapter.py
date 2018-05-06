@@ -1,22 +1,30 @@
 import app_logger
 from peewee import *
-from storage.adapter_classes import Project
+from storage.adapter_classes import Project, UserProjectRelation
 from singleton import Singleton
 from main_instances.project import Project as ProjectInstance
 import exceptions.db_exceptions as db_e
 
 
-def save(project):
+def save(project_model):
     """
     This function is used to store given project in database
-    :param project: This is our task to save
-    :type project: ProjectInstance
+    :param project_model: This is our task to save
+    :type project_model: ProjectInstance
     :return: None
     """
 
-    Project.create(admin=project.admin_uid,
-                   decription=project.description,
-                   title=project.title)
+    project = Project(admin=project_model.admin_uid,
+                      description=project_model.description,
+                      title=project_model.title)
+
+    relation = UserProjectRelation(user=Singleton.GLOBAL_USER.uid,
+                                   project=project)
+
+    # only if everything is ok we save project to our database
+    project.save()
+    relation.save()
+
     app_logger.custom_logger('storage').debug('project saved to database')
 
 
@@ -49,11 +57,15 @@ def get_project_by_id(pid):
     :return: Project
     """
     # TODO: FIX (need relations)
-    project = Project.select().\
-        where((Project.id == pid) &
-              ((Project.creator == Singleton.GLOBAL_USER.uid) |
-               (Project.receiver == Singleton.GLOBAL_USER.uid)))
     try:
+        # we are checking if there is a connection our user and selected project
+        UserProjectRelation.select().\
+            where((UserProjectRelation.user == Singleton.GLOBAL_USER.uid) &
+                  (UserProjectRelation.project == pid)).get()
+
+        # if so, ge get this project by pid
+        project = Project.select().where((Project.id == pid))
+
         return _storage_to_model(project.get())
 
     except DoesNotExist:

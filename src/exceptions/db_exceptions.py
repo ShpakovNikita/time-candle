@@ -59,3 +59,5 @@ class ProjectMessages(Enum):
     # This is pre defined messages that will be associated with projects all
     # over the project
     PROJECT_DOES_NOT_EXISTS = 'Selected project does not exists'
+    DO_NOT_HAVE_RIGHTS = 'You don\'t have rights to modify this project'
+    USER_ALREADY_EXISTS = 'The selected user already exists in this project'

@@ -226,7 +226,13 @@ def _init_add_user_parser(root_args):
 
     # define two positional arguments login password
     user.add_argument('login', help='user login')
-    user.add_argument('password', help='user password')
+    user.add_argument('--password', '-p',
+                      help='user password', default='')
+
+    user.add_argument(_Args.prefix().PROJECT.long,
+                      _Args.prefix().PROJECT.short,
+                      help=_Args.PROJECT.docstring,
+                      nargs=1)
 
 
 def _init_add_task_parser(root_args):
@@ -402,13 +408,20 @@ def _process_remove_task(parsed_args):
 
 def _process_add_user(parsed_args):
     app_logger.custom_logger(MODULE_LOGGER_NAME).debug('add_user')
-    commands.add_user(parsed_args.login, parsed_args.password)
+    if parsed_args.project is None:
+        if parsed_args.password == '':
+            raise ValueError('You must specify the password!')
+
+        commands.add_user(parsed_args.login, parsed_args.password)
+
+    else:
+        commands.add_user_to_project(parsed_args.login, parsed_args.project)
 
 
 def _process_add_project(parsed_args):
     app_logger.custom_logger(MODULE_LOGGER_NAME).debug('add_project')
     commands.add_project(parsed_args.title,
-                         parsed_args.description,
+                         parsed_args.description[0],
                          parsed_args.members)
 
 

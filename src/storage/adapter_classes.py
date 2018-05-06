@@ -58,6 +58,7 @@ class Task(Model):
     # Time in milliseconds. Nullable for further functionality TODO:
     deadline_time = BigIntegerField(null=True)
     comment = CharField(default='')
+    period = IntegerField(null=True)
 
     # Chat will be organized later. But we are planning to create a new
     # relations table that will be holding task id, message id (not necessary),
@@ -75,9 +76,11 @@ class UserProjectRelation(Model):
     project have.
     """
 
-    user = ForeignKeyField(User, related_name='user', primary_key=True)
-    project = ForeignKeyField(Project, related_name='projects')
-    rights = SmallIntegerField()
+    user = ForeignKeyField(User, related_name='user')
+    project = ForeignKeyField(Project, related_name='project')
+
+    # TODO: rights as class with the relations
+    rights = CharField(default='')
 
     class Meta:
         database = db
@@ -93,7 +96,7 @@ class TagTaskRelation(Model):
 
     tag = ForeignKeyField(User, related_name='tag')
     task = ForeignKeyField(Task, related_name='tasks')
-    project = ForeignKeyField(Project, related_name='project', primary_key=True)
+    project = ForeignKeyField(Project, related_name='project')
 
     class Meta:
         database = db

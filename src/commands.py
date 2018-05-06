@@ -45,6 +45,20 @@ def add_user(login, password):
     pass
 
 
+def add_user_to_project(login, pid):
+    """
+    This function adds user to the project, if our logged user is admin of the
+    project
+    :param login: User's login
+    :param pid: Project's id
+    :return: None
+    """
+    # get user from config.ini to make our project from it's name
+    Singleton.GLOBAL_USER = _login()
+
+    storage.user_adapter.add_user_to_project_by_id(login, pid)
+
+
 def add_project(title, description, members):
     """
     This function adds a new project to the database with the creator from
