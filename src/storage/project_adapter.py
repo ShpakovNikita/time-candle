@@ -75,6 +75,23 @@ def get_project_by_id(pid):
         raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
 
 
+def has_rights(pid):
+    """
+    This function checks if logged user has rights to do something inside the
+    project
+    :param pid: Project's id
+    :return: Bool
+    """
+    try:
+        Project.select().where((Project.id == pid) &
+                               (Project.admin == Singleton.GLOBAL_USER.uid))
+
+        return True
+
+    except DoesNotExist:
+        raise db_e.InvalidLoginError(db_e.ProjectMessages.DO_NOT_HAVE_RIGHTS)
+
+
 def _storage_to_model(storage_project):
     """
     This function converts storage project to model project

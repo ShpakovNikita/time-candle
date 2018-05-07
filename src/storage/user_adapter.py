@@ -47,7 +47,6 @@ def add_user_to_project_by_id(login, pid):
     :param pid: Project's id
     :return: None
     """
-    print('123')
     try:
         # we get task where current user is admin and where project id is
         # matching
@@ -69,7 +68,7 @@ def add_user_to_project_by_id(login, pid):
 
     try:
         # and now we are checking if selected user already in the project. If
-        # the exception DOesNotExist was not raised, that means that user
+        # the exception DoesNotExist was not raised, that means that user
         # already in project and it's bad
         UserProjectRelation.select().\
             where((UserProjectRelation.project == pid) &
@@ -83,3 +82,40 @@ def add_user_to_project_by_id(login, pid):
 
     app_logger.custom_logger('storage').info('user_project relation created')
 
+
+def get_id_by_login(login):
+    """
+    This function checks if user by passed login exists in the database and
+    returns user's id, or raises an error
+    :param login: User's login
+    :return: Int
+    """
+    try:
+        return User.select().\
+               where(User.login == login).get().id
+
+    except DoesNotExist:
+        db_e.InvalidLoginError(db_e.LoginMessages.USER_DOES_NOT_EXISTS)
+
+
+# TODO: maybe add function get_id_by_login to change all login on uid
+def is_user_in_project(login, pid):
+    """
+    This function checks if passed user exists in the selected project
+    :param login: User's login
+    :param pid: Project's id
+    :return: Bool
+    """
+    uid = get_id_by_login(login)
+    app_logger.custom_logger('storage').debug('the uid is %s' % uid)
+
+    try:
+        UserProjectRelation.select().\
+            where((UserProjectRelation.project == pid) &
+                  (UserProjectRelation.user == uid)).get()
+
+        app_logger.custom_logger('storage').debug('user exists in project')
+        return True
+
+    except DoesNotExist:
+        raise db_e.InvalidPidError(db_e.LoginMessages.USER_DOES_NOT_EXISTS )

@@ -26,7 +26,7 @@ def save(task):
 
     table_task = Task.create(creator=task.creator_uid,
                              receiver=task.uid,
-                             project=None,
+                             project=task.pid,
                              status=task.status,
                              parent=task.parent,
                              title=task.title,

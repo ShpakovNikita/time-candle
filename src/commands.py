@@ -72,7 +72,7 @@ def add_project(title, description, members):
     # TODO: make it to the final!
     # get user from config.ini to make our project from it's name
     user = _login()
-    Singleton.GLOBAL_USER = _login()
+    Singleton.GLOBAL_USER = user
 
     project = ProjectInstance(storage.project_adapter.last_id(),
                               user.uid,
@@ -82,6 +82,7 @@ def add_project(title, description, members):
     storage.project_adapter.save(project)
 
 
+# TODO: THERE IS REALLY BIG DUPLICATED CODE. ASK ANDY WHAT IS OK
 def add_task(title, priority, status, time, parent_id, comment):
     """
     This function will add passed task to the database, with the creator and
@@ -131,7 +132,6 @@ def add_task(title, priority, status, time, parent_id, comment):
     app_logger.custom_logger('model').debug('time in milliseconds %s' %
                                             deadline_time)
 
-    # TODO: much status, priority fix
     task = TaskInstance(user.uid,
                         user.uid,
                         storage.task_adapter.last_id() + 1,
@@ -147,6 +147,97 @@ def add_task(title, priority, status, time, parent_id, comment):
                                             ', the task id is %s' % task.tid)
 
     storage.task_adapter.save(task)
+
+
+def add_task_to_project(title,
+                        priority,
+                        status,
+                        time,
+                        parent_id,
+                        comment,
+                        pid,
+                        login):
+    """
+    This function will add passed task to the database, with the creator and
+    executor that named in the config.ini (i.e current logged user)
+    :param pid: Project's id
+    :param login: User's login
+    :param comment: Task's comment for some detailed explanation
+    :param parent_id: Parent's task id
+    :param time: Time in following format: YYYY-MM-DD HH:MM:SS
+    :param title: Tasks title
+    :param priority: Tasks priority (enum from Priority)
+    :param status: Tasks status (enum from Status)
+    :type pid: Int
+    :type login: String
+    :type comment: String
+    :type parent_id: Int
+    :type time: String
+    :type title: String
+    :type priority: Int
+    :type status: Int
+    :return: None
+    """
+    # get user from config.ini to make our task from it's name
+    user = _login()
+    Singleton.GLOBAL_USER = user
+
+    # This max func needed to set tasks status and priority not lower then
+    # parent's
+    if priority is None:
+        app_logger.custom_logger('model').debug('Default priority has been set')
+        priority = Priority.MEDIUM
+
+    if status is None:
+        app_logger.custom_logger('model').debug('Default status has been set')
+        status = Status.IN_PROGRESS
+
+    # This code is also checking is our parent tid exists in the database for
+    # logged user. The max func needed to set tasks status and priority not
+    # lower then parent's
+
+    if parent_id is not None:
+        parent_task = storage.task_adapter.get_task_by_id(parent_id)
+        status = max(status, parent_task.status)
+        priority = max(priority, parent_task.priority)
+
+    deadline_time = None
+
+    if time is not None:
+        deadline_time = validators.get_milliseconds(time)
+
+    app_logger.custom_logger('model').debug('time in milliseconds %s' %
+                                            deadline_time)
+
+    # TODO: MADE NOT ONLY ADMIN ADD, BUT USERS WITH LOW PRIORITY!!! Just change
+    # TODO: on is_admin(pid) maybe
+
+    # Check for rights and id's
+    if login is None:
+        task_uid = user.uid
+    else:
+        storage.user_adapter.is_user_in_project(login, pid)
+        task_uid = storage.user_adapter.get_id_by_login(login)
+
+    storage.project_adapter.has_rights(pid)
+
+    task = TaskInstance(task_uid,
+                        user.uid,
+                        storage.task_adapter.last_id() + 1,
+                        deadline_time,
+                        title,
+                        pid,
+                        status,
+                        priority,
+                        parent_id,
+                        comment)
+
+    app_logger.custom_logger('model').debug('task configured and ready to save'
+                                            ', the task id is %s' % task.tid)
+
+    storage.task_adapter.save(task)
+
+    app_logger.custom_logger('model').debug('task to project added')
 
 
 def remove_task(tid):

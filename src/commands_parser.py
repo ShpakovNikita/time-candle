@@ -24,11 +24,15 @@ class _Args:
                         database or project, according to the given login and 
                         password, if it possible""")
 
+    # TODO: low priority if not admin and etc.
     PROJECT = Argument(long='project',
                        short='o',
                        docstring="""This argument adds a selected user from 
                        database by login to the selected project. Specify by 
-                       project's id""")
+                       project's id. If used in the addtask command specify
+                       two arguments, the first argument is project id, and the 
+                       second one is user login. If no user specified, task will
+                       be created for logged user""")
 
     # login tree arguments
     LOGIN = Argument(long='login',
@@ -130,7 +134,7 @@ class _Args:
                          docstring="""This argument clears output logs""")
 
     # TODO: split_task?
-    # TODO: alias
+    # TODO: alias?
     _with_prefix = None
 
     @staticmethod
@@ -266,8 +270,7 @@ def _init_add_task_parser(root_args):
     task.add_argument(_Args.prefix().PROJECT.long,
                       _Args.prefix().PROJECT.short,
                       help=_Args.PROJECT.docstring,
-                      type=int,
-                      nargs=1)
+                      nargs='+')
 
     task.add_argument(_Args.prefix().COMMENT.long,
                       _Args.prefix().COMMENT.short,
@@ -378,12 +381,30 @@ def _process_add_task(parsed_args):
         parent = parsed_args.parent[0]
 
     # TODO: multiple times
-    commands.add_task(parsed_args.title,
-                      parsed_args.priority,
-                      parsed_args.status,
-                      time,
-                      parent,
-                      parsed_args.comment[0])
+    if parsed_args.project is None:
+        commands.add_task(parsed_args.title,
+                          parsed_args.priority,
+                          parsed_args.status,
+                          time,
+                          parent,
+                          parsed_args.comment[0])
+
+    else:
+        # set the uid None if it is not in the list
+        if len(parsed_args.project) == 1:
+            uid = None
+
+        else:
+            uid = parsed_args.project[1]
+
+        commands.add_task_to_project(parsed_args.title,
+                                     parsed_args.priority,
+                                     parsed_args.status,
+                                     time,
+                                     parent,
+                                     parsed_args.comment[0],
+                                     parsed_args.project[0],
+                                     uid)
 
 
 def _process_change_task(parsed_args):
