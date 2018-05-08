@@ -83,18 +83,21 @@ def remove_task_by_id(tid):
         raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
 
 
-def get_task_by_id(tid):
+def get_task_by_id(tid, pid=None):
     """
     This function finds task by id and current user in database and returns it,
     or raise error due to incorrect request
+    :param pid: Project's id to get task from it
     :param tid: Task id to find
+    :type pid: Int
     :type tid: Int
     :return: Task
     """
     # TODO: more flexible user dependency find for projects
     task = Task.select().where((Task.id == tid) &
                                ((Task.creator == Singleton.GLOBAL_USER.uid) |
-                                (Task.receiver == Singleton.GLOBAL_USER.uid)))
+                                (Task.receiver == Singleton.GLOBAL_USER.uid)) &
+                               (Task.project == pid))
     try:
         return _storage_to_model(task.get())
 

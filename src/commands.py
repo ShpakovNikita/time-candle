@@ -196,8 +196,9 @@ def add_task_to_project(title,
     # logged user. The max func needed to set tasks status and priority not
     # lower then parent's
 
+    # TODO: parent pid match pid
     if parent_id is not None:
-        parent_task = storage.task_adapter.get_task_by_id(parent_id)
+        parent_task = storage.task_adapter.get_task_by_id(parent_id, pid)
         status = max(status, parent_task.status)
         priority = max(priority, parent_task.priority)
 
