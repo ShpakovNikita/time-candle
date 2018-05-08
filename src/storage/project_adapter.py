@@ -83,6 +83,12 @@ def has_rights(pid):
     :return: Bool
     """
     try:
+        Project.select().where(Project.id == pid).get()
+
+    except DoesNotExist:
+        raise db_e.InvalidPidError(db_e.ProjectMessages.PROJECT_DOES_NOT_EXISTS)
+
+    try:
         Project.select().where((Project.id == pid) &
                                (Project.admin == Singleton.GLOBAL_USER.uid))
 
@@ -90,6 +96,29 @@ def has_rights(pid):
 
     except DoesNotExist:
         raise db_e.InvalidLoginError(db_e.ProjectMessages.DO_NOT_HAVE_RIGHTS)
+
+
+def remove_project_by_id(pid):
+    """
+    This function removes project from id snd clears all relations between users
+    and passed project. Or it raises an exception if you don't have rights or
+    pid do not exists
+    :param pid: Project's id
+    :return: None
+    """
+    has_rights(pid)
+
+    try:
+        UserProjectRelation.delete(). \
+            where(UserProjectRelation.project == pid).execute()
+
+        Project.delete(). \
+            where(Project.id == pid).execute()
+
+        app_logger.custom_logger('storage').debug('project fully removed')
+
+    except DoesNotExist:
+        db_e.InvalidPidError(db_e.ProjectMessages.PROJECT_DOES_NOT_EXISTS)
 
 
 def _storage_to_model(storage_project):

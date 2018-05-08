@@ -324,7 +324,8 @@ def _init_add_project_parser(root_args):
     project.add_argument(_Args.prefix().MEMBERS.long,
                          _Args.prefix().MEMBERS.short,
                          help=_Args.MEMBERS.docstring,
-                         nargs='+')
+                         nargs='+',
+                         default=[])
 
     project.add_argument(_Args.prefix().DESCRIPTION.long,
                          _Args.prefix().DESCRIPTION.short,

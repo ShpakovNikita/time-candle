@@ -11,6 +11,7 @@ import storage.adapter_classes
 import storage.task_adapter
 import storage.user_adapter
 import storage.project_adapter
+import exceptions.db_exceptions as db_e
 import validators
 from singleton import Singleton
 """
@@ -74,12 +75,19 @@ def add_project(title, description, members):
     user = _login()
     Singleton.GLOBAL_USER = user
 
-    project = ProjectInstance(storage.project_adapter.last_id(),
+    project = ProjectInstance(storage.project_adapter.last_id() + 1,
                               user.uid,
                               title,
                               description)
 
     storage.project_adapter.save(project)
+
+    try:
+        for login in members:
+            add_user_to_project(login, project.pid)
+
+    except db_e.InvalidLoginError:
+        storage.project_adapter.remove_project_by_id(project.pid)
 
 
 # TODO: THERE IS REALLY BIG DUPLICATED CODE. ASK ANDY WHAT IS OK
