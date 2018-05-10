@@ -119,3 +119,28 @@ def is_user_in_project(login, pid):
 
     except DoesNotExist:
         raise db_e.InvalidPidError(db_e.LoginMessages.USER_DOES_NOT_EXISTS )
+
+
+def get_tasks_id_by_uid(uid):
+    """
+    This function returns task id's of each personal user's task
+    :param: User's id
+    :return: List of tids
+    """
+    query = Task.select(Task.id).where((Task.creator == uid) &
+                                       (Task.receiver == uid) &
+                                       Task.project.is_null(True))
+
+    return [tid.id for tid in query]
+
+
+def get_projects_id_by_uid(uid):
+    """
+    This function returns projects id's of each project where user is named
+    :param: User's id
+    :return: List of pids
+    """
+    query = Task.select(UserProjectRelation.project).\
+        where(UserProjectRelation.user == uid)
+
+    return [pid.id for pid in query]

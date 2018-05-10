@@ -284,7 +284,11 @@ def change_task(tid, priority, status, time, comment):
 
 def show_tasks(projects, all_flag):
     """
-    This function prints the tasks for
+    This function prints the tasks for current user. It will print all tasks for
+    each project if he admin in it or just his tasks, and not his personal
+    tasks. But if there is no projects we will print only personal tasks.
+    And if all flag specified we will print all tasks that you have relation
+    with.
     :param projects: all projects that will be visited to print the task
     :param all_flag: this flag shows, is we are going to show all related to you
     tasks
@@ -295,11 +299,15 @@ def show_tasks(projects, all_flag):
     user = _login()
     Singleton.GLOBAL_USER = user
 
-    if projects is None:
-        # change on user logger
-        pass
+    if len(projects) == 0:
+        # print user's personal task's
+        tids = storage.user_adapter.get_tasks_id_by_uid(user.uid)
+        for tid in tids:
+            _print_task(tid)
+
     else:
         if all_flag:
+            # print all tasks
             pass
 
         for project in projects:
@@ -309,6 +317,27 @@ def show_tasks(projects, all_flag):
 
 def _print_project_tasks(pid):
     pass
+
+
+def _print_task(tid, is_project=None):
+    """
+    This function print's task info
+    :param tid: Task's id to print
+    :param is_project: If flag specified then we will be printing users too
+    :return: None
+    """
+    task = storage.task_adapter.get_task_by_id(tid)
+    print()
+    print('Task ' + task.title)
+    print('Task\'s id is ' + str(task.tid))
+    if task.deadline is None:
+        task_time = 'unlimited'
+    else:
+        task_time = validators.get_datetime(task.deadline).\
+            strftime('%Y-%m-%d %H:%M:%S')
+
+    print('Task\'s deadline time is ' + task_time)
+    # print priority etc
 
 
 def _login():

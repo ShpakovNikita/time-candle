@@ -74,7 +74,8 @@ class _Args:
     TIME = Argument(long='time',
                     short='t',
                     docstring="""task\'s time, can be changed later. If not 
-                    passed, then time is not determent""")
+                    passed, then time is not determent. Format is 
+                    YYYY-MM-DD HH:MM:SS or simple HH:MM:SS""")
 
     # task status
     STATUS = Argument(long='status',
@@ -117,13 +118,19 @@ class _Args:
                           docstring="""Show all available tasks to the current 
                           person, including tasks where he is a creator. To 
                           show some type of sorted tasks, see the special 
-                          parser syntax.""")
+                          parser syntax""")
 
     # show tasks filter
     FILTERS = Argument(long='filters',
                        short='f',
                        docstring="""Filter all available tasks by one 
                        expression with own syntax""")
+
+    # TODO: filter will replace this argument?
+    ALL_TASKS = Argument(long='all',
+                         short='a',
+                         docstring="""If this flag is set, we will show all 
+                         tasks, with the project user's tasks""")
     """
     Also project argument
     """
@@ -353,12 +360,18 @@ def _init_show_tasks_parser(root_args):
     show.add_argument(_Args.prefix().PROJECT.long,
                       _Args.prefix().PROJECT.short,
                       help=_Args.PROJECT.docstring,
-                      nargs='+')
+                      nargs='+',
+                      default=[])
 
     show.add_argument(_Args.prefix().FILTERS.long,
                       _Args.prefix().FILTERS.short,
                       help=_Args.FILTERS.docstring,
                       nargs=1)
+
+    show.add_argument(_Args.prefix().ALL_TASKS.long,
+                      _Args.prefix().ALL_TASKS.short,
+                      help=_Args.ALL_TASKS.docstring,
+                      action='store_true')
 
 # Process parsed arguments
 # TODO: Change everything on getattr
@@ -448,4 +461,4 @@ def _process_add_project(parsed_args):
 
 
 def _process_show_tasks(parsed_args):
-    commands.show_tasks(parsed_args.project[0])
+    commands.show_tasks(parsed_args.project, parsed_args.all)

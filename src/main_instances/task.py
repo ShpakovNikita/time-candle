@@ -1,7 +1,5 @@
 from enums.priority import Priority
 from enums.status import Status
-from helper_entities import controllers
-from datetime import datetime, date, time
 import app_logger
 
 
@@ -41,28 +39,3 @@ class Task:
         self.deadline = deadline_
         self.comment = comment_
         self.chat = chat_
-
-    def __call__(self, *args, **kwargs):
-        pass
-
-    @classmethod
-    def make_task(cls,
-                  year=datetime.today().year,
-                  # If this argument is None, then year will be ignored.
-                  # Also it means that task will be created with current time as
-                  # the deadline time.
-                  time=None,
-                  t_priority=Priority.MEDIUM):
-        if time is None:
-            controller = controllers.BehaviorController()
-        elif isinstance(time, datetime):
-            controller = controllers.BehaviorController(year=year,
-                                                        month=time.month,
-                                                        day=time.day,
-                                                        hour=time.hour,
-                                                        minute=time.minute)
-        else:
-            raise ValueError("Time must be an object of type datetime")
-
-        return None
-

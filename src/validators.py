@@ -74,8 +74,8 @@ def _time_get_formatted(formatted_time):
     :type formatted_time: String
     :return: String of format %Y-%m-%d %H:%M:%S to the strptime function
     """
-    long_pattern = r'(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})'
-    short_pattern = r'(\d{2}):(\d{2}):(\d{2})'
+    long_pattern = r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
+    short_pattern = r'\d{2}:\d{2}:\d{2}'
     if re.match(long_pattern, formatted_time):
         app_logger.custom_logger('model').debug('date matched long pattern')
         return formatted_time
