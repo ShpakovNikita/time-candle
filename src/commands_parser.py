@@ -255,12 +255,14 @@ def _init_add_task_parser(root_args):
     task.add_argument(_Args.prefix().PRIORITY.long,
                       _Args.prefix().PRIORITY.short,
                       help=_Args.PRIORITY.docstring,
-                      nargs=1)
+                      nargs=1,
+                      default=[None])
 
     task.add_argument(_Args.prefix().STATUS.long,
                       _Args.prefix().STATUS.short,
                       help=_Args.STATUS.docstring,
-                      nargs=1)
+                      nargs=1,
+                      default=[None])
 
     task.add_argument(_Args.prefix().TIME.long,
                       _Args.prefix().TIME.short,
@@ -397,8 +399,8 @@ def _process_add_task(parsed_args):
     # TODO: multiple times
     if parsed_args.project is None:
         commands.add_task(parsed_args.title,
-                          parsed_args.priority,
-                          parsed_args.status,
+                          parsed_args.priority[0],
+                          parsed_args.status[0],
                           time,
                           parent,
                           parsed_args.comment[0])
@@ -412,8 +414,8 @@ def _process_add_task(parsed_args):
             uid = parsed_args.project[1]
 
         commands.add_task_to_project(parsed_args.title,
-                                     parsed_args.priority,
-                                     parsed_args.status,
+                                     parsed_args.priority[0],
+                                     parsed_args.status[0],
                                      time,
                                      parent,
                                      parsed_args.comment[0],

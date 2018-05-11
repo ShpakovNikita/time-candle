@@ -81,11 +81,11 @@ class TaskFilter(PrimaryFilter):
 
         self.result.append(Task.title.contains(substring))
 
-    def title_regex(self, substring, op=PrimaryFilter.OP_AND):
+    def title_regex(self, regex, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
-        self.result.append(Task.title.contains(substring))
+        self.result.append(Task.title.contains(regex))
 
     def priority(self,
                  priority,
@@ -97,19 +97,20 @@ class TaskFilter(PrimaryFilter):
             self.ops.append(op)
 
         if TaskFilter.OP_GREATER == storage_op:
-            self.result.append(Task.status > priority)
+            self.result.append(Task.priority > priority)
 
         elif TaskFilter.OP_GREATER_OR_EQUALS == storage_op:
-            self.result.append(Task.status >= priority)
+            print(priority)
+            self.result.append(Task.priority >= priority)
 
         elif TaskFilter.OP_EQUALS == storage_op:
-            self.result.append(Task.status == priority)
+            self.result.append(Task.priority == priority)
 
         elif TaskFilter.OP_LESS_OR_EQUALS == storage_op:
-            self.result.append(Task.status <= priority)
+            self.result.append(Task.priority <= priority)
 
         elif TaskFilter.OP_LESS == storage_op:
-            self.result.append(Task.status < priority)
+            self.result.append(Task.priority < priority)
 
         else:
             raise db_e.InvalidFilterOperator(db_e.FilterMessages.
@@ -125,19 +126,19 @@ class TaskFilter(PrimaryFilter):
             self.ops.append(op)
 
         if TaskFilter.OP_GREATER == storage_op:
-            self.result.append(Task.status > deadline_time)
+            self.result.append(Task.deadline_time > deadline_time)
 
         elif TaskFilter.OP_GREATER_OR_EQUALS == storage_op:
-            self.result.append(Task.status >= deadline_time)
+            self.result.append(Task.deadline_time >= deadline_time)
 
         elif TaskFilter.OP_EQUALS == storage_op:
-            self.result.append(Task.status == deadline_time)
+            self.result.append(Task.deadline_time == deadline_time)
 
         elif TaskFilter.OP_LESS_OR_EQUALS == storage_op:
-            self.result.append(Task.status <= deadline_time)
+            self.result.append(Task.deadline_time <= deadline_time)
 
         elif TaskFilter.OP_LESS == storage_op:
-            self.result.append(Task.status < deadline_time)
+            self.result.append(Task.deadline_time < deadline_time)
 
         else:
             raise db_e.InvalidFilterOperator(db_e.FilterMessages.
@@ -165,23 +166,38 @@ class TaskFilter(PrimaryFilter):
             self.ops.append(op)
 
         if TaskFilter.OP_GREATER == storage_op:
-            self.result.append(Task.status > period)
+            self.result.append(Task.period > period)
 
         elif TaskFilter.OP_GREATER_OR_EQUALS == storage_op:
-            self.result.append(Task.status >= period)
+            self.result.append(Task.period >= period)
 
         elif TaskFilter.OP_EQUALS == storage_op:
-            self.result.append(Task.status == period)
+            self.result.append(Task.period == period)
 
         elif TaskFilter.OP_LESS_OR_EQUALS == storage_op:
-            self.result.append(Task.status <= period)
+            self.result.append(Task.period <= period)
 
         elif TaskFilter.OP_LESS == storage_op:
-            self.result.append(Task.status < period)
+            self.result.append(Task.period < period)
 
         else:
             raise db_e.InvalidFilterOperator(db_e.FilterMessages.
                                              FILTER_DOES_NOT_EXISTS)
+
+
+def get_by_filter(filter_instance):
+    """
+    This function returns model objects by the given TaskFilter.
+    :param filter_instance: TaskFilter with defined filters
+    :return: List of TaskInstances
+    """
+    result = []
+    query = Task.select().where(filter_instance.to_query())
+
+    for task in query:
+        result.append(_storage_to_model(task))
+
+    return result
 
 
 def save(task):

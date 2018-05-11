@@ -71,7 +71,15 @@ class InvalidFilterOperator(Exception):
         self.errors = errors
 
 
+class InvalidFilter(Exception):
+    def __init__(self, errors=None, message='The filter is invalid! {}'
+                 ):
+        super().__init__(message.format(errors))
+        self.errors = errors
+
+
 class FilterMessages(Enum):
     # This is pre defined messages that will be associated with filters all
     # over the project
     FILTER_DOES_NOT_EXISTS = 'Selected operator is invalid'
+    FILTER_ITEMS_NOT_EXISTS = 'Selected filter items do not exists'

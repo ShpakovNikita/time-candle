@@ -1,9 +1,46 @@
 from main_instances.user import User as UserInstance
 from storage.adapter_classes import User, Task, Project, UserProjectRelation
+from storage.adapter_classes import Filter as PrimaryFilter
 import exceptions.db_exceptions as db_e
 from peewee import *
 from singleton import Singleton
 from storage import logger
+
+
+class UserFilter(PrimaryFilter):
+
+    def __init__(self):
+        super().__init__()
+
+    def uid(self, uid, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(User.id == uid)
+
+    def login_substring(self, substring, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(User.login.contains(substring))
+
+    def login_regex(self, regex, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(User.login.contains(regex))
+
+    def nickname_substring(self, substring, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(User.nickname.contains(substring))
+
+    def nickname_regex(self, regex, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(User.nickname.contains(regex))
 
 
 def login_user(login, password):
@@ -21,8 +58,8 @@ def login_user(login, password):
         obj = query.get()
 
     except DoesNotExist:
-        raise db_e.InvalidLoginError(str(db_e.LoginMessages.USER_DOES_NOT_EXISTS
-                                         ) + ', try to login again')
+        raise db_e.InvalidLoginError(db_e.LoginMessages.USER_DOES_NOT_EXISTS
+                                          + ', try to login again')
 
     if not query.exists():
         raise db_e.InvalidLoginError(db_e.LoginMessages.USER_DOES_NOT_EXISTS)
