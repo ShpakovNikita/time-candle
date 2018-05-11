@@ -105,4 +105,3 @@ def get_datetime(milliseconds_time):
     final_time = datetime.fromtimestamp((milliseconds_time +
                                          epoch.timestamp() * 1000) / 1000)
     return final_time
-

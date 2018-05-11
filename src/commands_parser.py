@@ -4,7 +4,7 @@ import commands
 import app_logger
 
 
-MODULE_LOGGER_NAME = 'controller'
+logger = app_logger.custom_logger('controller')
 
 
 class _Args:
@@ -194,7 +194,7 @@ def run():
                          help=_Args.CLEAR_LOG.docstring)
 
     parsed = parser.parse_args()
-    app_logger.custom_logger(MODULE_LOGGER_NAME).debug(parsed)
+    logger.debug(parsed)
 
     # try to process each command
     if parsed.action == _Args.ADD_USER.long:
@@ -208,7 +208,7 @@ def run():
 
     elif parsed.action == _Args.CLEAR_LOG.long:
         open(app_logger.LOG_FILENAME, 'w').close()
-        app_logger.custom_logger('controller').info('log has been cleared')
+        logger.info('log has been cleared')
 
     elif parsed.action == _Args.ADD_PROJECT.long:
         _process_add_project(parsed)
@@ -378,12 +378,12 @@ def _init_show_tasks_parser(root_args):
 
 
 def _process_login(parsed_args):
-    app_logger.custom_logger(MODULE_LOGGER_NAME).debug('login')
+    logger.debug('login')
     commands.log_in(parsed_args.login, parsed_args.password)
 
 
 def _process_add_task(parsed_args):
-    app_logger.custom_logger(MODULE_LOGGER_NAME).debug('add_task')
+    logger.debug('add_task')
 
     # time, parent and comment is list value, so we have to extract data from it
     time = None
@@ -422,7 +422,7 @@ def _process_add_task(parsed_args):
 
 
 def _process_change_task(parsed_args):
-    app_logger.custom_logger(MODULE_LOGGER_NAME).debug('change_task')
+    logger.debug('change_task')
 
     # time and comment is list value, so we have to extract data from it
     time = None
@@ -437,12 +437,12 @@ def _process_change_task(parsed_args):
 
 
 def _process_remove_task(parsed_args):
-    app_logger.custom_logger(MODULE_LOGGER_NAME).debug('remove_task')
+    logger.debug('remove_task')
     commands.remove_task(parsed_args.id)
 
 
 def _process_add_user(parsed_args):
-    app_logger.custom_logger(MODULE_LOGGER_NAME).debug('add_user')
+    logger.debug('add_user')
     if parsed_args.project is None:
         if parsed_args.password == '':
             raise ValueError('You must specify the password!')
@@ -454,7 +454,7 @@ def _process_add_user(parsed_args):
 
 
 def _process_add_project(parsed_args):
-    app_logger.custom_logger(MODULE_LOGGER_NAME).debug('add_project')
+    logger.debug('add_project')
     commands.add_project(parsed_args.title,
                          parsed_args.description[0],
                          parsed_args.members)

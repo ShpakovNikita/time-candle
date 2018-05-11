@@ -61,3 +61,17 @@ class ProjectMessages(Enum):
     PROJECT_DOES_NOT_EXISTS = 'Selected project does not exists'
     DO_NOT_HAVE_RIGHTS = 'You don\'t have rights to modify this project'
     USER_ALREADY_EXISTS = 'The selected user already exists in this project'
+
+
+# Filters related things
+class InvalidFilterOperator(Exception):
+    def __init__(self, errors=None, message='The filter operator is invalid! {}'
+                 ):
+        super().__init__(message.format(errors))
+        self.errors = errors
+
+
+class FilterMessages(Enum):
+    # This is pre defined messages that will be associated with filters all
+    # over the project
+    FILTER_DOES_NOT_EXISTS = 'Selected operator is invalid'

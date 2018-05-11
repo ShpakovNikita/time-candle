@@ -9,6 +9,43 @@ new_db_flag = not os.path.exists(db_filename)
 db = SqliteDatabase(db_filename)
 
 
+class Filter:
+    # Constants that show our operators
+    OP_AND = 0
+    OP_OR = 1
+
+    def __init__(self):
+        self.result = []
+        self.ops = []
+
+    # clear filter query
+    def clear(self):
+        self.result = []
+        self.ops = []
+
+    # Generate query to make result array to the peewee object
+    def to_query(self):
+        query = None
+        # try to get result's first element
+        try:
+            query = self.result[0]
+        except IndexError:
+            pass
+
+        for i in range(len(self.result) - 1):
+            if self.ops[i] == Filter.OP_AND:
+                query = query & self.result[i + 1]
+
+            elif self.ops[i] == Filter.OP_OR:
+                query = query | self.result[i + 1]
+
+            else:
+                raise db_e.InvalidFilterOperator(db_e.FilterMessages.
+                                                 FILTER_DOES_NOT_EXISTS)
+
+        return query
+
+
 class User(Model):
     # user fields
     # for UserModel's own_tasks we have a relation field in Task class from
@@ -106,29 +143,6 @@ class TagTaskRelation(Model):
 
 # TODO: chat task relations table witch maybe messages
 # TODO: role tags relations?
-
-
-# only test functions. They will be changed or removed
-def _test_add_user(login, password):
-    """
-    This function if checking is current user exists, and if so we are raising
-    an exception. Or we are adding it to the database.
-    :param login: String
-    :param password: String
-    :return: None
-    """
-    if User.select().where(User.login == login).exists():
-        raise db_e.InvalidLoginError(db_e.LoginMessages.USER_EXISTS)
-
-    user = User.create(login=login,
-                       password=password,
-                       about='Hello, it\'s me, {}'.format(login))
-
-    # Maybe it is better to fix it in another way. Here we are defining nickname
-    # same as the login
-    if not user.nickname:
-        user.nickname = user.login
-        user.save()
 
 
 def _test_login(login, password):

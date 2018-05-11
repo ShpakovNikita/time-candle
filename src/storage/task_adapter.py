@@ -1,10 +1,187 @@
 from storage.adapter_classes import Task, User
-import storage
+from storage.adapter_classes import Filter as PrimaryFilter
+from storage import logger
 from main_instances.task import Task as TaskInstance
-import app_logger
 import exceptions.db_exceptions as db_e
 from singleton import Singleton
 from peewee import *
+
+
+class TaskFilter(PrimaryFilter):
+    OP_GREATER = 0
+    OP_GREATER_OR_EQUALS = 1
+    OP_EQUALS = 2
+    OP_LESS_OR_EQUALS = 3
+    OP_LESS = 4
+
+    def __init__(self):
+        super().__init__()
+
+    def tid(self, tid, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(Task.id == tid)
+
+    def creator(self, uid, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(Task.creator == uid)
+
+    def receiver(self, uid, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(Task.receiver == uid)
+
+    def project(self, pid, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(Task.project == pid)
+
+    def status(self,
+               status,
+               storage_op=OP_EQUALS,
+               op=PrimaryFilter.OP_AND):
+        # in this function we also have to compare on less or greater, that's
+        # why another operator arg is needed
+        if self.result:
+            self.ops.append(op)
+
+        if TaskFilter.OP_GREATER == storage_op:
+            self.result.append(Task.status > status)
+
+        elif TaskFilter.OP_GREATER_OR_EQUALS == storage_op:
+            self.result.append(Task.status >= status)
+
+        elif TaskFilter.OP_EQUALS == storage_op:
+            self.result.append(Task.status == status)
+
+        elif TaskFilter.OP_LESS_OR_EQUALS == storage_op:
+            self.result.append(Task.status <= status)
+
+        elif TaskFilter.OP_LESS == storage_op:
+            self.result.append(Task.status < status)
+
+        else:
+            raise db_e.InvalidFilterOperator(db_e.FilterMessages.
+                                             FILTER_DOES_NOT_EXISTS)
+
+    def parent(self, tid, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(Task.parent == tid)
+
+    def title_substring(self, substring, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(Task.title.contains(substring))
+
+    def title_regex(self, substring, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(Task.title.contains(substring))
+
+    def priority(self,
+                 priority,
+                 storage_op=OP_EQUALS,
+                 op=PrimaryFilter.OP_AND):
+        # in this function we also have to compare on less or greater, that's
+        # why another operator arg is needed
+        if self.result:
+            self.ops.append(op)
+
+        if TaskFilter.OP_GREATER == storage_op:
+            self.result.append(Task.status > priority)
+
+        elif TaskFilter.OP_GREATER_OR_EQUALS == storage_op:
+            self.result.append(Task.status >= priority)
+
+        elif TaskFilter.OP_EQUALS == storage_op:
+            self.result.append(Task.status == priority)
+
+        elif TaskFilter.OP_LESS_OR_EQUALS == storage_op:
+            self.result.append(Task.status <= priority)
+
+        elif TaskFilter.OP_LESS == storage_op:
+            self.result.append(Task.status < priority)
+
+        else:
+            raise db_e.InvalidFilterOperator(db_e.FilterMessages.
+                                             FILTER_DOES_NOT_EXISTS)
+
+    def deadline_time(self,
+                      deadline_time,
+                      storage_op=OP_EQUALS,
+                      op=PrimaryFilter.OP_AND):
+        # in this function we also have to compare on less or greater, that's
+        # why another operator arg is needed
+        if self.result:
+            self.ops.append(op)
+
+        if TaskFilter.OP_GREATER == storage_op:
+            self.result.append(Task.status > deadline_time)
+
+        elif TaskFilter.OP_GREATER_OR_EQUALS == storage_op:
+            self.result.append(Task.status >= deadline_time)
+
+        elif TaskFilter.OP_EQUALS == storage_op:
+            self.result.append(Task.status == deadline_time)
+
+        elif TaskFilter.OP_LESS_OR_EQUALS == storage_op:
+            self.result.append(Task.status <= deadline_time)
+
+        elif TaskFilter.OP_LESS == storage_op:
+            self.result.append(Task.status < deadline_time)
+
+        else:
+            raise db_e.InvalidFilterOperator(db_e.FilterMessages.
+                                             FILTER_DOES_NOT_EXISTS)
+
+    def comment_substring(self, substring, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(Task.comment.contains(substring))
+
+    def comment_regex(self, substring, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(Task.comment.contains(substring))
+
+    def period(self,
+               period,
+               storage_op=OP_EQUALS,
+               op=PrimaryFilter.OP_AND):
+        # in this function we also have to compare on less or greater, that's
+        # why another operator arg is needed
+        if self.result:
+            self.ops.append(op)
+
+        if TaskFilter.OP_GREATER == storage_op:
+            self.result.append(Task.status > period)
+
+        elif TaskFilter.OP_GREATER_OR_EQUALS == storage_op:
+            self.result.append(Task.status >= period)
+
+        elif TaskFilter.OP_EQUALS == storage_op:
+            self.result.append(Task.status == period)
+
+        elif TaskFilter.OP_LESS_OR_EQUALS == storage_op:
+            self.result.append(Task.status <= period)
+
+        elif TaskFilter.OP_LESS == storage_op:
+            self.result.append(Task.status < period)
+
+        else:
+            raise db_e.InvalidFilterOperator(db_e.FilterMessages.
+                                             FILTER_DOES_NOT_EXISTS)
 
 
 def save(task):
@@ -19,10 +196,10 @@ def save(task):
     try:
         Task.select().where(Task.id == task.tid).get()
         update()
-        app_logger.custom_logger('storage').debug('task updated')
+        logger.debug('task updated')
 
     except DoesNotExist:
-        app_logger.custom_logger('storage').debug('adding task...')
+        logger.debug('adding task...')
 
     table_task = Task.create(creator=task.creator_uid,
                              receiver=task.uid,
@@ -34,10 +211,9 @@ def save(task):
                              deadline_time=task.deadline,
                              comment=task.comment)
 
-    app_logger.custom_logger('storage').debug('taks\'s parent %s' %
-                                              table_task.parent)
+    logger.debug('taks\'s parent %s' % table_task.parent)
 
-    app_logger.custom_logger('storage').debug('task saved to database')
+    logger.debug('task saved to database')
 
 
 def last_id():
@@ -50,7 +226,7 @@ def last_id():
     """
 
     query = Task.select().order_by(Task.id.desc())
-    app_logger.custom_logger('storage').debug('getting last id from query...{}'
+    logger.debug('getting last id from query...{}'
                                               .format(query))
 
     try:
@@ -73,13 +249,11 @@ def remove_task_by_id(tid):
         for task in query:
             remove_task_by_id(task.id)
 
-        app_logger.custom_logger('storage').info('removing task by tid %s' %
-                                                 tid)
+        logger.info('removing task by tid %s' % tid)
         Task.delete().where(Task.id == tid).execute()
     except DoesNotExist:
-        app_logger.custom_logger('storage').info('There is no such tid %s in '
-                                                 'the database for your user' %
-                                                 tid)
+        logger.info('There is no such tid %s in the database for your user' %
+                    tid)
         raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
 
 
@@ -102,9 +276,8 @@ def get_task_by_id(tid, pid=None):
         return _storage_to_model(task.get())
 
     except DoesNotExist:
-        app_logger.custom_logger('storage').info('There is no such tid %s in '
-                                                 'the database for your user' %
-                                                 tid)
+        logger.info('There is no such tid %s in the database for your user' %
+                    tid)
         raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
 
 
@@ -118,7 +291,7 @@ def _storage_to_model(storage_task):
     :type storage_task: Task
     :return: TaskInstance
     """
-    app_logger.custom_logger('storage').debug('convert storage to model task')
+    logger.debug('convert storage to model task')
     # we can have a None parent, so we have to determine this to take it's id or
     # not
     if storage_task.parent is None:

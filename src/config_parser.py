@@ -4,6 +4,7 @@ import exceptions.exceptions
 import storage.user_adapter
 
 CONFIG_NAME = 'config.ini'
+logger = app_logger.custom_logger('model')
 
 
 def run_config():
@@ -28,9 +29,9 @@ def run_config():
 
         # Create user by it's name and password. If it exists, we will get it
         # from database
-        app_logger.custom_logger('model').debug('login has been set {} {}'.
+        logger.debug('login has been set {} {}'.
                                                 format(login, password))
-        config_dict['user'] = storage.user_adapter.get_user(login, password)
+        config_dict['user'] = storage.user_adapter.login_user(login, password)
         return config_dict
 
     except KeyError:

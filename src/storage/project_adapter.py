@@ -1,9 +1,46 @@
-import app_logger
 from peewee import *
 from storage.adapter_classes import Project, UserProjectRelation
+from storage.adapter_classes import Filter as PrimaryFilter
 from singleton import Singleton
 from main_instances.project import Project as ProjectInstance
 import exceptions.db_exceptions as db_e
+from storage import logger
+
+
+class ProjectFilter(PrimaryFilter):
+
+    def __init__(self):
+        super().__init__()
+
+    def pid(self, pid, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(Project.admin == pid)
+
+    def admin(self, uid, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(Project.admin == uid)
+
+    def title(self, title, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(Project.title == title)
+
+    def description_substring(self, substring, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(Project.description.contains(substring))
+
+    def description_regex(self, regex, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(Project.description.regexp(regex))
 
 
 def save(project_model):
@@ -25,7 +62,7 @@ def save(project_model):
     project.save()
     relation.save()
 
-    app_logger.custom_logger('storage').debug('project saved to database')
+    logger.debug('project saved to database')
 
 
 def last_id():
@@ -38,7 +75,7 @@ def last_id():
     """
 
     query = Project.select().order_by(Project.id.desc())
-    app_logger.custom_logger('storage').debug('getting last id from query...{}'
+    logger.debug('getting last id from query...{}'
                                               .format(query))
 
     try:
@@ -69,7 +106,7 @@ def get_project_by_id(pid):
         return _storage_to_model(project.get())
 
     except DoesNotExist:
-        app_logger.custom_logger('storage').info('There is no such pid %s in '
+        logger.info('There is no such pid %s in '
                                                  'the database for your user' %
                                                  pid)
         raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
@@ -115,7 +152,7 @@ def remove_project_by_id(pid):
         Project.delete(). \
             where(Project.id == pid).execute()
 
-        app_logger.custom_logger('storage').debug('project fully removed')
+        logger.debug('project fully removed')
 
     except DoesNotExist:
         db_e.InvalidPidError(db_e.ProjectMessages.PROJECT_DOES_NOT_EXISTS)
@@ -127,8 +164,7 @@ def _storage_to_model(storage_project):
     :type storage_project: Project
     :return: ProjectInstance
     """
-    app_logger.custom_logger('storage').\
-        debug('convert storage to model project')
+    logger.debug('convert storage to model project')
 
     model_project = ProjectInstance(storage_project.id,
                                     storage_project.admin.id)

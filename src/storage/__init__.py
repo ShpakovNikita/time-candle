@@ -7,9 +7,11 @@ to remove, store, pull and add data to the DB.
 
 import pkgutil
 import inspect
+import app_logger
 import os
 
 __all__ = []
+logger = app_logger.custom_logger('storage')
 
 for loader, name, is_pkg in pkgutil.walk_packages(__path__):
     module = loader.find_module(name).load_module(name)

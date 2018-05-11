@@ -22,6 +22,9 @@ Note, that we have to login anytime firstly before the actions from the user
 """
 
 
+logger = app_logger.custom_logger('model')
+
+
 def log_in(login, password):
     """
     This function writes current user to the config.ini
@@ -29,8 +32,10 @@ def log_in(login, password):
     :type password: String
     :return: None
     """
-    # TODO: Yes, it is protected member and it is bad to use it
-    storage.adapter_classes._test_login(login, password)
+    storage.user_adapter.login_user(login, password)
+    # if everything is ok, we will write our login and password to the
+    # config.ini
+    config_parser.write_user(login, password)
 
 
 def add_user(login, password):
@@ -41,9 +46,7 @@ def add_user(login, password):
     :type password: String
     :return: None
     """
-    # TODO: Yes, it is protected member and it is bad to use it
-    storage.adapter_classes._test_add_user(login, password)
-    pass
+    storage.user_adapter.add_user(login, password)
 
 
 def add_user_to_project(login, pid):
@@ -88,6 +91,7 @@ def add_project(title, description, members):
 
     except db_e.InvalidLoginError:
         storage.project_adapter.remove_project_by_id(project.pid)
+        raise db_e.InvalidLoginError(db_e.LoginMessages.USER_DOES_NOT_EXISTS)
 
 
 # TODO: THERE IS REALLY BIG DUPLICATED CODE. ASK ANDY WHAT IS OK
@@ -116,11 +120,11 @@ def add_task(title, priority, status, time, parent_id, comment):
     # This max func needed to set tasks status and priority not lower then
     # parent's
     if priority is None:
-        app_logger.custom_logger('model').debug('Default priority has been set')
+        logger.debug('Default priority has been set')
         priority = Priority.MEDIUM
 
     if status is None:
-        app_logger.custom_logger('model').debug('Default status has been set')
+        logger.debug('Default status has been set')
         status = Status.IN_PROGRESS
 
     # This code is also checking is our parent tid exists in the database for
@@ -137,8 +141,7 @@ def add_task(title, priority, status, time, parent_id, comment):
     if time is not None:
         deadline_time = validators.get_milliseconds(time)
 
-    app_logger.custom_logger('model').debug('time in milliseconds %s' %
-                                            deadline_time)
+    logger.debug('time in milliseconds %s' % deadline_time)
 
     task = TaskInstance(user.uid,
                         user.uid,
@@ -151,8 +154,8 @@ def add_task(title, priority, status, time, parent_id, comment):
                         parent_id,
                         comment)
 
-    app_logger.custom_logger('model').debug('task configured and ready to save'
-                                            ', the task id is %s' % task.tid)
+    logger.debug('task configured and ready to save , the task id is %s'
+                 % task.tid)
 
     storage.task_adapter.save(task)
 
@@ -193,11 +196,11 @@ def add_task_to_project(title,
     # This max func needed to set tasks status and priority not lower then
     # parent's
     if priority is None:
-        app_logger.custom_logger('model').debug('Default priority has been set')
+        logger.debug('Default priority has been set')
         priority = Priority.MEDIUM
 
     if status is None:
-        app_logger.custom_logger('model').debug('Default status has been set')
+        logger.debug('Default status has been set')
         status = Status.IN_PROGRESS
 
     # This code is also checking is our parent tid exists in the database for
@@ -215,8 +218,7 @@ def add_task_to_project(title,
     if time is not None:
         deadline_time = validators.get_milliseconds(time)
 
-    app_logger.custom_logger('model').debug('time in milliseconds %s' %
-                                            deadline_time)
+    logger.debug('time in milliseconds %s' % deadline_time)
 
     # TODO: MADE NOT ONLY ADMIN ADD, BUT USERS WITH LOW PRIORITY!!! Just change
     # TODO: on is_admin(pid) maybe
@@ -241,12 +243,12 @@ def add_task_to_project(title,
                         parent_id,
                         comment)
 
-    app_logger.custom_logger('model').debug('task configured and ready to save'
-                                            ', the task id is %s' % task.tid)
+    logger.debug('task configured and ready to save , the task id is %s'
+                 % task.tid)
 
     storage.task_adapter.save(task)
 
-    app_logger.custom_logger('model').debug('task to project added')
+    logger.debug('task to project added')
 
 
 def remove_task(tid):
@@ -319,7 +321,7 @@ def _print_project_tasks(pid):
     pass
 
 
-def _print_task(tid, is_project=None):
+def _print_task(tid, is_project=False):
     """
     This function print's task info
     :param tid: Task's id to print
@@ -330,6 +332,12 @@ def _print_task(tid, is_project=None):
     print()
     print('Task ' + task.title)
     print('Task\'s id is ' + str(task.tid))
+    if is_project:
+        print('The task creator: ' +
+              storage.user_adapter.get_user_by_id(task.creator_uid).nickname)
+        print('The task receiver: ' +
+              storage.user_adapter.get_user_by_id(task.uid).nickname)
+
     if task.deadline is None:
         task_time = 'unlimited'
     else:

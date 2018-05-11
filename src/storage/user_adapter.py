@@ -3,10 +3,10 @@ from storage.adapter_classes import User, Task, Project, UserProjectRelation
 import exceptions.db_exceptions as db_e
 from peewee import *
 from singleton import Singleton
-import app_logger
+from storage import logger
 
 
-def get_user(login, password):
+def login_user(login, password):
     """
     This function is like head function for all adapters. From this start point
     we get real user from database by it's login and valid password
@@ -39,6 +39,28 @@ def get_user(login, password):
                         obj.about)
 
 
+def add_user(login, password):
+    """
+    This function if checking is current user exists, and if so we are raising
+    an exception. Or we are adding it to the database.
+    :param login: String
+    :param password: String
+    :return: None
+    """
+    if User.select().where(User.login == login).exists():
+        raise db_e.InvalidLoginError(db_e.LoginMessages.USER_EXISTS)
+
+    user = User.create(login=login,
+                       password=password,
+                       about='Hello, it\'s me, {}'.format(login))
+
+    # Maybe it is better to fix it in another way. Here we are defining nickname
+    # same as the login
+    if not user.nickname:
+        user.nickname = user.login
+        user.save()
+
+
 def add_user_to_project_by_id(login, pid):
     """
     This function adds user to the Project relationship table to make user a 
@@ -53,7 +75,7 @@ def add_user_to_project_by_id(login, pid):
         project = Project.select().\
             where((Singleton.GLOBAL_USER.uid == Project.admin) &
                   (Project.id == pid)).get()
-        app_logger.custom_logger('storage').debug('such project exists')
+        logger.debug('such project exists')
 
     except DoesNotExist:
         raise db_e.InvalidPidError(db_e.ProjectMessages.YOU_DO_NOT_HAVE_RIGHTS)
@@ -61,7 +83,7 @@ def add_user_to_project_by_id(login, pid):
     try:
         # we trying to find user by login
         user = User.select().where(User.login == login).get()
-        app_logger.custom_logger('storage').debug('such user exists')
+        logger.debug('such user exists')
 
     except DoesNotExist:
         raise db_e.InvalidLoginError(db_e.LoginMessages.USER_DOES_NOT_EXISTS)
@@ -74,13 +96,14 @@ def add_user_to_project_by_id(login, pid):
             where((UserProjectRelation.project == pid) &
                   (UserProjectRelation.user == user.id)).get()
 
+        logger.debug('such relation exists')
         raise db_e.InvalidLoginError(db_e.ProjectMessages.USER_ALREADY_EXISTS)
     except DoesNotExist:
-        app_logger.custom_logger('storage').debug('such user is not in project')
+        logger.debug('such user is not in project')
 
         UserProjectRelation.create(user=user, project=project)
 
-    app_logger.custom_logger('storage').info('user_project relation created')
+    logger.info('user_project relation created')
 
 
 def get_id_by_login(login):
@@ -98,6 +121,27 @@ def get_id_by_login(login):
         db_e.InvalidLoginError(db_e.LoginMessages.USER_DOES_NOT_EXISTS)
 
 
+def get_user_by_id(uid):
+    """
+    This function returns login of user by id
+    :param uid: User's id
+    :return: String
+    """
+    query = User.select().where(User.id == uid)
+    try:
+        obj = query.get()
+
+    except DoesNotExist:
+        raise db_e.InvalidLoginError(db_e.LoginMessages.USER_DOES_NOT_EXISTS)
+
+    return UserInstance(obj.id,
+                        obj.login,
+                        obj.password,
+                        obj.time_zone,
+                        obj.nickname,
+                        obj.about)
+
+
 # TODO: maybe add function get_id_by_login to change all login on uid
 def is_user_in_project(login, pid):
     """
@@ -107,14 +151,14 @@ def is_user_in_project(login, pid):
     :return: Bool
     """
     uid = get_id_by_login(login)
-    app_logger.custom_logger('storage').debug('the uid is %s' % uid)
+    logger.debug('the uid is %s' % uid)
 
     try:
         UserProjectRelation.select().\
             where((UserProjectRelation.project == pid) &
                   (UserProjectRelation.user == uid)).get()
 
-        app_logger.custom_logger('storage').debug('user exists in project')
+        logger.debug('user exists in project')
         return True
 
     except DoesNotExist:

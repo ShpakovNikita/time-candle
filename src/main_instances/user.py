@@ -18,6 +18,3 @@ class User:
         self.password = password_
         self.time_zone = time_zone_
         self.about = about_
-
-    def say_hi(self):
-        print('hello, I\'m {}'.format(self.nickname))
