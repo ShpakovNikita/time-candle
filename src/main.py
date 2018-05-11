@@ -17,7 +17,7 @@ def main():
     """
     app_logger.custom_logger('root').info('Entering the program.')
     fil = ta.TaskFilter()
-    fil.priority(Priority.HIGH, ta.TaskFilter.OP_GREATER_OR_EQUALS,
+    fil.priority(Priority.MEDIUM, ta.TaskFilter.OP_GREATER_OR_EQUALS,
                  op=Filter.OP_AND)
     fil.priority(Priority.MAX, ta.TaskFilter.OP_LESS,
                  op=Filter.OP_AND)

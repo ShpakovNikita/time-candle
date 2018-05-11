@@ -23,6 +23,21 @@ class Filter:
         self.result = []
         self.ops = []
 
+    # make groups operation
+    def __and__(self, other):
+        fil = Filter()
+        fil.ops.append(Filter.OP_AND)
+        fil.result.append(self.to_query())
+        fil.result.append(other.to_query())
+        return fil
+
+    def __or__(self, other):
+        fil = Filter()
+        fil.ops.append(Filter.OP_OR)
+        fil.result.append(self.to_query())
+        fil.result.append(other.to_query())
+        return fil
+
     # Generate query to make result array to the peewee object
     def to_query(self):
         query = None

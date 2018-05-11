@@ -1,4 +1,4 @@
-from storage.adapter_classes import Task, User
+from storage.adapter_classes import Task, User, UserProjectRelation, Project
 from storage.adapter_classes import Filter as PrimaryFilter
 from storage import logger
 from main_instances.task import Task as TaskInstance
@@ -192,12 +192,34 @@ def get_by_filter(filter_instance):
     :return: List of TaskInstances
     """
     result = []
-    query = Task.select().where(filter_instance.to_query())
+    query = _get_available_tasks().select().where(filter_instance.to_query())
 
     for task in query:
         result.append(_storage_to_model(task))
 
     return result
+
+
+def _get_available_tasks():
+    uid = 2
+    query_projects = UserProjectRelation.select(UserProjectRelation.project).\
+        where(UserProjectRelation.user == uid)
+    projects = [rel.project.id for rel in query_projects]
+
+    # q = UserProjectRelation.select().where(UserProjectRelation.project <<
+    #                                        projects)
+    # users = list(set([rel.user.id for rel in q]))
+
+    query = (Task.select().join(User, on=((Task.creator == User.id)
+                                          | (Task.receiver == User.id))).join(
+        UserProjectRelation)).where((User.id << projects) &
+                                    (Task.project << projects)).group_by(Task)
+
+    # query = Task.select().where(((Task.creator << users) |
+    #                              (Task.receiver << users)) &
+    #                             (Task.project << projects))
+
+    return query
 
 
 def save(task):
