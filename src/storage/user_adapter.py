@@ -43,6 +43,21 @@ class UserFilter(PrimaryFilter):
         self.result.append(User.nickname.contains(regex))
 
 
+def get_users_by_filter(filter_instance):
+    """
+    This function returns model objects by the given UserFilter.
+    :param filter_instance: UserFilter with defined filters
+    :return: List of UserInstances
+    """
+    result = []
+    query = User.select().where(filter_instance.to_query())
+
+    for user in query:
+        result.append(_storage_to_model(user))
+
+    return result
+
+
 def login_user(login, password):
     """
     This function is like head function for all adapters. From this start point
@@ -58,8 +73,9 @@ def login_user(login, password):
         obj = query.get()
 
     except DoesNotExist:
-        raise db_e.InvalidLoginError(db_e.LoginMessages.USER_DOES_NOT_EXISTS
-                                          + ', try to login again')
+        raise db_e.InvalidLoginError(
+            str(db_e.LoginMessages.USER_DOES_NOT_EXISTS) +
+            ', try to login again')
 
     if not query.exists():
         raise db_e.InvalidLoginError(db_e.LoginMessages.USER_DOES_NOT_EXISTS)
@@ -225,3 +241,21 @@ def get_projects_id_by_uid(uid):
         where(UserProjectRelation.user == uid)
 
     return [pid.id for pid in query]
+
+
+def _storage_to_model(storage_user):
+    """
+    This function converts storage user to model user
+    :type storage_user: User
+    :return: UserInstance
+    """
+    logger.debug('convert storage to model user')
+
+    model_user = UserInstance(storage_user.id,
+                              storage_user.login,
+                              storage_user.password,
+                              storage_user.time_zone,
+                              storage_user.nickname,
+                              storage_user.about)
+
+    return model_user

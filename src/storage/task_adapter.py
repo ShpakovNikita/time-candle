@@ -21,25 +21,37 @@ class TaskFilter(PrimaryFilter):
         if self.result:
             self.ops.append(op)
 
-        self.result.append(Task.id == tid)
+        if isinstance(tid, (list, )):
+            self.result.append(Task.id << tid)
+        else:
+            self.result.append(Task.id == tid)
 
     def creator(self, uid, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
-        self.result.append(Task.creator == uid)
+        if isinstance(uid, (list, )):
+            self.result.append(Task.creator << uid)
+        else:
+            self.result.append(Task.creator == uid)
 
     def receiver(self, uid, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
-        self.result.append(Task.receiver == uid)
+        if isinstance(uid, (list,)):
+            self.result.append(Task.receiver << uid)
+        else:
+            self.result.append(Task.receiver == uid)
 
     def project(self, pid, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
-        self.result.append(Task.project == pid)
+        if isinstance(pid, (list,)):
+            self.result.append(Task.project << pid)
+        else:
+            self.result.append(Task.project == pid)
 
     def status(self,
                status,
@@ -185,6 +197,7 @@ class TaskFilter(PrimaryFilter):
                                              FILTER_DOES_NOT_EXISTS)
 
 
+# TODO: USER JOIN TO FIND BY LOGIN
 def get_by_filter(filter_instance):
     """
     This function returns model objects by the given TaskFilter.
