@@ -1,4 +1,4 @@
-import config_parser
+from model import config_parser
 import storage.adapter_classes
 import storage.task_adapter
 import storage.user_adapter

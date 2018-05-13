@@ -1,14 +1,7 @@
 #!/usr/bin/env python3
 import commands_parser
 import app_logger
-import tokenizer
-import storage.task_adapter as ta
-import storage.user_adapter as ua
-from enums.priority import Priority
-from storage.adapter_classes import Filter
-from pprint import pprint
-import config_parser
-from session_control import start_session
+from model.session_control import start_session
 # TODO: cut down lower part of the code from this module
 
 
@@ -37,9 +30,6 @@ def main():
     """
 
     commands_parser.run()
-
-    with open('tokenizer.py', 'r') as myfile:
-        data = myfile.read().replace('\n', '')
 
     # pprint(tokenizer.parse_string("data:'name', 'field' ; this_is_sparta:'huh', 1.2 > 2"))
 

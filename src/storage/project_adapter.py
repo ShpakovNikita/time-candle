@@ -2,7 +2,7 @@ from peewee import *
 from storage.adapter_classes import Project, UserProjectRelation
 from storage.adapter_classes import Filter as PrimaryFilter
 from storage.adapter_classes import Adapter as PrimaryAdapter
-from main_instances.project import Project as ProjectInstance
+from model.main_instances import Project as ProjectInstance
 import exceptions.db_exceptions as db_e
 from storage import logger
 

@@ -1,6 +1,6 @@
 import argparse
 from collections import namedtuple
-import commands
+from model import commands
 import app_logger
 
 

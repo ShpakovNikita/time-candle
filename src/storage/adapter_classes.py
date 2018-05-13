@@ -1,7 +1,6 @@
 from peewee import *
 import exceptions.db_exceptions as db_e
 import os
-import config_parser
 import app_logger
 
 db_filename = 'data.db'

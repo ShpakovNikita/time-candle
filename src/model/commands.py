@@ -1,15 +1,11 @@
-import config_parser
-import app_logger
 from enums.status import Status
 from enums.priority import Priority
-from main_instances.user import User
-from main_instances.task import Task as TaskInstance
-from main_instances.project import Project as ProjectInstance
-import os
+from model.main_instances.task import Task as TaskInstance
+from model.main_instances import Project as ProjectInstance
 from storage import *
 import exceptions.db_exceptions as db_e
-import validators
-from session_control import Singleton, Adapters
+from model import validators, config_parser
+from model.session_control import Singleton, Adapters
 """
 This is commands module. Commands from argparse and django will go to this 
 module and it will help to separate argparser from the model. In this module 

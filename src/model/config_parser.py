@@ -2,7 +2,7 @@ import configparser
 import app_logger
 import exceptions.exceptions
 import storage.user_adapter
-from main_instances.user import User
+from model.main_instances.user import User
 
 CONFIG_NAME = 'config.ini'
 logger = app_logger.custom_logger('model')
