@@ -4,12 +4,12 @@ class User:
     you must be sure that your data is RIGHT and CLEAR (i.e validated)
     """
     def __init__(self,
-                 uid_,
-                 login_,
-                 password_,
-                 time_zone_,
-                 nickname_,
-                 about_):
+                 uid_=None,
+                 login_='guest',
+                 password_=None,
+                 time_zone_=None,
+                 nickname_='guest',
+                 about_=''):
         self.own_tasks = []
         self.projects = []
         self.uid = uid_

@@ -61,7 +61,19 @@ class Filter:
         return query
 
 
-class User(Model):
+class Adapter:
+    def __init__(self, uid):
+        self._uid = uid
+
+
+class BaseModel(Model):
+    class Meta:
+        database = db
+
+
+class User(BaseModel):
+    uid = PrimaryKeyField()
+
     # user fields
     # for UserModel's own_tasks we have a relation field in Task class from
     # storage.task_adapter
@@ -79,20 +91,18 @@ class User(Model):
     time_zone = IntegerField(default=0)
     about = CharField(default='')
 
-    class Meta:
-        database = db
 
+class Project(BaseModel):
+    pid = PrimaryKeyField()
 
-class Project(Model):
     title = CharField()
     admin = ForeignKeyField(User, related_name='admin')
     description = TextField()
 
-    class Meta:
-        database = db
 
+class Task(BaseModel):
+    tid = PrimaryKeyField()
 
-class Task(Model):
     creator = ForeignKeyField(User, related_name='creator')
 
     # if the task is not project task this field equals to the creator field
@@ -101,7 +111,6 @@ class Task(Model):
     # if the task is not project task this field equals null
     project = ForeignKeyField(User, related_name='project', null=True)
     status = SmallIntegerField()
-    # TODO: Nani???
     parent = ForeignKeyField('self', null=True)
 
     title = CharField()
@@ -110,17 +119,17 @@ class Task(Model):
     # Time in milliseconds. Nullable for further functionality TODO:
     deadline_time = BigIntegerField(null=True)
     comment = CharField(default='')
-    period = IntegerField(null=True)
+    period = BigIntegerField(null=True)
+
+    # crontab style planner?
+    planner = CharField(null=True)
 
     # Chat will be organized later. But we are planning to create a new
     # relations table that will be holding task id, message id (not necessary),
     # message time in milliseconds, it's user id, and message itself
 
-    class Meta:
-        database = db
 
-
-class UserProjectRelation(Model):
+class UserProjectRelation(BaseModel):
     """
     This class is class for connecting projects and users, because one user can
     have more then one project, and one project can have multiple users. From it
@@ -134,11 +143,8 @@ class UserProjectRelation(Model):
     # TODO: rights as class with the relations
     rights = CharField(default='')
 
-    class Meta:
-        database = db
 
-
-class TagTaskRelation(Model):
+class TagTaskRelation(BaseModel):
     """
     This class is class for connecting search tag and tasks, because one tag can
     have more then one task, and one task can have multiple tags. From it we can
@@ -150,37 +156,12 @@ class TagTaskRelation(Model):
     task = ForeignKeyField(Task, related_name='tasks')
     project = ForeignKeyField(Project, related_name='project')
 
-    class Meta:
-        database = db
 
 # Maybe it is wise to create another relations table with the time rules and etc
 # but for not we have only deadline time. So simple.
 
 # TODO: chat task relations table witch maybe messages
 # TODO: role tags relations?
-
-
-def _test_login(login, password):
-    """
-    This function checking if selected login and password matches to the
-    database and if so, we make next session from the logged user's name (user
-    data is written to the config file). Or we are raising an exception.
-    :param login: String
-    :param password: String
-    :return: None
-    """
-    query = User.select().where(User.login == login)
-    if not query.exists():
-        raise db_e.InvalidLoginError(db_e.LoginMessages.USER_NOT_EXISTS)
-
-    elif query.get().password != password:
-        raise db_e.InvalidPasswordError(db_e.PasswordMessages.
-                                        PASSWORD_IS_NOT_MATCH)
-
-    # Due to this function is just for checking, it is wise to relocate lower
-    # code to the inner function
-    else:
-        config_parser.write_user(login, password)
 
 
 def _run():

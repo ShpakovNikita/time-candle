@@ -2,6 +2,7 @@ import configparser
 import app_logger
 import exceptions.exceptions
 import storage.user_adapter
+from main_instances.user import User
 
 CONFIG_NAME = 'config.ini'
 logger = app_logger.custom_logger('model')
@@ -29,13 +30,19 @@ def run_config():
 
         # Create user by it's name and password. If it exists, we will get it
         # from database
-        logger.debug('login has been set {} {}'.
-                                                format(login, password))
-        config_dict['user'] = storage.user_adapter.login_user(login, password)
+        logger.debug('login has been set {} {}'.format(login, password))
+        config_dict['user'] = storage.user_adapter.UserAdapter.login_user(
+            login, password)
         return config_dict
 
     except KeyError:
         raise exceptions.exceptions.InvalidLoginException
+
+    except exceptions.exceptions.InvalidLoginException:
+        config_dict['user'] = User()
+        logger.debug('user is invalid. Logging as guest')
+
+        return config_dict
 
 
 def write_config(user):

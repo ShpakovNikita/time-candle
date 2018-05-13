@@ -7,13 +7,9 @@ from main_instances.task import Task as TaskInstance
 from main_instances.project import Project as ProjectInstance
 import os
 from storage import *
-import storage.adapter_classes
-import storage.task_adapter
-import storage.user_adapter
-import storage.project_adapter
 import exceptions.db_exceptions as db_e
 import validators
-from singleton import Singleton
+from session_control import Singleton, Adapters
 """
 This is commands module. Commands from argparse and django will go to this 
 module and it will help to separate argparser from the model. In this module 
@@ -32,7 +28,7 @@ def log_in(login, password):
     :type password: String
     :return: None
     """
-    storage.user_adapter.login_user(login, password)
+    Adapters.USER_ADAPTER.login_user(login, password)
     # if everything is ok, we will write our login and password to the
     # config.ini
     config_parser.write_user(login, password)
@@ -46,7 +42,7 @@ def add_user(login, password):
     :type password: String
     :return: None
     """
-    storage.user_adapter.add_user(login, password)
+    Adapters.USER_ADAPTER.add_user(login, password)
 
 
 def add_user_to_project(login, pid):
@@ -57,10 +53,7 @@ def add_user_to_project(login, pid):
     :param pid: Project's id
     :return: None
     """
-    # get user from config.ini to make our project from it's name
-    Singleton.GLOBAL_USER = _login()
-
-    storage.user_adapter.add_user_to_project_by_id(login, pid)
+    Adapters.USER_ADAPTER.add_user_to_project_by_id(login, pid)
 
 
 def add_project(title, description, members):
@@ -74,23 +67,22 @@ def add_project(title, description, members):
     """
 
     # TODO: make it to the final!
-    # get user from config.ini to make our project from it's name
-    user = _login()
-    Singleton.GLOBAL_USER = user
 
-    project = ProjectInstance(storage.project_adapter.last_id() + 1,
-                              user.uid,
+    project = ProjectInstance(Adapters.PROJECT_ADAPTER.last_id() + 1,
+                              Singleton.GLOBAL_USER.uid,
                               title,
                               description)
 
-    storage.project_adapter.save(project)
+    Adapters.PROJECT_ADAPTER.save(project)
 
+    # if we cannot add one member from list, we delete project and it's
+    # relations
     try:
         for login in members:
             add_user_to_project(login, project.pid)
 
     except db_e.InvalidLoginError:
-        storage.project_adapter.remove_project_by_id(project.pid)
+        Adapters.PROJECT_ADAPTER.remove_project_by_id(project.pid)
         raise db_e.InvalidLoginError(db_e.LoginMessages.USER_DOES_NOT_EXISTS)
 
 
@@ -113,9 +105,6 @@ def add_task(title, priority, status, time, parent_id, comment):
     :type status: Int
     :return: None
     """
-    # get user from config.ini to make our task from it's name
-    user = _login()
-    Singleton.GLOBAL_USER = user
 
     # This max func needed to set tasks status and priority not lower then
     # parent's
@@ -132,7 +121,7 @@ def add_task(title, priority, status, time, parent_id, comment):
     # lower then parent's
 
     if parent_id is not None:
-        parent_task = storage.task_adapter.get_task_by_id(parent_id)
+        parent_task = Adapters.TASK_ADAPTER.get_task_by_id(parent_id)
         status = max(status, parent_task.status)
         priority = max(priority, parent_task.priority)
 
@@ -143,9 +132,9 @@ def add_task(title, priority, status, time, parent_id, comment):
 
     logger.debug('time in milliseconds %s' % deadline_time)
 
-    task = TaskInstance(user.uid,
-                        user.uid,
-                        storage.task_adapter.last_id() + 1,
+    task = TaskInstance(Singleton.GLOBAL_USER.uid,
+                        Singleton.GLOBAL_USER.uid,
+                        Adapters.TASK_ADAPTER.last_id() + 1,
                         deadline_time,
                         title,
                         None,
@@ -157,7 +146,7 @@ def add_task(title, priority, status, time, parent_id, comment):
     logger.debug('task configured and ready to save , the task id is %s'
                  % task.tid)
 
-    storage.task_adapter.save(task)
+    Adapters.TASK_ADAPTER.save(task)
 
 
 def add_task_to_project(title,
@@ -189,9 +178,6 @@ def add_task_to_project(title,
     :type status: Int
     :return: None
     """
-    # get user from config.ini to make our task from it's name
-    user = _login()
-    Singleton.GLOBAL_USER = user
 
     # This max func needed to set tasks status and priority not lower then
     # parent's
@@ -209,7 +195,7 @@ def add_task_to_project(title,
 
     # TODO: parent pid match pid
     if parent_id is not None:
-        parent_task = storage.task_adapter.get_task_by_id(parent_id, pid)
+        parent_task = Adapters.TASK_ADAPTER.get_task_by_id(parent_id, pid)
         status = max(status, parent_task.status)
         priority = max(priority, parent_task.priority)
 
@@ -225,16 +211,16 @@ def add_task_to_project(title,
 
     # Check for rights and id's
     if login is None:
-        task_uid = user.uid
+        task_uid = Singleton.GLOBAL_USER.uid
     else:
-        storage.user_adapter.is_user_in_project(login, pid)
-        task_uid = storage.user_adapter.get_id_by_login(login)
+        Adapters.USER_ADAPTER.is_user_in_project(login, pid)
+        task_uid = Adapters.USER_ADAPTER.get_id_by_login(login)
 
-    storage.project_adapter.has_rights(pid)
+    Adapters.PROJECT_ADAPTER.has_rights(pid)
 
     task = TaskInstance(task_uid,
-                        user.uid,
-                        storage.task_adapter.last_id() + 1,
+                        Singleton.GLOBAL_USER.uid,
+                        Adapters.TASK_ADAPTER.last_id() + 1,
                         deadline_time,
                         title,
                         pid,
@@ -246,7 +232,7 @@ def add_task_to_project(title,
     logger.debug('task configured and ready to save , the task id is %s'
                  % task.tid)
 
-    storage.task_adapter.save(task)
+    Adapters.TASK_ADAPTER.save(task)
 
     logger.debug('task to project added')
 
@@ -258,7 +244,7 @@ def remove_task(tid):
     :param tid: Tasks id
     :return: None
     """
-    storage.task_adapter.remove_task_by_id(tid)
+    Adapters.TASK_ADAPTER.remove_task_by_id(tid)
 
 
 def change_task(tid, priority, status, time, comment):
@@ -278,9 +264,6 @@ def change_task(tid, priority, status, time, comment):
     :return: None
     """
     # TODO: This function
-    # get user from config.ini to make our task from it's name
-    user = _login()
-    Singleton.GLOBAL_USER = user
     pass
 
 
@@ -296,14 +279,12 @@ def show_tasks(projects, all_flag):
     tasks
     :return: None
     """
-    # TODO: This function
-    # get user from config.ini to make our task from it's name
-    user = _login()
-    Singleton.GLOBAL_USER = user
+    # TODO: Change on get tasks
 
     if len(projects) == 0:
         # print user's personal task's
-        tids = storage.user_adapter.get_tasks_id_by_uid(user.uid)
+        tids = Adapters.USER_ADAPTER.get_tasks_id_by_uid(
+            Singleton.GLOBAL_USER.uid)
         for tid in tids:
             _print_task(tid)
 
@@ -328,15 +309,15 @@ def _print_task(tid, is_project=False):
     :param is_project: If flag specified then we will be printing users too
     :return: None
     """
-    task = storage.task_adapter.get_task_by_id(tid)
+    task = Adapters.TASK_ADAPTER.get_task_by_id(tid)
     print()
     print('Task ' + task.title)
     print('Task\'s id is ' + str(task.tid))
     if is_project:
         print('The task creator: ' +
-              storage.user_adapter.get_user_by_id(task.creator_uid).nickname)
+              Adapters.USER_ADAPTER.get_user_by_id(task.creator_uid).nickname)
         print('The task receiver: ' +
-              storage.user_adapter.get_user_by_id(task.uid).nickname)
+              Adapters.USER_ADAPTER.get_user_by_id(task.uid).nickname)
 
     if task.deadline is None:
         task_time = 'unlimited'
@@ -347,12 +328,3 @@ def _print_task(tid, is_project=False):
     print('Task\'s deadline time is ' + task_time)
     # print priority etc
 
-
-def _login():
-    """
-    Returns loaded user to make some actions from it's name. User will be
-    initialized from config file.
-    :return: User
-    """
-
-    return config_parser.run_config()['user']

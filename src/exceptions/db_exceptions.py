@@ -46,6 +46,7 @@ class TaskMessages(Enum):
     # This is pre defined messages that will be associated with task all over
     # the project
     TASK_DOES_NOT_EXISTS = 'Selected task does not exists'
+    DO_NOT_HAVE_RIGHTS = 'You don\'t have rights to create task'
 
 
 # Project related things

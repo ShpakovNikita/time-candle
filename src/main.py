@@ -8,6 +8,7 @@ from enums.priority import Priority
 from storage.adapter_classes import Filter
 from pprint import pprint
 import config_parser
+from session_control import start_session
 # TODO: cut down lower part of the code from this module
 
 
@@ -17,18 +18,23 @@ def main():
     usr.say_hi()
     """
     app_logger.custom_logger('root').info('Entering the program.')
+    start_session()
+    """
     fil = ta.TaskFilter()
-    fil.priority(Priority.MEDIUM, ta.TaskFilter.OP_GREATER_OR_EQUALS,
+    fil.priority(Priority.LOW, ta.TaskFilter.OP_GREATER_OR_EQUALS,
                  op=Filter.OP_AND)
 
+    print(ta.get_by_filter(fil))
     fil2 = ta.TaskFilter()
     fil2.priority(Priority.MAX, ta.TaskFilter.OP_LESS,
-                 op=Filter.OP_AND)
+                  op=Filter.OP_AND)
+    print(ta.get_by_filter(fil2))
     print(ta.get_by_filter(fil & fil2))
 
     fil = ua.UserFilter()
     fil.login_substring('n')
     print(ua.get_users_by_filter(fil))
+    """
 
     commands_parser.run()
 

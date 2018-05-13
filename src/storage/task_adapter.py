@@ -1,9 +1,9 @@
 from storage.adapter_classes import Task, User, UserProjectRelation, Project
 from storage.adapter_classes import Filter as PrimaryFilter
+from storage.adapter_classes import Adapter as PrimaryAdapter
 from storage import logger
 from main_instances.task import Task as TaskInstance
 import exceptions.db_exceptions as db_e
-from singleton import Singleton
 from peewee import *
 
 
@@ -21,16 +21,16 @@ class TaskFilter(PrimaryFilter):
         if self.result:
             self.ops.append(op)
 
-        if isinstance(tid, (list, )):
-            self.result.append(Task.id << tid)
+        if isinstance(tid, (list,)):
+            self.result.append(Task.tid << tid)
         else:
-            self.result.append(Task.id == tid)
+            self.result.append(Task.tid == tid)
 
     def creator(self, uid, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
-        if isinstance(uid, (list, )):
+        if isinstance(uid, (list,)):
             self.result.append(Task.creator << uid)
         else:
             self.result.append(Task.creator == uid)
@@ -197,168 +197,176 @@ class TaskFilter(PrimaryFilter):
                                              FILTER_DOES_NOT_EXISTS)
 
 
-# TODO: USER JOIN TO FIND BY LOGIN
-def get_by_filter(filter_instance):
-    """
-    This function returns model objects by the given TaskFilter.
-    :param filter_instance: TaskFilter with defined filters
-    :return: List of TaskInstances
-    """
-    result = []
-    query = _get_available_tasks().select().where(filter_instance.to_query())
+class TaskAdapter(PrimaryAdapter):
+    def __init__(self, uid=-1):
+        super().__init__(uid)
 
-    for task in query:
-        result.append(_storage_to_model(task))
+    # TODO: USER JOIN TO FIND BY LOGIN ETC
+    def get_by_filter(self, filter_instance):
+        """
+        This function returns model objects by the given TaskFilter.
+        :param filter_instance: TaskFilter with defined filters
+        :return: List of TaskInstances
+        """
+        result = []
+        # in this query we get all available tasks (our personal tasks and all
+        # tasks our in projects)
+        query = self._get_available_tasks().select(). \
+            join(User, on=((Task.creator == User.uid) |
+                           (Task.receiver == User.uid))). \
+            where(filter_instance.to_query()).group_by(Task)
 
-    return result
-
-
-def _get_available_tasks():
-    uid = 2
-    query_projects = UserProjectRelation.select(UserProjectRelation.project).\
-        where(UserProjectRelation.user == uid)
-    projects = [rel.project.id for rel in query_projects]
-
-    # q = UserProjectRelation.select().where(UserProjectRelation.project <<
-    #                                        projects)
-    # users = list(set([rel.user.id for rel in q]))
-
-    query = (Task.select().join(User, on=((Task.creator == User.id)
-                                          | (Task.receiver == User.id))).join(
-        UserProjectRelation)).where((User.id << projects) &
-                                    (Task.project << projects)).group_by(Task)
-
-    # query = Task.select().where(((Task.creator << users) |
-    #                              (Task.receiver << users)) &
-    #                             (Task.project << projects))
-
-    return query
-
-
-def save(task):
-    """
-    This function is used to store given task to the database. Note, that tasks
-    can be with similar names and dates (but on that case I have a task below)
-    TODO: warning if the task's title and time are matching with some precision
-    :param task: This is our task to save
-    :type task: TaskInstance
-    :return: None
-    """
-    try:
-        Task.select().where(Task.id == task.tid).get()
-        update()
-        logger.debug('task updated')
-
-    except DoesNotExist:
-        logger.debug('adding task...')
-
-    table_task = Task.create(creator=task.creator_uid,
-                             receiver=task.uid,
-                             project=task.pid,
-                             status=task.status,
-                             parent=task.parent,
-                             title=task.title,
-                             priority=task.priority,
-                             deadline_time=task.deadline,
-                             comment=task.comment)
-
-    logger.debug('taks\'s parent %s' % table_task.parent)
-
-    logger.debug('task saved to database')
-
-
-def last_id():
-    """
-    This function gets last id to add task on it's place
-    TODO:
-    This function finds the first unused id in the table to add new task row on
-    that place
-    :return: Int
-    """
-
-    query = Task.select().order_by(Task.id.desc())
-    logger.debug('getting last id from query...{}'
-                                              .format(query))
-
-    try:
-        return query.get().id
-
-    except DoesNotExist:
-        return 1
-
-
-def remove_task_by_id(tid):
-    """
-    This function removes selected task and it's all childs recursively or
-    raises an exception if task does not exists
-    :param tid: Tasks id
-    :return: None
-    """
-    # TODO: Is that good to have a recursive try except?
-    try:
-        query = Task.select().where(Task.parent == tid)
+        # return converted query to the outer module
         for task in query:
-            remove_task_by_id(task.id)
+            result.append(self._storage_to_model(task))
 
-        logger.info('removing task by tid %s' % tid)
-        Task.delete().where(Task.id == tid).execute()
-    except DoesNotExist:
-        logger.info('There is no such tid %s in the database for your user' %
-                    tid)
-        raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
+        return result
 
+    def _get_available_tasks(self):
+        query_projects = UserProjectRelation. \
+            select(UserProjectRelation.project). \
+            where(UserProjectRelation.user == self._uid)
+        projects = [rel.project.pid for rel in query_projects]
 
-def get_task_by_id(tid, pid=None):
-    """
-    This function finds task by id and current user in database and returns it,
-    or raise error due to incorrect request
-    :param pid: Project's id to get task from it
-    :param tid: Task id to find
-    :type pid: Int
-    :type tid: Int
-    :return: Task
-    """
-    # TODO: more flexible user dependency find for projects
-    task = Task.select().where((Task.id == tid) &
-                               ((Task.creator == Singleton.GLOBAL_USER.uid) |
-                                (Task.receiver == Singleton.GLOBAL_USER.uid)) &
-                               (Task.project == pid))
-    try:
-        return _storage_to_model(task.get())
+        q = UserProjectRelation.select().where(UserProjectRelation.project <<
+                                               projects)
+        users = list(set([rel.user.uid for rel in q]))
 
-    except DoesNotExist:
-        logger.info('There is no such tid %s in the database for your user' %
-                    tid)
-        raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
+        # TODO: check for critical moments
+        query = Task.select().where((Task.creator << users) |
+                                    (Task.project << projects))
 
+        print(len(query))
 
-def update():
-    pass
+        return query
 
+    def save(self, task):
+        """
+        This function is used to store given task to the database. Note, that
+        tasks can be with similar names and dates (but on that case I have a
+        task below)
+        TODO: warning if the task's title and time are matching with some precision
+        :param task: This is our task to save
+        :type task: TaskInstance
+        :return: None
+        """
+        try:
+            Task.select().where(Task.tid == task.tid).get()
+            self.update()
+            logger.debug('task updated')
 
-def _storage_to_model(storage_task):
-    """
-    This function converts storage task to model task
-    :type storage_task: Task
-    :return: TaskInstance
-    """
-    logger.debug('convert storage to model task')
-    # we can have a None parent, so we have to determine this to take it's id or
-    # not
-    if storage_task.parent is None:
-        parent_id = None
-    else:
-        parent_id = storage_task.parent.id
+        except DoesNotExist:
+            logger.debug('adding task...')
+        try:
+            table_task = Task.create(creator=task.creator_uid,
+                                     receiver=task.uid,
+                                     project=task.pid,
+                                     status=task.status,
+                                     parent=task.parent,
+                                     title=task.title,
+                                     priority=task.priority,
+                                     deadline_time=task.deadline,
+                                     comment=task.comment)
+        except IntegrityError:
+            # if you are guest
+            raise db_e.InvalidLoginError(db_e.TaskMessages.DO_NOT_HAVE_RIGHTS)
 
-    model_task = TaskInstance(storage_task.receiver.id,
-                              storage_task.creator.id,
-                              storage_task.id,
-                              storage_task.deadline_time,
-                              storage_task.title,
-                              None,
-                              storage_task.status,
-                              storage_task.priority,
-                              parent_id,
-                              storage_task.comment)
+        logger.debug('task\'s parent %s' % table_task.parent)
 
-    return model_task
+        logger.debug('task saved to database')
+
+    def get_task_by_id(self, tid, pid=None):
+        """
+        This function finds task by id and current user in database and returns
+        it, or raise error due to incorrect request
+        :param pid: Project's id to get task from it
+        :param tid: Task id to find
+        :type pid: Int
+        :type tid: Int
+        :return: Task
+        """
+        # TODO: more flexible user dependency find for projects
+        task = Task.select().where((Task.tid == tid) &
+                                   ((Task.creator == self._uid) |
+                                    (Task.receiver == self._uid)) &
+                                   (Task.project == pid))
+        try:
+            return self._storage_to_model(task.get())
+
+        except DoesNotExist:
+            logger.info('There is no such tid %s in the database for your user'
+                        % tid)
+            raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
+
+    def update(self):
+        pass
+
+    @staticmethod
+    def last_id():
+        """
+        This function gets last id to add task on it's place
+        TODO:
+        This function finds the first unused id in the table to add new task row
+        on that place
+        :return: Int
+        """
+        query = Task.select().order_by(Task.tid.desc())
+        logger.debug('getting last id from query...{}'
+                     .format(query))
+
+        try:
+            # task query
+            return query.get().tid
+
+        except DoesNotExist:
+            return 1
+
+    @staticmethod
+    def remove_task_by_id(tid):
+        """
+        This function removes selected task and it's all childs recursively or
+        raises an exception if task does not exists
+        :param tid: Tasks id
+        :return: None
+        """
+        # TODO: Is that good to have a recursive try except?
+        try:
+            query = Task.select().where(Task.parent == tid)
+            for task in query:
+                TaskAdapter.remove_task_by_id(task.tid)
+
+            logger.info('removing task by tid %s' % tid)
+            Task.delete().where(Task.tid == tid).execute()
+        except DoesNotExist:
+            logger.info(
+                'There is no such tid %s in the database for your user' %
+                tid)
+            raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
+
+    @staticmethod
+    def _storage_to_model(storage_task):
+        """
+        This function converts storage task to model task
+        :type storage_task: Task
+        :return: TaskInstance
+        """
+        logger.debug('convert storage to model task')
+        # we can have a None parent, so we have to determine this to take it's
+        # id or not
+        if storage_task.parent is None:
+            parent_id = None
+        else:
+            parent_id = storage_task.parent.tid
+
+        model_task = TaskInstance(storage_task.receiver.uid,
+                                  storage_task.creator.uid,
+                                  storage_task.tid,
+                                  storage_task.deadline_time,
+                                  storage_task.title,
+                                  None,
+                                  storage_task.status,
+                                  storage_task.priority,
+                                  parent_id,
+                                  storage_task.comment)
+
+        return model_task
