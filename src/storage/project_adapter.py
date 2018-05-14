@@ -94,7 +94,7 @@ class ProjectAdapter(PrimaryAdapter):
             # if so, ge get this project by pid
             project = Project.select().where((Project.pid == pid))
 
-            return self._storage_to_model(project.get())
+            return project.get()
 
         except DoesNotExist:
             logger.info('There is no such pid %s in the database for your user'
@@ -166,17 +166,3 @@ class ProjectAdapter(PrimaryAdapter):
 
         except DoesNotExist:
             return 1
-
-    @staticmethod
-    def _storage_to_model(self, storage_project):
-        """
-        This function converts storage project to model project
-        :type storage_project: Project
-        :return: ProjectInstance
-        """
-        logger.debug('convert storage to model project')
-
-        model_project = ProjectInstance(storage_project.pid,
-                                        storage_project.admin.pid)
-
-        return model_project

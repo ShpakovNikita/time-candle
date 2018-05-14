@@ -54,12 +54,9 @@ class UserAdapter(PrimaryAdapter):
         :param filter_instance: UserFilter with defined filters
         :return: List of UserInstances
         """
-        result = []
         query = User.select().where(filter_instance.to_query())
 
-        for user in query:
-            result.append(UserAdapter._storage_to_model(user))
-
+        result = [user for user in query]
         return result
 
     @staticmethod
@@ -89,12 +86,7 @@ class UserAdapter(PrimaryAdapter):
                 raise db_e.InvalidPasswordError(
                     db_e.PasswordMessages.PASSWORD_DOES_IS_NOT_MATCH)
 
-            return UserInstance(obj.uid,
-                                obj.login,
-                                obj.password,
-                                obj.time_zone,
-                                obj.nickname,
-                                obj.about)
+            return obj
 
         except db_e.InvalidPasswordError:
             logger.debug('Invalid password! Now you act like a guest here')
@@ -203,12 +195,7 @@ class UserAdapter(PrimaryAdapter):
             raise db_e.InvalidLoginError(
                 db_e.LoginMessages.USER_DOES_NOT_EXISTS)
 
-        return UserInstance(obj.uid,
-                            obj.login,
-                            obj.password,
-                            obj.time_zone,
-                            obj.nickname,
-                            obj.about)
+        return obj
 
     # TODO: maybe add function get_id_by_login to change all login on uid
     @staticmethod
@@ -257,21 +244,3 @@ class UserAdapter(PrimaryAdapter):
             where(UserProjectRelation.user == uid)
 
         return [project.pid for project in query]
-
-    @staticmethod
-    def _storage_to_model(storage_user):
-        """
-        This function converts storage user to model user
-        :type storage_user: User
-        :return: UserInstance
-        """
-        logger.debug('convert storage to model user')
-
-        model_user = UserInstance(storage_user.uid,
-                                  storage_user.login,
-                                  storage_user.password,
-                                  storage_user.time_zone,
-                                  storage_user.nickname,
-                                  storage_user.about)
-
-        return model_user

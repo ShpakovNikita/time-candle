@@ -1,6 +1,6 @@
 from enums.priority import Priority
 from enums.status import Status
-import app_logger
+from model import logger
 
 
 class Task:
@@ -23,7 +23,7 @@ class Task:
                  # controller=None
                  comment_='',
                  chat_=None):
-        app_logger.custom_logger('model').debug('creating a task...')
+        logger.debug('creating a task...')
 
         self.uid = uid_
         self.creator_uid = creator_uid_
@@ -39,3 +39,40 @@ class Task:
         self.deadline = deadline_
         self.comment = comment_
         self.chat = chat_
+
+    @classmethod
+    def make_task(cls, obj):
+        """
+        This function converts some data type to task
+        :type obj: type with fields:
+        - other obj receiver with uid
+        - other obj creator with uid
+        - tid
+        - deadline_time
+        - title
+        - status
+        - priority
+        - other obj parent with tid or None
+        - comment
+        :return: Task
+        """
+        logger.debug('convert storage to model task')
+        # we can have a None parent, so we have to determine this to take it's
+        # id or not
+        if obj.parent is None:
+            parent_id = None
+        else:
+            parent_id = obj.parent.tid
+
+        task = cls(obj.receiver.uid,
+                   obj.creator.uid,
+                   obj.tid,
+                   obj.deadline_time,
+                   obj.title,
+                   None,
+                   obj.status,
+                   obj.priority,
+                   parent_id,
+                   obj.comment)
+
+        return task

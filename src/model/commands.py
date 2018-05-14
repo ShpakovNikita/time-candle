@@ -1,7 +1,8 @@
 from enums.status import Status
 from enums.priority import Priority
 from model.main_instances.task import Task as TaskInstance
-from model.main_instances import Project as ProjectInstance
+from model.main_instances.project import Project as ProjectInstance
+from model.main_instances.user import User as UserInstance
 from storage import *
 import exceptions.db_exceptions as db_e
 from model import validators, config_parser
@@ -24,7 +25,7 @@ def log_in(login, password):
     :type password: String
     :return: None
     """
-    Adapters.USER_ADAPTER.login_user(login, password)
+    UserInstance.make_user(Adapters.USER_ADAPTER.login_user(login, password))
     # if everything is ok, we will write our login and password to the
     # config.ini
     config_parser.write_user(login, password)
@@ -63,7 +64,6 @@ def add_project(title, description, members):
     """
 
     # TODO: make it to the final!
-
     project = ProjectInstance(Adapters.PROJECT_ADAPTER.last_id() + 1,
                               Singleton.GLOBAL_USER.uid,
                               title,
@@ -117,7 +117,8 @@ def add_task(title, priority, status, time, parent_id, comment):
     # lower then parent's
 
     if parent_id is not None:
-        parent_task = Adapters.TASK_ADAPTER.get_task_by_id(parent_id)
+        parent_task = TaskInstance.make_task(
+            Adapters.TASK_ADAPTER.get_task_by_id(parent_id))
         status = max(status, parent_task.status)
         priority = max(priority, parent_task.priority)
 
@@ -191,7 +192,8 @@ def add_task_to_project(title,
 
     # TODO: parent pid match pid
     if parent_id is not None:
-        parent_task = Adapters.TASK_ADAPTER.get_task_by_id(parent_id, pid)
+        parent_task = TaskInstance.make_task(
+            Adapters.TASK_ADAPTER.get_task_by_id(parent_id, pid))
         status = max(status, parent_task.status)
         priority = max(priority, parent_task.priority)
 
@@ -298,6 +300,7 @@ def _print_project_tasks(pid):
     pass
 
 
+# TODO: remove
 def _print_task(tid, is_project=False):
     """
     This function print's task info
@@ -305,15 +308,18 @@ def _print_task(tid, is_project=False):
     :param is_project: If flag specified then we will be printing users too
     :return: None
     """
-    task = Adapters.TASK_ADAPTER.get_task_by_id(tid)
+    task = TaskInstance.make_task(Adapters.TASK_ADAPTER.get_task_by_id(tid))
     print()
     print('Task ' + task.title)
     print('Task\'s id is ' + str(task.tid))
     if is_project:
         print('The task creator: ' +
-              Adapters.USER_ADAPTER.get_user_by_id(task.creator_uid).nickname)
+              UserInstance.make_user(
+                  Adapters.USER_ADAPTER.get_user_by_id(task.creator_uid).
+                  nickname))
         print('The task receiver: ' +
-              Adapters.USER_ADAPTER.get_user_by_id(task.uid).nickname)
+              UserInstance.make_user(
+                  Adapters.USER_ADAPTER.get_user_by_id(task.uid).nickname))
 
     if task.deadline is None:
         task_time = 'unlimited'

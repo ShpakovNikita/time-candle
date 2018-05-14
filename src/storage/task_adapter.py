@@ -208,7 +208,6 @@ class TaskAdapter(PrimaryAdapter):
         :param filter_instance: TaskFilter with defined filters
         :return: List of TaskInstances
         """
-        result = []
         # in this query we get all available tasks (our personal tasks and all
         # tasks our in projects)
         query = self._get_available_tasks().select(). \
@@ -217,9 +216,7 @@ class TaskAdapter(PrimaryAdapter):
             where(filter_instance.to_query()).group_by(Task)
 
         # return converted query to the outer module
-        for task in query:
-            result.append(self._storage_to_model(task))
-
+        result = [task for task in query]
         return result
 
     def _get_available_tasks(self):
@@ -291,7 +288,7 @@ class TaskAdapter(PrimaryAdapter):
                                     (Task.receiver == self._uid)) &
                                    (Task.project == pid))
         try:
-            return self._storage_to_model(task.get())
+            return task.get()
 
         except DoesNotExist:
             logger.info('There is no such tid %s in the database for your user'
@@ -342,31 +339,3 @@ class TaskAdapter(PrimaryAdapter):
                 'There is no such tid %s in the database for your user' %
                 tid)
             raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
-
-    @staticmethod
-    def _storage_to_model(storage_task):
-        """
-        This function converts storage task to model task
-        :type storage_task: Task
-        :return: TaskInstance
-        """
-        logger.debug('convert storage to model task')
-        # we can have a None parent, so we have to determine this to take it's
-        # id or not
-        if storage_task.parent is None:
-            parent_id = None
-        else:
-            parent_id = storage_task.parent.tid
-
-        model_task = TaskInstance(storage_task.receiver.uid,
-                                  storage_task.creator.uid,
-                                  storage_task.tid,
-                                  storage_task.deadline_time,
-                                  storage_task.title,
-                                  None,
-                                  storage_task.status,
-                                  storage_task.priority,
-                                  parent_id,
-                                  storage_task.comment)
-
-        return model_task
