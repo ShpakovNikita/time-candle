@@ -1,4 +1,3 @@
-from model.main_instances.user import User as UserInstance
 from storage.adapter_classes import User, Task, Project, UserProjectRelation
 from storage.adapter_classes import Filter as PrimaryFilter
 from storage.adapter_classes import Adapter as PrimaryAdapter

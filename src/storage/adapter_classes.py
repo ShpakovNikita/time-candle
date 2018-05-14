@@ -3,6 +3,7 @@ import exceptions.db_exceptions as db_e
 import os
 import app_logger
 
+
 db_filename = 'data.db'
 new_db_flag = not os.path.exists(db_filename)
 db = SqliteDatabase(db_filename)
@@ -117,6 +118,8 @@ class Task(BaseModel):
 
     # Time in milliseconds. Nullable for further functionality TODO:
     deadline_time = BigIntegerField(null=True)
+    realization_time = BigIntegerField(default=-1)
+
     comment = CharField(default='')
     period = BigIntegerField(null=True)
 

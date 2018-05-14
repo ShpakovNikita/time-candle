@@ -8,20 +8,20 @@ class User:
     """
 
     def __init__(self,
-                 uid_=None,
-                 login_='guest',
-                 password_=None,
-                 time_zone_=None,
-                 nickname_='guest',
-                 about_=''):
+                 uid=None,
+                 login='guest',
+                 password=None,
+                 time_zone=None,
+                 nickname='guest',
+                 about=''):
         self.own_tasks = []
         self.projects = []
-        self.uid = uid_
-        self.login = login_
-        self.nickname = nickname_
-        self.password = password_
-        self.time_zone = time_zone_
-        self.about = about_
+        self.uid = uid
+        self.login = login
+        self.nickname = nickname
+        self.password = password
+        self.time_zone = time_zone
+        self.about = about
 
     @classmethod
     def make_user(cls, obj):

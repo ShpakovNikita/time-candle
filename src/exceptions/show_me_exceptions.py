@@ -16,5 +16,5 @@ class InvalidExpressionError(Exception):
 
 
 class ShowMeMessages(Enum):
-    NO_ELEMENTS_FOR_FILTER = 'Spicify the elements for selected command'
+    NO_ELEMENTS_FOR_FILTER = 'Specify the elements for selected command'
     UNEXPECTED_SYMBOL_FOUND = 'Make sure that your request is right'

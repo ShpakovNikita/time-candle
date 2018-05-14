@@ -9,36 +9,38 @@ class Task:
     """
 
     def __init__(self,
-                 uid_,
-                 creator_uid_,
-                 tid_,
+                 uid,
+                 creator_uid,
+                 tid,
                  # Replace later with the controller
-                 deadline_,
-                 title_,
-                 pid_=None,
-                 status_=Status.IN_PROGRESS,
-                 priority_=Priority.MEDIUM,
-                 parent_=None,
+                 deadline,
+                 title,
+                 pid=None,
+                 status=Status.IN_PROGRESS,
+                 priority=Priority.MEDIUM,
+                 parent=None,
                  # instead of controller for now we have only deadline
                  # controller=None
-                 comment_='',
-                 chat_=None):
+                 comment='',
+                 chat=None,
+                 realization_time=-1):
         logger.debug('creating a task...')
 
-        self.uid = uid_
-        self.creator_uid = creator_uid_
-        self.tid = tid_
-        self.pid = pid_
-        self.title = title_
-        self.status = status_
+        self.uid = uid
+        self.creator_uid = creator_uid
+        self.tid = tid
+        self.pid = pid
+        self.title = title
+        self.status = status
         self.tags = []
         self.childs = []
-        self.priority = priority_
-        self.parent = parent_
+        self.priority = priority
+        self.parent = parent
         # self._controller = controller
-        self.deadline = deadline_
-        self.comment = comment_
-        self.chat = chat_
+        self.deadline = deadline
+        self.comment = comment
+        self.chat = chat
+        self.realization_time = realization_time
 
     @classmethod
     def make_task(cls, obj):

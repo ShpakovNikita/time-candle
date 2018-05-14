@@ -6,18 +6,18 @@ class Project:
     This is the base Project class for the task manager.
     """
     def __init__(self,
-                 pid_,
-                 admin_uid_,
-                 title_,
-                 description_=''):
-        self.pid = pid_
-        self.admin_uid = admin_uid_
+                 pid,
+                 admin_uid,
+                 title,
+                 description=''):
+        self.pid = pid
+        self.admin_uid = admin_uid
         self.tid_list = []
 
         # this is list of tuples in format (uid , [role_tags] )
         self.uid_roles = []
-        self.title = title_
-        self.description = description_
+        self.title = title
+        self.description = description
 
     @classmethod
     def make_project(cls, obj):
