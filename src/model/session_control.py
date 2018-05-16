@@ -6,16 +6,20 @@ import storage.project_adapter
 
 
 def start_session():
-    Singleton.GLOBAL_USER = _login()
-
     Adapters.TASK_ADAPTER = storage.task_adapter.\
-        TaskAdapter(Singleton.GLOBAL_USER.uid)
+        TaskAdapter()
 
     Adapters.PROJECT_ADAPTER = storage.project_adapter.\
-        ProjectAdapter(Singleton.GLOBAL_USER.uid)
+        ProjectAdapter()
 
     Adapters.USER_ADAPTER = storage.user_adapter.\
-        UserAdapter(Singleton.GLOBAL_USER.uid)
+        UserAdapter()
+
+    Singleton.GLOBAL_USER = _login()
+
+    Adapters.TASK_ADAPTER.uid = Singleton.GLOBAL_USER.uid
+    Adapters.PROJECT_ADAPTER.uid = Singleton.GLOBAL_USER.uid
+    Adapters.USER_ADAPTER.uid = Singleton.GLOBAL_USER.uid
 
 
 class Singleton:

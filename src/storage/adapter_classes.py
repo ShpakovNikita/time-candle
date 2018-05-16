@@ -1,12 +1,12 @@
 from peewee import *
 import exceptions.db_exceptions as db_e
 import os
-import app_logger
+from storage import logger
 
 
 db_filename = 'data.db'
 new_db_flag = not os.path.exists(db_filename)
-db = SqliteDatabase(db_filename)
+_db_proxy = Proxy()
 
 
 class Filter:
@@ -61,14 +61,9 @@ class Filter:
         return query
 
 
-class Adapter:
-    def __init__(self, uid):
-        self._uid = uid
-
-
 class BaseModel(Model):
     class Meta:
-        database = db
+        database = _db_proxy
 
 
 class User(BaseModel):
@@ -166,14 +161,38 @@ class TagTaskRelation(BaseModel):
 # TODO: role tags relations?
 
 
-def _run():
-    User.create_table()
-    Project.create_table()
-    UserProjectRelation.create_table()
-    TagTaskRelation.create_table()
-    Task.create_table()
-    app_logger.custom_logger('storage').debug("Database created")
+class Adapter:
 
+    _db_initialized = False
 
-if new_db_flag:
-    _run()
+    def __init__(self, uid=-1, db_name=db_filename):
+        self.uid = uid
+
+        self.db_name = db_name
+        self._db_exists = os.path.exists(self.db_name)
+
+        if not Adapter._db_initialized:
+            self._db_initialize()
+            Adapter._db_initialized = True
+
+        if not self._db_exists:
+            self._create_database()
+
+            # but this will never be used later
+            self._db_exists = True
+
+    @staticmethod
+    def _create_database():
+        User.create_table()
+        Project.create_table()
+        UserProjectRelation.create_table()
+        TagTaskRelation.create_table()
+        Task.create_table()
+        logger.debug("Database created")
+
+    def _db_initialize(self):
+        db = SqliteDatabase(self.db_name)
+        _db_proxy.initialize(db)
+
+    def _db_exists(self):
+        return os.path.exists(self.db_name)

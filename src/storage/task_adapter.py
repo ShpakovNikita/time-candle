@@ -221,7 +221,7 @@ class TaskAdapter(PrimaryAdapter):
     def _get_available_tasks(self):
         query_projects = UserProjectRelation. \
             select(UserProjectRelation.project). \
-            where(UserProjectRelation.user == self._uid)
+            where(UserProjectRelation.user == self.uid)
         projects = [rel.project.pid for rel in query_projects]
 
         q = UserProjectRelation.select().where(UserProjectRelation.project <<
@@ -283,8 +283,8 @@ class TaskAdapter(PrimaryAdapter):
         """
         # TODO: more flexible user dependency find for projects
         task = Task.select().where((Task.tid == tid) &
-                                   ((Task.creator == self._uid) |
-                                    (Task.receiver == self._uid)) &
+                                   ((Task.creator == self.uid) |
+                                    (Task.receiver == self.uid)) &
                                    (Task.project == pid))
         try:
             return task.get()

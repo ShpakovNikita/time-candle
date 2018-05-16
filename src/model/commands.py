@@ -7,13 +7,14 @@ from storage import *
 import exceptions.db_exceptions as db_e
 from model import validators, config_parser
 from model.session_control import Singleton, Adapters
+import app_logger
+
 """
 This is commands module. Commands from argparse and django will go to this 
 module and it will help to separate argparser from the model. In this module 
 also we have a validation for each case and conversion to the primary entities.
 Note, that we have to login anytime firstly before the actions from the user
 """
-
 
 logger = app_logger.custom_logger('model')
 
@@ -82,78 +83,14 @@ def add_project(title, description, members):
         raise db_e.InvalidLoginError(db_e.LoginMessages.USER_DOES_NOT_EXISTS)
 
 
-# TODO: THERE IS REALLY BIG DUPLICATED CODE. ASK ANDY WHAT IS OK
-def add_task(title, priority, status, time, parent_id, comment):
-    """
-    This function will add passed task to the database, with the creator and
-    executor that named in the config.ini (i.e current logged user)
-    :param comment: Task's comment for some detailed explanation
-    :param parent_id: Parent's task id
-    :param time: Time in following format: YYYY-MM-DD HH:MM:SS
-    :param title: Tasks title
-    :param priority: Tasks priority (enum from Priority)
-    :param status: Tasks status (enum from Status)
-    :type comment: String
-    :type parent_id: Int
-    :type time: String
-    :type title: String
-    :type priority: Int
-    :type status: Int
-    :return: None
-    """
-
-    # This max func needed to set tasks status and priority not lower then
-    # parent's
-    if priority is None:
-        logger.debug('Default priority has been set')
-        priority = Priority.MEDIUM
-
-    if status is None:
-        logger.debug('Default status has been set')
-        status = Status.IN_PROGRESS
-
-    # This code is also checking is our parent tid exists in the database for
-    # logged user. The max func needed to set tasks status and priority not
-    # lower then parent's
-
-    if parent_id is not None:
-        parent_task = TaskInstance.make_task(
-            Adapters.TASK_ADAPTER.get_task_by_id(parent_id))
-        status = max(status, parent_task.status)
-        priority = max(priority, parent_task.priority)
-
-    deadline_time = None
-
-    if time is not None:
-        deadline_time = validators.get_milliseconds(time)
-
-    logger.debug('time in milliseconds %s' % deadline_time)
-
-    task = TaskInstance(Singleton.GLOBAL_USER.uid,
-                        Singleton.GLOBAL_USER.uid,
-                        Adapters.TASK_ADAPTER.last_id() + 1,
-                        deadline_time,
-                        title,
-                        None,
-                        status,
-                        priority,
-                        parent_id,
-                        comment)
-
-    logger.debug('task configured and ready to save , the task id is %s'
-                 % task.tid)
-
-    Adapters.TASK_ADAPTER.save(task)
-
-
-def add_task_to_project(title,
-                        priority,
-                        status,
-                        time,
-                        parent_id,
-                        comment,
-                        pid,
-                        login):
+def add_task(title,
+             priority,
+             status,
+             time,
+             parent_id,
+             comment,
+             pid,
+             login):
     """
     This function will add passed task to the database, with the creator and
     executor that named in the config.ini (i.e current logged user)
@@ -214,7 +151,8 @@ def add_task_to_project(title,
         Adapters.USER_ADAPTER.is_user_in_project(login, pid)
         task_uid = Adapters.USER_ADAPTER.get_id_by_login(login)
 
-    Adapters.PROJECT_ADAPTER.has_rights(pid)
+    if pid is not None:
+        Adapters.PROJECT_ADAPTER.has_rights(pid)
 
     task = TaskInstance(task_uid,
                         Singleton.GLOBAL_USER.uid,
@@ -232,7 +170,7 @@ def add_task_to_project(title,
 
     Adapters.TASK_ADAPTER.save(task)
 
-    logger.debug('task to project added')
+    logger.debug('task added')
 
 
 def remove_task(tid):
@@ -292,7 +230,6 @@ def show_tasks(projects, all_flag):
             pass
 
         for project in projects:
-
             _print_project_tasks(project)
 
 
@@ -316,7 +253,7 @@ def _print_task(tid, is_project=False):
         print('The task creator: ' +
               UserInstance.make_user(
                   Adapters.USER_ADAPTER.get_user_by_id(task.creator_uid).
-                  nickname))
+                      nickname))
         print('The task receiver: ' +
               UserInstance.make_user(
                   Adapters.USER_ADAPTER.get_user_by_id(task.uid).nickname))
@@ -324,9 +261,8 @@ def _print_task(tid, is_project=False):
     if task.deadline is None:
         task_time = 'unlimited'
     else:
-        task_time = validators.get_datetime(task.deadline).\
+        task_time = validators.get_datetime(task.deadline). \
             strftime('%Y-%m-%d %H:%M:%S')
 
     print('Task\'s deadline time is ' + task_time)
     # print priority etc
-

@@ -3,7 +3,6 @@ from collections import namedtuple
 from model import commands
 import app_logger
 
-
 logger = app_logger.custom_logger('controller')
 
 
@@ -227,6 +226,8 @@ def run():
 The functions below are private. So do not use it int any cases outside this 
 commands parser module.
 """
+
+
 # Initialize parsers
 
 
@@ -375,6 +376,7 @@ def _init_show_tasks_parser(root_args):
                       help=_Args.ALL_TASKS.docstring,
                       action='store_true')
 
+
 # Process parsed arguments
 # TODO: Change everything on getattr
 
@@ -403,7 +405,9 @@ def _process_add_task(parsed_args):
                           parsed_args.status[0],
                           time,
                           parent,
-                          parsed_args.comment[0])
+                          parsed_args.comment[0],
+                          None,
+                          None)
 
     else:
         # set the uid None if it is not in the list
@@ -413,14 +417,14 @@ def _process_add_task(parsed_args):
         else:
             uid = parsed_args.project[1]
 
-        commands.add_task_to_project(parsed_args.title,
-                                     parsed_args.priority[0],
-                                     parsed_args.status[0],
-                                     time,
-                                     parent,
-                                     parsed_args.comment[0],
-                                     parsed_args.project[0],
-                                     uid)
+        commands.add_task(parsed_args.title,
+                          parsed_args.priority[0],
+                          parsed_args.status[0],
+                          time,
+                          parent,
+                          parsed_args.comment[0],
+                          parsed_args.project[0],
+                          uid)
 
 
 def _process_change_task(parsed_args):

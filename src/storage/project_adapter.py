@@ -59,10 +59,10 @@ class ProjectAdapter(PrimaryAdapter):
                               description=project_model.description,
                               title=project_model.title)
 
-            relation = UserProjectRelation(user=self._uid,
+            relation = UserProjectRelation(user=self.uid,
                                            project=project)
 
-            print(self._uid, project_model.admin_uid, relation.project)
+            print(self.uid, project_model.admin_uid, relation.project)
             # only if everything is ok we try save project to our database
             project.save()
             relation.save()
@@ -87,7 +87,7 @@ class ProjectAdapter(PrimaryAdapter):
             # we are checking if there is a connection our user and selected
             # project
             UserProjectRelation.select(). \
-                where((UserProjectRelation.user == self._uid) &
+                where((UserProjectRelation.user == self.uid) &
                       (UserProjectRelation.project == pid)).get()
 
             # if so, ge get this project by pid
@@ -116,7 +116,7 @@ class ProjectAdapter(PrimaryAdapter):
 
         try:
             Project.select().where((Project.pid == pid) &
-                                   (Project.admin == self._uid))
+                                   (Project.admin == self.uid))
 
             return True
 

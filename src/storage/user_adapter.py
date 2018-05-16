@@ -128,7 +128,7 @@ class UserAdapter(PrimaryAdapter):
             # we get task where current user is admin and where project id is
             # matching
             project = Project.select(). \
-                where((self._uid == Project.admin) &
+                where((self.uid == Project.admin) &
                       (Project.pid == pid)).get()
             logger.debug('such project exists')
 
