@@ -168,6 +168,9 @@ class Adapter:
     def __init__(self, uid=-1, db_name=db_filename):
         self.uid = uid
 
+        if db_name is None:
+            db_name = db_filename
+
         self.db_name = db_name
         self._db_exists = os.path.exists(self.db_name)
 

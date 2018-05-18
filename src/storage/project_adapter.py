@@ -43,14 +43,14 @@ class ProjectFilter(PrimaryFilter):
 
 
 class ProjectAdapter(PrimaryAdapter):
-    def __init__(self, uid=-1):
-        super().__init__(uid)
+    def __init__(self, db_name=None, uid=-1):
+        super().__init__(uid, db_name)
 
     def save(self, project_model):
         """
         This function is used to store given project in database
-        :param project_model: This is our task to save
-        :type project_model: ProjectInstance
+        :param project: This is our task to save
+        :type project: ProjectInstance
         :return: None
         """
 

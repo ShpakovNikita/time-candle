@@ -197,8 +197,8 @@ class TaskFilter(PrimaryFilter):
 
 
 class TaskAdapter(PrimaryAdapter):
-    def __init__(self, uid=-1):
-        super().__init__(uid)
+    def __init__(self, db_name=None, uid=-1):
+        super().__init__(uid, db_name)
 
     # TODO: USER JOIN TO FIND BY LOGIN ETC
     def get_by_filter(self, filter_instance):

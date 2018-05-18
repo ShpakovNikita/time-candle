@@ -130,6 +130,27 @@ class _Args:
                          short='a',
                          docstring="""If this flag is set, we will show all 
                          tasks, with the project user's tasks""")
+
+    PLANNER = Argument(long='planner',
+                       short='l',
+                       docstring="""In this argument you may pass up to 7 unique
+                       numbers from 0 to 6 by the spaces. This will allow you to
+                       make task planner, with the period of 7 days (weekly 
+                       tasks). Also it conflicts with period argument.""")
+
+    PERIOD = Argument(long='period',
+                      short='e',
+                      docstring="""This argument made for periodical tasks. You 
+                      should pass one string parameter in format * * *, where 
+                      first star is day, second is week, third is month. Star as
+                      argument means 'every'. Example: 
+                      0 * * - every first day of the every week in every month.
+                      1 4 * - every second day of 5th week every month. But be 
+                      sure, if there is a 28 days in the month, it can be in the
+                      29 day in terms of current month. In this case task will 
+                      not be shown in this month.Also it conflicts with planner 
+                      argument.""")
+
     """
     Also project argument
     """
@@ -286,6 +307,18 @@ def _init_add_task_parser(root_args):
                       _Args.prefix().COMMENT.short,
                       help=_Args.COMMENT.docstring,
                       default=[''],
+                      nargs=1)
+
+    task.add_argument(_Args.prefix().PERIOD.long,
+                      _Args.prefix().PERIOD.short,
+                      help=_Args.PERIOD.docstring,
+                      default=[None],
+                      nargs='+')
+
+    task.add_argument(_Args.prefix().PLANNER.long,
+                      _Args.prefix().PLANNER.short,
+                      help=_Args.PLANNER.docstring,
+                      default=[None],
                       nargs=1)
 
 
