@@ -270,6 +270,22 @@ class TestTaskAdapter(unittest.TestCase):
         fil.priority(Priority.MEDIUM, TaskFilter.OP_NOT_EQUALS)
         self.assertEqual(len(self.adapter.get_by_filter(fil)), 2)
 
+        # trying to take some more complex filter with lists
+        tasks = self.adapter.get_by_filter(
+            TaskFilter().project([1, 3]).receiver([2, 1]))
+        self.assertEqual(len(tasks), 5)
+
+        # check on assertations
+        with self.assertRaises(db_e.InvalidFilterOperator):
+            TaskFilter().priority(Priority.MEDIUM, TaskFilter.OP_NOT_EQUALS + 1)
+
+        # we check our result on length, but we have also to check if they are
+        # right
+        for task in tasks:
+            self.assertIn(task.tid, [12, 13, 14, 20, 21])
+
+    def test_remove_save_get_task(self):
+        pass
 
 class TestUserAdapter(unittest.TestCase):
     def setUp(self):

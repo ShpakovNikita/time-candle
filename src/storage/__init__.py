@@ -35,6 +35,7 @@ TASKS_ROOT = "tasks"
 def check_for_database(directory, file=None):
     if not os.path.exists(directory):
         os.makedirs(directory)
+
     if file is not None:
         out_val = open(directory + "/" + file, 'w+')
 

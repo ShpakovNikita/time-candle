@@ -20,30 +20,35 @@ class ProjectFilter(PrimaryFilter):
             self.ops.append(op)
 
         self.result.append(Project.admin == pid)
+        return self
 
     def admin(self, uid, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
         self.result.append(Project.admin == uid)
+        return self
 
     def title(self, title, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
         self.result.append(Project.title == title)
+        return self
 
     def description_substring(self, substring, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
         self.result.append(Project.description.contains(substring))
+        return self
 
     def description_regex(self, regex, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
         self.result.append(Project.description.regexp(regex))
+        return self
 
 
 class ProjectAdapter(PrimaryAdapter):

@@ -30,6 +30,8 @@ class TaskFilter(PrimaryFilter):
         else:
             self.result.append(Task.tid == tid)
 
+        return self
+
     def creator(self, uid, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
@@ -38,6 +40,8 @@ class TaskFilter(PrimaryFilter):
             self.result.append(Task.creator << uid)
         else:
             self.result.append(Task.creator == uid)
+
+        return self
 
     def receiver(self, uid, op=PrimaryFilter.OP_AND):
         if self.result:
@@ -48,6 +52,8 @@ class TaskFilter(PrimaryFilter):
         else:
             self.result.append(Task.receiver == uid)
 
+        return self
+
     def project(self, pid, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
@@ -56,6 +62,8 @@ class TaskFilter(PrimaryFilter):
             self.result.append(Task.project << pid)
         else:
             self.result.append(Task.project == pid)
+
+        return self
 
     def status(self,
                status,
@@ -81,27 +89,35 @@ class TaskFilter(PrimaryFilter):
         elif TaskFilter.OP_LESS == storage_op:
             self.result.append(Task.status < status)
 
+        elif TaskFilter.OP_NOT_EQUALS == storage_op:
+            self.result.append(Task.status != status)
+
         else:
             raise db_e.InvalidFilterOperator(db_e.FilterMessages.
                                              FILTER_DOES_NOT_EXISTS)
+
+        return self
 
     def parent(self, tid, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
         self.result.append(Task.parent == tid)
+        return self
 
     def title_substring(self, substring, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
         self.result.append(Task.title.contains(substring))
+        return self
 
     def title_regex(self, regex, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
         self.result.append(Task.title.contains(regex))
+        return self
 
     def priority(self,
                  priority,
@@ -135,6 +151,8 @@ class TaskFilter(PrimaryFilter):
             raise db_e.InvalidFilterOperator(db_e.FilterMessages.
                                              FILTER_DOES_NOT_EXISTS)
 
+        return self
+
     def deadline_time(self,
                       deadline_time,
                       storage_op=OP_EQUALS,
@@ -159,21 +177,28 @@ class TaskFilter(PrimaryFilter):
         elif TaskFilter.OP_LESS == storage_op:
             self.result.append(Task.deadline_time < deadline_time)
 
+        elif TaskFilter.OP_NOT_EQUALS == storage_op:
+            self.result.append(Task.deadline_time != deadline_time)
+
         else:
             raise db_e.InvalidFilterOperator(db_e.FilterMessages.
                                              FILTER_DOES_NOT_EXISTS)
+
+        return self
 
     def comment_substring(self, substring, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
         self.result.append(Task.comment.contains(substring))
+        return self
 
     def comment_regex(self, substring, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
         self.result.append(Task.comment.contains(substring))
+        return self
 
     def period(self,
                period,
@@ -199,9 +224,14 @@ class TaskFilter(PrimaryFilter):
         elif TaskFilter.OP_LESS == storage_op:
             self.result.append(Task.period < period)
 
+        elif TaskFilter.OP_NOT_EQUALS == storage_op:
+            self.result.append(Task.period != period)
+
         else:
             raise db_e.InvalidFilterOperator(db_e.FilterMessages.
                                              FILTER_DOES_NOT_EXISTS)
+
+        return self
 
 
 class TaskAdapter(PrimaryAdapter):

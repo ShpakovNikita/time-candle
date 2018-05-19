@@ -20,30 +20,35 @@ class UserFilter(PrimaryFilter):
             self.ops.append(op)
 
         self.result.append(User.uid == uid)
+        return self
 
     def login_substring(self, substring, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
         self.result.append(User.login.contains(substring))
+        return self
 
     def login_regex(self, regex, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
         self.result.append(User.login.contains(regex))
+        return self
 
     def nickname_substring(self, substring, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
         self.result.append(User.nickname.contains(substring))
+        return self
 
     def nickname_regex(self, regex, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
         self.result.append(User.nickname.contains(regex))
+        return self
 
 
 class UserAdapter(PrimaryAdapter):
