@@ -43,7 +43,7 @@ class UserFilter(PrimaryFilter):
 
 
 class UserAdapter(PrimaryAdapter):
-    def __init__(self, db_name=None, uid=-1):
+    def __init__(self, db_name=None, uid=None):
         super().__init__(uid, db_name)
 
     @staticmethod

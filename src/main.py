@@ -11,7 +11,7 @@ def main():
     usr.say_hi()
     """
     app_logger.custom_logger('root').info('Entering the program.')
-    start_session()
+    start_session('user')
     """
     fil = ta.TaskFilter()
     fil.priority(Priority.LOW, ta.TaskFilter.OP_GREATER_OR_EQUALS,

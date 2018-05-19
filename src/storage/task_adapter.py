@@ -197,7 +197,7 @@ class TaskFilter(PrimaryFilter):
 
 
 class TaskAdapter(PrimaryAdapter):
-    def __init__(self, db_name=None, uid=-1):
+    def __init__(self, db_name=None, uid=None):
         super().__init__(uid, db_name)
 
     # TODO: USER JOIN TO FIND BY LOGIN ETC
@@ -236,33 +236,41 @@ class TaskAdapter(PrimaryAdapter):
 
         return query
 
-    def save(self, task):
+    def save(self, obj):
         """
         This function is used to store given task to the database. Note, that
         tasks can be with similar names and dates (but on that case I have a
         task below)
         TODO: warning if the task's title and time are matching with some precision
-        :param task: This is our task to save
-        :type task: TaskInstance
+        :param obj: type with fields:
+        - creator_uid
+        - uid
+        - pid
+        - status
+        - deadline_time
+        - title
+        - priority
+        - parent with tid or None
+        - comment
         :return: None
         """
         try:
-            Task.select().where(Task.tid == task.tid).get()
+            Task.select().where(Task.tid == obj.tid).get()
             self.update()
             logger.debug('task updated')
 
         except DoesNotExist:
             logger.debug('adding task...')
         try:
-            table_task = Task.create(creator=task.creator_uid,
-                                     receiver=task.uid,
-                                     project=task.pid,
-                                     status=task.status,
-                                     parent=task.parent,
-                                     title=task.title,
-                                     priority=task.priority,
-                                     deadline_time=task.deadline,
-                                     comment=task.comment)
+            table_task = Task.create(creator=obj.creator_uid,
+                                     receiver=obj.uid,
+                                     project=obj.pid,
+                                     status=obj.status,
+                                     parent=obj.parent,
+                                     title=obj.title,
+                                     priority=obj.priority,
+                                     deadline_time=obj.deadline,
+                                     comment=obj.comment)
         except IntegrityError:
             # if you are guest
             raise db_e.InvalidLoginError(db_e.TaskMessages.DO_NOT_HAVE_RIGHTS)

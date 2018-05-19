@@ -165,7 +165,7 @@ class Adapter:
 
     _db_initialized = False
 
-    def __init__(self, uid=-1, db_name=db_filename):
+    def __init__(self, uid, db_name=db_filename):
         self.uid = uid
 
         if db_name is None:

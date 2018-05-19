@@ -3,9 +3,18 @@ import storage.adapter_classes
 import storage.task_adapter
 import storage.user_adapter
 import storage.project_adapter
+import sys
+from exceptions import custom_excepthook
 
 
-def start_session():
+def start_session(dev_opt='dev'):
+    if dev_opt == 'dev':
+        pass
+    elif dev_opt == 'user':
+        sys.excepthook = custom_excepthook
+    else:
+        raise ValueError('session option is wrong!')
+
     Adapters.TASK_ADAPTER = storage.task_adapter.\
         TaskAdapter()
 

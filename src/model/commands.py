@@ -233,6 +233,10 @@ def show_tasks(projects, all_flag):
             _print_project_tasks(project)
 
 
+def logout():
+    config_parser.write_user('', '')
+
+
 def _print_project_tasks(pid):
     pass
 

@@ -160,6 +160,11 @@ class _Args:
                          short='l',
                          docstring="""This argument clears output logs""")
 
+    # logout tree arguments
+    LOGOUT = Argument(long='logout',
+                      short='u',
+                      docstring="""This argument logouts current user""")
+
     # TODO: split_task?
     # TODO: alias?
     _with_prefix = None
@@ -213,6 +218,10 @@ def run():
     root_args.add_parser(_Args.CLEAR_LOG.long,
                          help=_Args.CLEAR_LOG.docstring)
 
+    # simple logout arg
+    root_args.add_parser(_Args.LOGOUT.long,
+                         help=_Args.LOGOUT.docstring)
+
     parsed = parser.parse_args()
     logger.debug(parsed)
 
@@ -229,6 +238,9 @@ def run():
     elif parsed.action == _Args.CLEAR_LOG.long:
         open(app_logger.LOG_FILENAME, 'w').close()
         logger.info('log has been cleared')
+
+    elif parsed.action == _Args.LOGOUT.long:
+        _process_logout()
 
     elif parsed.action == _Args.ADD_PROJECT.long:
         _process_add_project(parsed)
@@ -479,6 +491,10 @@ def _process_remove_task(parsed_args):
     logger.debug('remove_task')
     commands.remove_task(parsed_args.id)
 
+
+def _process_logout():
+    commands.logout()
+    
 
 def _process_add_user(parsed_args):
     logger.debug('add_user')

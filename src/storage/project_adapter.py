@@ -43,26 +43,28 @@ class ProjectFilter(PrimaryFilter):
 
 
 class ProjectAdapter(PrimaryAdapter):
-    def __init__(self, db_name=None, uid=-1):
+    def __init__(self, db_name=None, uid=None):
         super().__init__(uid, db_name)
 
-    def save(self, project_model):
+    def save(self, obj):
         """
         This function is used to store given project in database
-        :param project: This is our task to save
-        :type project: ProjectInstance
+        :param obj: type with fields:
+        - admin_uid
+        - description
+        - title
         :return: None
         """
 
         try:
-            project = Project(admin=project_model.admin_uid,
-                              description=project_model.description,
-                              title=project_model.title)
+            project = Project(admin=obj.admin_uid,
+                              description=obj.description,
+                              title=obj.title)
 
             relation = UserProjectRelation(user=self.uid,
                                            project=project)
 
-            print(self.uid, project_model.admin_uid, relation.project)
+            print(self.uid, obj.admin_uid, relation.project)
             # only if everything is ok we try save project to our database
             project.save()
             relation.save()
