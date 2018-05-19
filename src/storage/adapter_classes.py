@@ -18,6 +18,10 @@ class Filter:
         self.result = []
         self.ops = []
 
+    @staticmethod
+    def _union_filter():
+        return None
+
     # clear filter query
     def clear(self):
         self.result = []
@@ -41,6 +45,9 @@ class Filter:
     # Generate query to make result array to the peewee object
     def to_query(self):
         query = None
+        if not self.result:
+            return self._union_filter()
+
         # try to get result's first element
         try:
             query = self.result[0]

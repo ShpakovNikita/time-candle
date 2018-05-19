@@ -11,6 +11,10 @@ class ProjectFilter(PrimaryFilter):
     def __init__(self):
         super().__init__()
 
+    @staticmethod
+    def _union_filter():
+        return Project.pid.is_null(False)
+
     def pid(self, pid, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)

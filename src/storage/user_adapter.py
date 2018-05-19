@@ -11,6 +11,10 @@ class UserFilter(PrimaryFilter):
     def __init__(self):
         super().__init__()
 
+    @staticmethod
+    def _union_filter():
+        return User.uid.is_null(False)
+
     def uid(self, uid, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)

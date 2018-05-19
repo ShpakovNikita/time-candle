@@ -1,8 +1,9 @@
 import unittest
 from storage.adapter_classes import Task, User, Project, UserProjectRelation
-from storage.project_adapter import ProjectAdapter
-from storage.user_adapter import UserAdapter
-from storage.task_adapter import TaskAdapter
+from storage.adapter_classes import Filter as PrimaryFilter
+from storage.project_adapter import ProjectAdapter, ProjectFilter
+from storage.user_adapter import UserAdapter, UserFilter
+from storage.task_adapter import TaskAdapter, TaskFilter
 from enums.priority import Priority
 from enums.status import Status
 import exceptions.db_exceptions as db_e
@@ -80,8 +81,8 @@ _USERS = [
 _TASKS = [
     TaskDummie(uid=1, creator_uid=1, tid=1, deadline=None, title='test task'),
     TaskDummie(uid=1, creator_uid=1, tid=2, deadline=None, title='test task 1'),
-    TaskDummie(uid=1, creator_uid=1, tid=3, deadline=222222222222,
-               title='test task 2'),
+    TaskDummie(uid=1, creator_uid=1, priority=Priority.HIGH, tid=3,
+               deadline=222222222222, title='test task 2'),
     TaskDummie(uid=1, creator_uid=1, tid=4, deadline=None, title='test task 3'),
     TaskDummie(uid=2, creator_uid=2, tid=5, deadline=None, title='test task 4'),
     TaskDummie(uid=2, creator_uid=2, tid=6, deadline=None, title='test task 5'),
@@ -103,12 +104,47 @@ _PROJECTS = [
                   description='Some unit test?'),
     ProjectDummie(pid=4, admin_uid=2, title='project 4', description='0_0')]
 
+_USER_PROJECT_RELATIONS = [{'user_id': 2, 'project_id': 1},
+                           {'user_id': 3, 'project_id': 1},
+                           {'user_id': 5, 'project_id': 1},
+                           {'user_id': 5, 'project_id': 2},
+                           {'user_id': 4, 'project_id': 3},
+                           {'user_id': 5, 'project_id': 3},
+                           {'user_id': 3, 'project_id': 3},
+                           {'user_id': 1, 'project_id': 3}]
+
+_PROJECT_TASKS = [TaskDummie(uid=2, creator_uid=1, tid=12, pid=1, deadline=None,
+                             title='test pr 1'),
+                  TaskDummie(uid=2, creator_uid=1, tid=13, pid=1, deadline=None,
+                             title='test pr 2'),
+                  TaskDummie(uid=1, creator_uid=1, tid=14, pid=1, deadline=None,
+                             title='test pr 3'),
+                  TaskDummie(uid=3, creator_uid=1, tid=15, pid=1, deadline=None,
+                             title='test pr 4', priority=Priority.MIN),
+                  TaskDummie(uid=1, creator_uid=1, tid=16, pid=2, deadline=None,
+                             title='test pr 5'),
+                  TaskDummie(uid=5, creator_uid=1, tid=17, pid=2, deadline=None,
+                             title='test pr 6'),
+                  TaskDummie(uid=5, creator_uid=1, tid=18, pid=2, deadline=None,
+                             title='test pr 7'),
+                  TaskDummie(uid=1, creator_uid=1, tid=19, pid=2, deadline=None,
+                             title='test pr 8'),
+                  TaskDummie(uid=1, creator_uid=2, tid=20, pid=3, deadline=None,
+                             title='test pr 9'),
+                  TaskDummie(uid=2, creator_uid=2, tid=21, pid=3, deadline=None,
+                             title='test pr 10'),
+                  TaskDummie(uid=3, creator_uid=2, tid=22, pid=3, deadline=None,
+                             title='test pr 11'),
+                  TaskDummie(uid=4, creator_uid=2, tid=23, pid=3, deadline=None,
+                             title='test pr 12'),
+                  TaskDummie(uid=2, creator_uid=2, tid=24, pid=4, deadline=None,
+                             title='test pr 13'),
+                  TaskDummie(uid=2, creator_uid=2, tid=25, pid=4, deadline=None,
+                             title='test pr 14')]
+
 
 def _init_user_table():
     for user in _USERS:
-        print(user.login,
-              user.nickname,
-              user.password)
         User.create(login=user.login,
                     nickname=user.nickname,
                     password=user.password)
@@ -136,13 +172,31 @@ def _init_project_table():
         UserProjectRelation.create(user=project.admin_uid,
                                    project=project.pid)
 
+    # add another members relations
+    for relation in _USER_PROJECT_RELATIONS:
+        UserProjectRelation.create(user=relation['user_id'],
+                                   project=relation['project_id'])
+
+
+# need for _init_task_table
+def _init_project_tasks_table():
+    for task in _PROJECT_TASKS:
+        Task.create(creator=task.creator_uid,
+                    receiver=task.uid,
+                    project=task.pid,
+                    status=task.status,
+                    parent=task.parent,
+                    title=task.title,
+                    priority=task.priority,
+                    deadline_time=task.deadline,
+                    comment=task.comment)
+
 
 class TestTaskAdapter(unittest.TestCase):
 
     def setUp(self):
         self.adapter = TaskAdapter(db_name=':memory:')
         _init_project_table()
-        # _init_task_table()
         _init_user_table()
 
     def tearDown(self):
@@ -151,17 +205,17 @@ class TestTaskAdapter(unittest.TestCase):
         Project.delete().execute()
         UserProjectRelation.delete().execute()
 
-    def test_get_save_task(self):
+    def test_save_get_task(self):
         # trying to add task to the None user and creator. This tests if the
         # exception is rised when our id is invalid
         with self.assertRaises(db_e.InvalidLoginError):
-            task = copy.copy(_TASKS[0])
+            task = copy(_TASKS[0])
             # Uid None
             task.uid = self.adapter.uid
             self.adapter.save(task)
 
         with self.assertRaises(db_e.InvalidLoginError):
-            task = copy.copy(_TASKS[1])
+            task = copy(_TASKS[1])
             # Uid None
             task.creator_uid = self.adapter.uid
             self.adapter.save(task)
@@ -188,8 +242,33 @@ class TestTaskAdapter(unittest.TestCase):
         # check that we created task
         self.assertEqual(self.adapter.last_id(), 2)
 
-    def test_heh_huh(self):
-        self.assertEqual(1, 1)
+    def test_get_by_filter_task(self):
+        _init_task_table()
+        _init_project_tasks_table()
+
+        self.adapter.uid = 1
+
+        fil = TaskFilter()
+        # test union filter
+        self.assertEqual(len(self.adapter.get_by_filter(fil)), 19)
+
+        fil.priority(Priority.MEDIUM, TaskFilter.OP_GREATER)
+        # all tasks with priority greater then medium
+        self.assertEqual(len(self.adapter.get_by_filter(fil)), 1)
+
+        fil_2 = TaskFilter()
+        fil_2.priority(Priority.MEDIUM, TaskFilter.OP_LESS)
+
+        # all tasks with priority greater then medium or less then medium
+        # (not equals medium)
+        self.assertEqual(len(self.adapter.get_by_filter(fil | fil_2)), 2)
+
+        fil.priority(Priority.MEDIUM, TaskFilter.OP_LESS, PrimaryFilter.OP_OR)
+        self.assertEqual(len(self.adapter.get_by_filter(fil)), 2)
+
+        fil = TaskFilter()
+        fil.priority(Priority.MEDIUM, TaskFilter.OP_NOT_EQUALS)
+        self.assertEqual(len(self.adapter.get_by_filter(fil)), 2)
 
 
 class TestUserAdapter(unittest.TestCase):
@@ -208,3 +287,6 @@ class TestUserAdapter(unittest.TestCase):
 
         with self.assertRaises(db_e.InvalidLoginError):
             self.adapter.add_user(_USERS[0].login, _USERS[0].password)
+
+    def test_login(self):
+        pass

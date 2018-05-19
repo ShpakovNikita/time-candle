@@ -12,9 +12,14 @@ class TaskFilter(PrimaryFilter):
     OP_EQUALS = 2
     OP_LESS_OR_EQUALS = 3
     OP_LESS = 4
+    OP_NOT_EQUALS = 5
 
     def __init__(self):
         super().__init__()
+
+    @staticmethod
+    def _union_filter():
+        return Task.tid.is_null(False)
 
     def tid(self, tid, op=PrimaryFilter.OP_AND):
         if self.result:
@@ -122,6 +127,9 @@ class TaskFilter(PrimaryFilter):
 
         elif TaskFilter.OP_LESS == storage_op:
             self.result.append(Task.priority < priority)
+
+        elif TaskFilter.OP_NOT_EQUALS == storage_op:
+            self.result.append(Task.priority != priority)
 
         else:
             raise db_e.InvalidFilterOperator(db_e.FilterMessages.
@@ -289,18 +297,13 @@ class TaskAdapter(PrimaryAdapter):
             raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
 
     def _get_available_tasks(self):
+        # get all tasks in project related to user and his personal tasks
         query_projects = UserProjectRelation. \
-            select(UserProjectRelation.project). \
-            where(UserProjectRelation.user == self.uid)
+            select().where(UserProjectRelation.user == self.uid)
         projects = [rel.project.pid for rel in query_projects]
 
-        q = UserProjectRelation.select().where(UserProjectRelation.project <<
-                                               projects)
-        users = list(set([rel.user.uid for rel in q]))
-
-        # TODO: check for critical moments
-        query = Task.select().where((Task.creator << users) |
-                                    (Task.project << projects))
+        query = Task.select().where((Task.project << projects) |
+                                    (Task.creator == self.uid))
 
         return query
 
