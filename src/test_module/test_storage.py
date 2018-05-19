@@ -6,6 +6,7 @@ from storage.task_adapter import TaskAdapter
 from enums.priority import Priority
 from enums.status import Status
 import exceptions.db_exceptions as db_e
+from copy import copy
 
 
 def _project_init(self,
@@ -150,23 +151,42 @@ class TestTaskAdapter(unittest.TestCase):
         Project.delete().execute()
         UserProjectRelation.delete().execute()
 
-    def test_add_task(self):
-
-        # Trying to add task to the None user and creator
+    def test_get_save_task(self):
+        # trying to add task to the None user and creator. This tests if the
+        # exception is rised when our id is invalid
         with self.assertRaises(db_e.InvalidLoginError):
-            task_1 = _TASKS[0]
+            task = copy.copy(_TASKS[0])
             # Uid None
-            task_1.uid = self.adapter.uid
-            self.adapter.save(task_1)
+            task.uid = self.adapter.uid
+            self.adapter.save(task)
 
-            task_2 = _TASKS[1]
+        with self.assertRaises(db_e.InvalidLoginError):
+            task = copy.copy(_TASKS[1])
             # Uid None
-            task_2.creator_uid = self.adapter.uid
-            self.adapter.save(task_2)
+            task.creator_uid = self.adapter.uid
+            self.adapter.save(task)
 
+        # this tests if we can't create two equal by tid tasks (it has to update
+        # them)
+
+        # first we have to log in
         self.adapter.uid = 1
 
-        self.assertEqual(1, 1)
+        # check that the no tasks has 0 id
+        self.assertEqual(self.adapter.last_id(), 0)
+
+        self.adapter.save(_TASKS[0])
+        self.adapter.save(_TASKS[0])
+
+        # check that we updated task
+        self.assertEqual(self.adapter.last_id(), 1)
+
+        task = copy(_TASKS[0])
+        task.tid = self.adapter.last_id() + 1
+        self.adapter.save(task)
+
+        # check that we created task
+        self.assertEqual(self.adapter.last_id(), 2)
 
     def test_heh_huh(self):
         self.assertEqual(1, 1)
@@ -183,7 +203,7 @@ class TestUserAdapter(unittest.TestCase):
         UserProjectRelation.delete().execute()
 
     def test_add_user(self):
-        # Not raises
+        # good if not raises
         self.adapter.add_user(_USERS[0].login, _USERS[0].password)
 
         with self.assertRaises(db_e.InvalidLoginError):

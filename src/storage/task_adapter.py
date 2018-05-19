@@ -218,24 +218,6 @@ class TaskAdapter(PrimaryAdapter):
         result = [task for task in query]
         return result
 
-    def _get_available_tasks(self):
-        query_projects = UserProjectRelation. \
-            select(UserProjectRelation.project). \
-            where(UserProjectRelation.user == self.uid)
-        projects = [rel.project.pid for rel in query_projects]
-
-        q = UserProjectRelation.select().where(UserProjectRelation.project <<
-                                               projects)
-        users = list(set([rel.user.uid for rel in q]))
-
-        # TODO: check for critical moments
-        query = Task.select().where((Task.creator << users) |
-                                    (Task.project << projects))
-
-        print(len(query))
-
-        return query
-
     def save(self, obj):
         """
         This function is used to store given task to the database. Note, that
@@ -255,9 +237,13 @@ class TaskAdapter(PrimaryAdapter):
         :return: None
         """
         try:
-            Task.select().where(Task.tid == obj.tid).get()
-            self.update()
+            task = Task.select().where((Task.tid == obj.tid) & (
+                    Task.receiver == self.uid | Task.creator == self.uid)).get()
+
+            TaskAdapter._update(task, obj)
+
             logger.debug('task updated')
+            return
 
         except DoesNotExist:
             logger.debug('adding task...')
@@ -302,8 +288,35 @@ class TaskAdapter(PrimaryAdapter):
                         % tid)
             raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
 
-    def update(self):
-        pass
+    def _get_available_tasks(self):
+        query_projects = UserProjectRelation. \
+            select(UserProjectRelation.project). \
+            where(UserProjectRelation.user == self.uid)
+        projects = [rel.project.pid for rel in query_projects]
+
+        q = UserProjectRelation.select().where(UserProjectRelation.project <<
+                                               projects)
+        users = list(set([rel.user.uid for rel in q]))
+
+        # TODO: check for critical moments
+        query = Task.select().where((Task.creator << users) |
+                                    (Task.project << projects))
+
+        return query
+
+    @staticmethod
+    def _update(task, obj):
+        task.creator = obj.creator_uid
+        task.receiver = obj.uid
+        task.project = obj.pid
+        task.status = obj.status
+        task.parent = obj.parent
+        task.title = obj.title
+        task.priority = obj.priority
+        task.deadline_time = obj.deadline
+        task.comment = obj.comment
+
+        task.save()
 
     @staticmethod
     def last_id():
@@ -323,7 +336,7 @@ class TaskAdapter(PrimaryAdapter):
             return query.get().tid
 
         except DoesNotExist:
-            return 1
+            return 0
 
     @staticmethod
     def remove_task_by_id(tid):
