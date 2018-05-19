@@ -80,9 +80,10 @@ _USERS = [
 
 _TASKS = [
     TaskDummie(uid=1, creator_uid=1, tid=1, deadline=None, title='test task'),
-    TaskDummie(uid=1, creator_uid=1, tid=2, deadline=None, title='test task 1'),
+    TaskDummie(uid=1, creator_uid=1, tid=2, deadline=None, title='test task 1',
+               parent=1),
     TaskDummie(uid=1, creator_uid=1, priority=Priority.HIGH, tid=3,
-               deadline=222222222222, title='test task 2'),
+               deadline=222222222222, title='test task 2', parent=1),
     TaskDummie(uid=1, creator_uid=1, tid=4, deadline=None, title='test task 3'),
     TaskDummie(uid=2, creator_uid=2, tid=5, deadline=None, title='test task 4'),
     TaskDummie(uid=2, creator_uid=2, tid=6, deadline=None, title='test task 5'),
@@ -90,12 +91,11 @@ _TASKS = [
     TaskDummie(uid=2, creator_uid=2, tid=8, deadline=1233321,
                title='test task 7'),
     TaskDummie(uid=1, creator_uid=1, tid=9, deadline=500000000,
-               title='test task 8'),
+               title='test task 8', parent=3),
     TaskDummie(uid=1, creator_uid=1, tid=10, deadline=None, title='test task 9',
                parent=2),
     TaskDummie(uid=1, creator_uid=1, tid=11, deadline=None,
-               title='test task 10', parent=10)
-]
+               title='test task 10', parent=9)]
 
 _PROJECTS = [
     ProjectDummie(pid=1, admin_uid=1, title='project 1', description='Huh?'),
@@ -284,8 +284,54 @@ class TestTaskAdapter(unittest.TestCase):
         for task in tasks:
             self.assertIn(task.tid, [12, 13, 14, 20, 21])
 
+        # little tests for get_by_id function
+        self.assertEqual(self.adapter.get_task_by_id(3).tid, 3)
+        self.assertEqual(self.adapter.get_task_by_id(3).title, 'test task 2')
+
+        with self.assertRaises(db_e.InvalidTidError):
+            self.adapter.get_task_by_id(100)
+
+        with self.assertRaises(db_e.InvalidTidError):
+            self.adapter.get_task_by_id(5)
+
     def test_remove_save_get_task(self):
-        pass
+        # adding tasks
+        for i in range(4):
+            self.adapter.save(_TASKS[i])
+
+        self.adapter.uid = 1
+        # remove the 4th task
+        self.adapter.remove_task_by_id(_TASKS[3].tid)
+
+        # checking tha we cannot remove deleted task somehow twice
+        with self.assertRaises(db_e.InvalidTidError):
+            self.adapter.remove_task_by_id(_TASKS[3].tid)
+
+        self.adapter.uid = 2
+
+        # check that we cannot remove not our task
+        with self.assertRaises(db_e.InvalidTidError):
+            self.adapter.remove_task_by_id(_TASKS[1].tid)
+
+        self.adapter.uid = 1
+        # delete childs recursive
+        self.adapter.remove_task_by_id(_TASKS[0].tid)
+
+        # check if we are really deleted them
+        self.assertEqual(len(self.adapter.get_by_filter(TaskFilter())), 0)
+
+        _init_task_table()
+        _init_project_tasks_table()
+
+        # check all above but on the project tasks
+        with self.assertRaises(db_e.InvalidTidError):
+            self.adapter.remove_task_by_id(24)
+
+        self.adapter.remove_task_by_id(13)
+
+        self.adapter.uid = 2
+        self.adapter.remove_task_by_id(25)
+
 
 class TestUserAdapter(unittest.TestCase):
     def setUp(self):

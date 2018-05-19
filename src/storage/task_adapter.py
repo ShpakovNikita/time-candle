@@ -371,8 +371,7 @@ class TaskAdapter(PrimaryAdapter):
         except DoesNotExist:
             return 0
 
-    @staticmethod
-    def remove_task_by_id(tid):
+    def remove_task_by_id(self, tid):
         """
         This function removes selected task and it's all childs recursively or
         raises an exception if task does not exists
@@ -381,14 +380,15 @@ class TaskAdapter(PrimaryAdapter):
         """
         # TODO: Is that good to have a recursive try except?
         try:
-            query = Task.select().where(Task.parent == tid)
+            query = self._get_available_tasks().select().where(Task.parent == tid)
             for task in query:
-                TaskAdapter.remove_task_by_id(task.tid)
+                self.remove_task_by_id(task.tid)
 
             logger.info('removing task by tid %s' % tid)
-            Task.delete().where(Task.tid == tid).execute()
+            self._get_available_tasks().select().where(Task.tid == tid).get().\
+                delete_instance()
+
         except DoesNotExist:
             logger.info(
-                'There is no such tid %s in the database for your user' %
-                tid)
+                'There is no such tid %s in the database for your user' % tid)
             raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
