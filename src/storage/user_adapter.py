@@ -79,30 +79,21 @@ class UserAdapter(PrimaryAdapter):
         :return: User
         """
         query = User.select().where(User.login == login)
-        user_field = type('user_field', (), {'uid': None})
+
         try:
-            try:
-                # user instance
-                obj = query.get()
+            # user instance
+            obj = query.get()
 
-            except DoesNotExist:
-                raise db_e.InvalidLoginError(
-                    str(db_e.LoginMessages.USER_DOES_NOT_EXISTS) +
-                    ', try to login again')
+        except DoesNotExist:
+            raise db_e.InvalidLoginError(
+                str(db_e.LoginMessages.USER_DOES_NOT_EXISTS) +
+                ', try to login again')
 
-            if obj.password != password:
-                raise db_e.InvalidPasswordError(
-                    db_e.PasswordMessages.PASSWORD_DOES_IS_NOT_MATCH)
+        if obj.password != password:
+            raise db_e.InvalidPasswordError(
+                db_e.PasswordMessages.PASSWORD_IS_NOT_MATCH)
 
-            return obj
-
-        except db_e.InvalidPasswordError:
-            logger.debug('Invalid password! Now you act like a guest here')
-            return user_field
-
-        except db_e.InvalidLoginError:
-            logger.debug('Invalid login! Now you act like a guest here')
-            return user_field
+        return obj
 
     @staticmethod
     def add_user(login, password, nickname=None):
@@ -143,7 +134,7 @@ class UserAdapter(PrimaryAdapter):
 
         except DoesNotExist:
             raise db_e.InvalidPidError(
-                db_e.ProjectMessages.YOU_DO_NOT_HAVE_RIGHTS)
+                db_e.ProjectMessages.DO_NOT_HAVE_RIGHTS)
 
         try:
             # we trying to find user by login
@@ -171,6 +162,41 @@ class UserAdapter(PrimaryAdapter):
             UserProjectRelation.create(user=user, project=project)
 
         logger.info('user_project relation created')
+
+    def remove_from_project_by_login(self, login, pid):
+        """
+        This function removes user from the project by it's login
+        :param pid: Project's id
+        :param login: User's login
+        :return: None
+        """
+        uid = UserAdapter.get_id_by_login(login)
+
+        try:
+            # we get task where current user is admin and where project id is
+            # matching
+            Project.select().where(
+                (self.uid == Project.admin) & (Project.pid == pid)).get()
+            logger.debug('such project exists')
+            # if an admin tries to delete himself we deny it
+            if uid == self.uid:
+                raise db_e.InvalidPidError(
+                    db_e.ProjectMessages.DO_NOT_HAVE_RIGHTS)
+
+        except DoesNotExist:
+            # not admin can try to delete himself
+            if uid != self.uid:
+                raise db_e.InvalidPidError(
+                    db_e.ProjectMessages.DO_NOT_HAVE_RIGHTS)
+
+        # now we try to find and delete user
+        rows = UserProjectRelation.delete().where(
+            (UserProjectRelation.project == pid) &
+            (UserProjectRelation.user == uid)).\
+            execute()
+
+        if rows == 0:
+            raise db_e.InvalidLoginError(db_e.LoginMessages.NO_USER_TO_DELETE)
 
     @staticmethod
     def get_id_by_login(login):
@@ -227,28 +253,3 @@ class UserAdapter(PrimaryAdapter):
 
         except DoesNotExist:
             raise db_e.InvalidPidError(db_e.LoginMessages.USER_DOES_NOT_EXISTS)
-
-    @staticmethod
-    def get_tasks_id_by_uid(uid):
-        """
-        This function returns task id's of each personal user's task
-        :param: User's id
-        :return: List of tids
-        """
-        query = Task.select(Task.tid).where((Task.creator == uid) &
-                                            (Task.receiver == uid) &
-                                            Task.project.is_null(True))
-
-        return [task.tid for task in query]
-
-    @staticmethod
-    def get_projects_id_by_uid(uid):
-        """
-        This function returns projects id's of each project where user is named
-        :param: User's id
-        :return: List of pids
-        """
-        query = Task.select(UserProjectRelation.project). \
-            where(UserProjectRelation.user == uid)
-
-        return [project.pid for project in query]

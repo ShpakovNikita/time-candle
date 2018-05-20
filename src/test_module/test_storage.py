@@ -336,6 +336,8 @@ class TestTaskAdapter(unittest.TestCase):
 class TestUserAdapter(unittest.TestCase):
     def setUp(self):
         self.adapter = UserAdapter(db_name=':memory:')
+        _init_task_table()
+        _init_project_table()
 
     def tearDown(self):
         User.delete().execute()
@@ -344,11 +346,89 @@ class TestUserAdapter(unittest.TestCase):
         UserProjectRelation.delete().execute()
 
     def test_add_user(self):
-        # good if not raises
         self.adapter.add_user(_USERS[0].login, _USERS[0].password)
 
         with self.assertRaises(db_e.InvalidLoginError):
             self.adapter.add_user(_USERS[0].login, _USERS[0].password)
 
+        for user in _USERS[1:]:
+            User.create(login=user.login,
+                        nickname=user.nickname,
+                        password=user.password)
+
+        # check all add to project situations
+
+        # try to add user from non admin
+        self.adapter.uid = 1
+        with self.assertRaises(db_e.InvalidPidError):
+            self.adapter.add_user_to_project_by_id(_USERS[0].login, 4)
+
+        # add user from admin
+        self.adapter.uid = 2
+        self.adapter.add_user_to_project_by_id(_USERS[0].login, 4)
+
+        # add the same user twice
+        with self.assertRaises(db_e.InvalidLoginError):
+            self.adapter.add_user_to_project_by_id(_USERS[0].login, 4)
+
+        # check that we cannot add other users even when we are in project, but
+        # not admins
+        self.adapter.uid = 1
+        with self.assertRaises(db_e.InvalidPidError):
+            self.adapter.add_user_to_project_by_id(_USERS[2].login, 4)
+
     def test_login(self):
+        _init_user_table()
+        self.adapter.login_user(_USERS[0].login, _USERS[0].password)
+        self.adapter.login_user(_USERS[0].login, _USERS[0].password)
+
+        with self.assertRaises(db_e.InvalidLoginError):
+            self.adapter.login_user('tochno_sanya', _USERS[0].password)
+
+        with self.assertRaises(db_e.InvalidPasswordError):
+            self.adapter.login_user(_USERS[0].login, _USERS[1].password)
+
+    def test_get_by_uid_login(self):
         pass
+
+    def test_get_filter(self):
+        pass
+
+    def test_in_remove_from_project(self):
+        _init_user_table()
+
+        self.adapter.is_user_in_project(_USERS[0].login, 3)
+
+        # if the user is not in project
+        with self.assertRaises(db_e.InvalidPidError):
+            self.adapter.is_user_in_project(_USERS[0].login, 4)
+
+        # if the pid is invalid...
+        with self.assertRaises(db_e.InvalidPidError):
+            self.adapter.is_user_in_project(_USERS[0].login, 10)
+
+        self.adapter.uid = 2
+
+        self.adapter.remove_from_project_by_login(_USERS[0].login, 3)
+
+        # remove removed user in project
+        with self.assertRaises(db_e.InvalidLoginError):
+            self.adapter.remove_from_project_by_login(_USERS[0].login, 3)
+
+        # remove admin from the project with no rights
+        with self.assertRaises(db_e.InvalidPidError):
+            self.adapter.remove_from_project_by_login(_USERS[0].login, 2)
+
+        self.adapter.uid = 1
+
+        # remove admin from the project with rights
+        with self.assertRaises(db_e.InvalidPidError):
+            self.adapter.remove_from_project_by_login(_USERS[0].login, 2)
+
+        # try to remove myself when I'm not admin
+        self.adapter.uid = 2
+        self.adapter.remove_from_project_by_login(_USERS[1].login, 1)
+
+
+class TestProjectAdapter(unittest.TestCase):
+    pass

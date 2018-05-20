@@ -3,6 +3,7 @@ import app_logger
 import exceptions.exceptions
 import storage.user_adapter
 from model.main_instances.user import User
+import exceptions.db_exceptions as db_e
 
 CONFIG_NAME = 'config.ini'
 logger = app_logger.custom_logger('model')
@@ -31,8 +32,19 @@ def run_config():
         # Create user by it's name and password. If it exists, we will get it
         # from database
         logger.debug('login has been set {} {}'.format(login, password))
-        config_dict['user'] = storage.user_adapter.UserAdapter.login_user(
-            login, password)
+
+        user_field = type('user_field', (), {'uid': None})
+        try:
+            config_dict['user'] = storage.user_adapter.UserAdapter.login_user(
+                login, password)
+
+        except db_e.InvalidPasswordError:
+            logger.debug('Invalid password! Now you act like a guest here')
+            config_dict['user'] = user_field()
+
+        except db_e.InvalidLoginError:
+            logger.debug('Invalid login! Now you act like a guest here')
+            config_dict['user'] = user_field()
         return config_dict
 
     except KeyError:

@@ -26,7 +26,16 @@ def log_in(login, password):
     :type password: String
     :return: None
     """
-    UserInstance.make_user(Adapters.USER_ADAPTER.login_user(login, password))
+    # TODO: DB_E
+    try:
+        UserInstance.make_user(
+            Adapters.USER_ADAPTER.login_user(login, password))
+    except db_e.InvalidPasswordError:
+        logger.debug('Invalid password! Now you act like a guest here')
+
+    except db_e.InvalidLoginError:
+        logger.debug('Invalid login! Now you act like a guest here')
+
     # if everything is ok, we will write our login and password to the
     # config.ini
     config_parser.write_user(login, password)
@@ -215,7 +224,7 @@ def show_tasks(projects, all_flag):
     tasks
     :return: None
     """
-    # TODO: Change on get tasks
+    # TODO: Change on get tasks, FULLY UNWORKABLE NOW
 
     if len(projects) == 0:
         # print user's personal task's

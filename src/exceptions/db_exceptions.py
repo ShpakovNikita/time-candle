@@ -13,7 +13,8 @@ class LoginMessages(Enum):
     # the project
     USER_EXISTS = 'Current user is already exists.'
     USER_DOES_NOT_EXISTS = 'Current user is not exists.'
-    # TODO: ALREADY_LOGGED_IN
+    ALREADY_LOGGED_IN = 'Already logged in'
+    NO_USER_TO_DELETE = 'There is no such user to delete'
 
 
 # Password related things
