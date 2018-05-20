@@ -481,4 +481,23 @@ class TestUserAdapter(unittest.TestCase):
 
 
 class TestProjectAdapter(unittest.TestCase):
-    pass
+    def setUp(self):
+        self.adapter = ProjectAdapter(db_name=':memory:')
+        _init_task_table()
+        _init_project_tasks_table()
+        _init_user_table()
+
+    def tearDown(self):
+        User.delete().execute()
+        Task.delete().execute()
+        Project.delete().execute()
+        UserProjectRelation.delete().execute()
+
+    def test_get_save_project(self):
+        pass
+
+    def test_remove_save_get_project(self):
+        pass
+
+    def test_get_by_filter(self):
+        pass

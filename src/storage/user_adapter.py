@@ -58,9 +58,9 @@ class UserAdapter(PrimaryAdapter):
     @staticmethod
     def get_users_by_filter(filter_instance):
         """
-        This function returns model objects by the given UserFilter.
+        This function returns storage objects by the given UserFilter.
         :param filter_instance: UserFilter with defined filters
-        :return: List of UserInstances without passwords
+        :return: List of User objects without passwords
         """
         query = User.select().where(filter_instance.to_query())
 

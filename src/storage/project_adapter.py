@@ -55,6 +55,20 @@ class ProjectAdapter(PrimaryAdapter):
     def __init__(self, db_name=None, uid=None):
         super().__init__(uid, db_name)
 
+    def get_by_filter(self, filter_instance):
+        """
+        This function returns storage objects by the given ProjectFilter.
+        :param filter_instance: ProjectFilter with defined filters
+        :return: List of Project objects
+        """
+        # in this query we get all available projects
+        query = self._get_available_projects().select().\
+            where(filter_instance.to_query())
+
+        # return converted query to the outer module
+        result = [project for project in query]
+        return result
+
     def save(self, obj):
         """
         This function is used to store given project in database
@@ -176,3 +190,10 @@ class ProjectAdapter(PrimaryAdapter):
 
         except DoesNotExist:
             return 1
+
+    def _get_available_projects(self):
+        # get all tasks in project related to user
+        query_projects = UserProjectRelation. \
+            select().where(UserProjectRelation.user == self.uid)
+
+        return query_projects

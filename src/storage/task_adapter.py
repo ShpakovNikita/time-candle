@@ -238,12 +238,11 @@ class TaskAdapter(PrimaryAdapter):
     def __init__(self, db_name=None, uid=None):
         super().__init__(uid, db_name)
 
-    # TODO: USER JOIN TO FIND BY LOGIN ETC
     def get_by_filter(self, filter_instance):
         """
-        This function returns model objects by the given TaskFilter.
+        This function returns storage objects by the given TaskFilter.
         :param filter_instance: TaskFilter with defined filters
-        :return: List of TaskInstances
+        :return: List of Task objects
         """
         # in this query we get all available tasks (our personal tasks and all
         # tasks our in projects)
