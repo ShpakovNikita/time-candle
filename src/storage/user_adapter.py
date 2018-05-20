@@ -60,11 +60,25 @@ class UserAdapter(PrimaryAdapter):
         """
         This function returns model objects by the given UserFilter.
         :param filter_instance: UserFilter with defined filters
-        :return: List of UserInstances
+        :return: List of UserInstances without passwords
         """
         query = User.select().where(filter_instance.to_query())
 
-        result = [user for user in query]
+        # this is we need in case of password flipping, just fot security
+        def _init_usr(self, obj):
+            self.uid = obj.uid
+            self.login = obj.login
+            self.time_zone = obj.time_zone
+            self.nickname = obj.nickname
+            self.about = obj.about
+
+        user_dummie = type('user_dummie', (), {'__init__': _init_usr,
+                                               'password': None})
+
+        result = []
+        for user in query:
+            result.append(user_dummie(user))
+
         return result
 
     @staticmethod
@@ -207,11 +221,11 @@ class UserAdapter(PrimaryAdapter):
         :return: Int
         """
         try:
-            return User.select(). \
-                where(User.login == login).get().uid
+            return User.select().where(User.login == login).get().uid
 
         except DoesNotExist:
-            db_e.InvalidLoginError(db_e.LoginMessages.USER_DOES_NOT_EXISTS)
+            raise db_e.InvalidLoginError(
+                db_e.LoginMessages.USER_DOES_NOT_EXISTS)
 
     @staticmethod
     def get_user_by_id(uid):
@@ -226,7 +240,7 @@ class UserAdapter(PrimaryAdapter):
             obj = query.get()
 
         except DoesNotExist:
-            raise db_e.InvalidLoginError(
+            raise db_e.InvalidUidError(
                 db_e.LoginMessages.USER_DOES_NOT_EXISTS)
 
         return obj

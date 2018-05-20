@@ -17,6 +17,13 @@ class LoginMessages(Enum):
     NO_USER_TO_DELETE = 'There is no such user to delete'
 
 
+# Uid related things
+class InvalidUidError(Exception):
+    def __init__(self, errors=None, message='The uid is invalid! {}'):
+        super().__init__(message.format(errors))
+        self.errors = errors
+
+
 # Password related things
 class InvalidPasswordError(Exception):
     def __init__(self, errors=None, message='The password is invalid! {}'):

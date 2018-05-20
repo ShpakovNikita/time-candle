@@ -76,7 +76,11 @@ _USERS = [
     UserDummie(uid=2, login='Shaft', password='123', nickname='SaNo228'),
     UserDummie(uid=3, login='Arracias', password='12345', nickname='Boudart'),
     UserDummie(uid=4, login='Andy', password='123452', nickname='weratt'),
-    UserDummie(uid=5, login='Vasya', password='Yanix', nickname='BPATUIIIKA')]
+    UserDummie(uid=5, login='sanga', password='Yanix', nickname='BPATUIIIKA'),
+    UserDummie(uid=6, login='Sashya', password='Ya', nickname='SanEk'),
+    UserDummie(uid=7, login='Shanya', password='Yanix', nickname='YandexTop'),
+    UserDummie(uid=8, login='Andrew', password='Yanix',
+               nickname='Xo4Y_V_YanDex')]
 
 _TASKS = [
     TaskDummie(uid=1, creator_uid=1, tid=1, deadline=None, title='test task'),
@@ -389,10 +393,56 @@ class TestUserAdapter(unittest.TestCase):
             self.adapter.login_user(_USERS[0].login, _USERS[1].password)
 
     def test_get_by_uid_login(self):
-        pass
+        _init_user_table()
+
+        # if we got right id
+        self.assertEqual(self.adapter.get_id_by_login(_USERS[0].login),
+                         _USERS[0].uid)
+
+        # what if we get unexistent user
+        with self.assertRaises(db_e.InvalidLoginError):
+            self.adapter.get_id_by_login('hahahaha')
+
+        # test get by id
+        self.assertEqual(self.adapter.get_user_by_id(_USERS[2].uid).nickname,
+                         _USERS[2].nickname)
+
+        with self.assertRaises(db_e.InvalidUidError):
+            self.adapter.get_user_by_id(100)
 
     def test_get_filter(self):
-        pass
+        _init_user_table()
+
+        # let's test search filters
+        self.assertEqual(len(self.adapter.get_users_by_filter(
+            UserFilter().login_substring(r'sa'))), 3)
+        self.assertEqual(len(self.adapter.get_users_by_filter(
+            UserFilter().login_substring(r'san'))), 2)
+        self.assertEqual(len(self.adapter.get_users_by_filter(
+            UserFilter().nickname_substring(r'Sa'))), 3)
+
+        # test union filter
+        self.assertEqual(len(self.adapter.get_users_by_filter(UserFilter())), 8)
+
+        # test complex filters
+        res_1, res_2 = 2, 3
+        fil_1 = UserFilter().login_substring(r'sa').nickname_substring(r'Sa')
+        self.assertEqual(len(self.adapter.get_users_by_filter(fil_1)), res_1)
+
+        fil_2 = UserFilter().login_substring(r'Sha').\
+            nickname_substring(r'BPA', PrimaryFilter.OP_OR)
+        self.assertEqual(len(self.adapter.get_users_by_filter(fil_2)), res_2)
+
+        users = self.adapter.get_users_by_filter(fil_1 | fil_2)
+        self.assertEqual(len(users),
+                         res_2 + res_1)
+        self.assertEqual(len(self.adapter.get_users_by_filter(fil_1 & fil_2)),
+                         0)
+
+        # we check our result on length, but we have also to check if they are
+        # right
+        for user in users:
+            self.assertIn(user.uid, [1, 2, 5, 6, 7])
 
     def test_in_remove_from_project(self):
         _init_user_table()
