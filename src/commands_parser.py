@@ -366,7 +366,7 @@ def _init_change_task_parser(root_args):
     task.add_argument(_Args.prefix().COMMENT.long,
                       _Args.prefix().COMMENT.short,
                       help=_Args.COMMENT.docstring,
-                      default=[''],
+                      default=[None],
                       nargs=1)
 
 
