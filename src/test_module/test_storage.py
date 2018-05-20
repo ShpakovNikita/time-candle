@@ -103,7 +103,8 @@ _TASKS = [
 
 _PROJECTS = [
     ProjectDummie(pid=1, admin_uid=1, title='project 1', description='Huh?'),
-    ProjectDummie(pid=2, admin_uid=1, title='project 2'),
+    ProjectDummie(pid=2, admin_uid=1, title='project 2',
+                  description='this is siiiiper cool'),
     ProjectDummie(pid=3, admin_uid=2, title='project 3',
                   description='Some unit test?'),
     ProjectDummie(pid=4, admin_uid=2, title='project 4', description='0_0')]
@@ -169,6 +170,7 @@ def _init_task_table():
 
 def _init_project_table():
     for project in _PROJECTS:
+        print(project.admin_uid)
         Project.create(admin=project.admin_uid,
                        description=project.description,
                        title=project.title)
@@ -211,7 +213,7 @@ class TestTaskAdapter(unittest.TestCase):
 
     def test_save_get_task(self):
         # trying to add task to the None user and creator. This tests if the
-        # exception is rised when our id is invalid
+        # exception is raised when our id is invalid
         with self.assertRaises(db_e.InvalidLoginError):
             task = copy(_TASKS[0])
             # Uid None
@@ -245,6 +247,20 @@ class TestTaskAdapter(unittest.TestCase):
 
         # check that we created task
         self.assertEqual(self.adapter.last_id(), 2)
+
+        self.adapter.uid = 2
+
+        # test that when we switch user we will ignore tid and make new task
+        task = copy(_TASKS[5])
+        task.tid = 3
+        self.adapter.save(task)
+        self.adapter.save(task)
+        self.assertEqual(self.adapter.last_id(), 3)
+
+        self.adapter.uid = 1
+        self.adapter.save(task)
+        self.assertEqual(self.adapter.last_id(), 4)
+
 
     def test_get_by_filter_task(self):
         _init_task_table()
@@ -307,7 +323,7 @@ class TestTaskAdapter(unittest.TestCase):
         # remove the 4th task
         self.adapter.remove_task_by_id(_TASKS[3].tid)
 
-        # checking tha we cannot remove deleted task somehow twice
+        # checking that we cannot remove deleted task somehow twice
         with self.assertRaises(db_e.InvalidTidError):
             self.adapter.remove_task_by_id(_TASKS[3].tid)
 
@@ -323,6 +339,7 @@ class TestTaskAdapter(unittest.TestCase):
 
         # check if we are really deleted them
         self.assertEqual(len(self.adapter.get_by_filter(TaskFilter())), 0)
+        self.assertEqual(self.adapter.last_id(), 0)
 
         _init_task_table()
         _init_project_tasks_table()
@@ -414,29 +431,29 @@ class TestUserAdapter(unittest.TestCase):
         _init_user_table()
 
         # let's test search filters
-        self.assertEqual(len(self.adapter.get_users_by_filter(
+        self.assertEqual(len(self.adapter.get_by_filter(
             UserFilter().login_substring(r'sa'))), 3)
-        self.assertEqual(len(self.adapter.get_users_by_filter(
+        self.assertEqual(len(self.adapter.get_by_filter(
             UserFilter().login_substring(r'san'))), 2)
-        self.assertEqual(len(self.adapter.get_users_by_filter(
+        self.assertEqual(len(self.adapter.get_by_filter(
             UserFilter().nickname_substring(r'Sa'))), 3)
 
         # test union filter
-        self.assertEqual(len(self.adapter.get_users_by_filter(UserFilter())), 8)
+        self.assertEqual(len(self.adapter.get_by_filter(UserFilter())), 8)
 
         # test complex filters
         res_1, res_2 = 2, 3
         fil_1 = UserFilter().login_substring(r'sa').nickname_substring(r'Sa')
-        self.assertEqual(len(self.adapter.get_users_by_filter(fil_1)), res_1)
+        self.assertEqual(len(self.adapter.get_by_filter(fil_1)), res_1)
 
-        fil_2 = UserFilter().login_substring(r'Sha').\
+        fil_2 = UserFilter().login_substring(r'Sha'). \
             nickname_substring(r'BPA', PrimaryFilter.OP_OR)
-        self.assertEqual(len(self.adapter.get_users_by_filter(fil_2)), res_2)
+        self.assertEqual(len(self.adapter.get_by_filter(fil_2)), res_2)
 
-        users = self.adapter.get_users_by_filter(fil_1 | fil_2)
+        users = self.adapter.get_by_filter(fil_1 | fil_2)
         self.assertEqual(len(users),
                          res_2 + res_1)
-        self.assertEqual(len(self.adapter.get_users_by_filter(fil_1 & fil_2)),
+        self.assertEqual(len(self.adapter.get_by_filter(fil_1 & fil_2)),
                          0)
 
         # we check our result on length, but we have also to check if they are
@@ -494,10 +511,102 @@ class TestProjectAdapter(unittest.TestCase):
         UserProjectRelation.delete().execute()
 
     def test_get_save_project(self):
-        pass
+        # trying to add project with None admin.
+        with self.assertRaises(db_e.InvalidLoginError):
+            project = copy(_PROJECTS[0])
+            project.admin_uid = self.adapter.uid
+            self.adapter.save(project)
 
-    def test_remove_save_get_project(self):
-        pass
+        # check that there is no projects in database
+        self.assertEqual(self.adapter.last_id(), 0)
+
+        self.adapter.uid = 1
+        self.adapter.save(_PROJECTS[0])
+        self.assertEqual(self.adapter.last_id(), 1)
+
+        # check that project was updated
+        project = copy(_PROJECTS[0])
+        project.description = 'new_desc'
+        self.adapter.save(project)
+        self.assertEqual(self.adapter.last_id(), 1)
+
+        self.assertEqual(self.adapter.get_project_by_id(_PROJECTS[0].pid).
+                         description, project.description)
+
+        # check if we can remove project
+        self.adapter.remove_project_by_id(_PROJECTS[0].pid)
+
+        self.assertEqual(self.adapter.last_id(), 0)
+
+        # check on correct addition to the db after all
+        self.adapter.save(_PROJECTS[0])
+        self.adapter.save(_PROJECTS[1])
+        self.assertEqual(self.adapter.last_id(), 2)
+
+        self.adapter.uid = 2
+        # check that we cannot delete project if we are not admins
+        with self.assertRaises(db_e.InvalidLoginError):
+            self.adapter.remove_project_by_id(_PROJECTS[0].pid)
+
+        # check on the right message if we delete unexistent project
+        with self.assertRaises(db_e.InvalidPidError):
+            self.adapter.remove_project_by_id(100)
+
+    def test_remove_task_project(self):
+        _init_project_table()
+
+        self.adapter.uid = 1
+        self.adapter.remove_project_by_id(_PROJECTS[0].pid)
+
+        # check that all tasks was removed
+        tasks = [project_task.tid for project_task in _PROJECT_TASKS
+                 if project_task.pid == _PROJECTS[0].pid]
+
+        for task in Task.select().where(Task.tid.is_null(False)):
+            self.assertNotIn(task.tid, tasks)
+
+        # check just for sure that we do not deleted some other task
+        Task.select().where(Task.tid == 20).get()
+
+        # check that all relations between _PROJECT[0] was removed
+        with self.assertRaises(db_e.InvalidPidError):
+            self.adapter.get_project_by_id(_PROJECTS[0].pid)
+
+        for rel in UserProjectRelation.select().where(
+                UserProjectRelation.project.is_null(False)):
+            self.assertNotEqual(rel.project.pid, _PROJECTS[0].pid)
 
     def test_get_by_filter(self):
-        pass
+        _init_project_table()
+
+        self.adapter.uid = 1
+        # let's test search filters
+        self.assertEqual(len(self.adapter.get_by_filter(
+            ProjectFilter().description_substring(r'u'))), 2)
+        self.assertEqual(len(self.adapter.get_by_filter(
+            ProjectFilter().description_substring(r'Huh'))), 1)
+
+        self.adapter.uid = None
+        # test union filter
+        self.assertEqual(len(self.adapter.get_by_filter(ProjectFilter())), 0)
+
+        self.adapter.uid = 1
+        self.assertEqual(len(self.adapter.get_by_filter(ProjectFilter())), 3)
+
+        res_1, res_2 = 2, 3
+        # analogue to the union
+        fil_1 = ProjectFilter().admin(1)
+        self.assertEqual(len(self.adapter.get_by_filter(fil_1)), res_1)
+
+        fil_2 = ProjectFilter().description_substring(r'u'). \
+            description_substring(r'iii', PrimaryFilter.OP_OR)
+        self.assertEqual(len(self.adapter.get_by_filter(fil_2)), res_2)
+
+        self.assertEqual(len(self.adapter.get_by_filter(fil_1 | fil_2)), 3)
+
+        projects = self.adapter.get_by_filter(fil_1 & fil_2)
+        self.assertEqual(len(projects), 2)
+
+        # now we check the truth of the gotten values
+        for project in projects:
+            self.assertIn(project.pid, [1, 2])

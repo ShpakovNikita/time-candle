@@ -1,4 +1,4 @@
-from storage.adapter_classes import Task, User, UserProjectRelation
+from storage.adapter_classes import Task, User, UserProjectRelation, Project
 from storage.adapter_classes import Filter as PrimaryFilter
 from storage.adapter_classes import Adapter as PrimaryAdapter
 from storage import logger
@@ -260,7 +260,6 @@ class TaskAdapter(PrimaryAdapter):
         This function is used to store given task to the database. Note, that
         tasks can be with similar names and dates (but on that case I have a
         task below)
-        TODO: warning if the task's title and time are matching with some precision
         :param obj: type with fields:
         - creator_uid
         - uid
@@ -274,8 +273,9 @@ class TaskAdapter(PrimaryAdapter):
         :return: None
         """
         try:
-            task = Task.select().where((Task.tid == obj.tid) & (
-                    Task.receiver == self.uid | Task.creator == self.uid)).get()
+            task = Task.select().where((Task.tid == obj.tid) &
+                                       ((Task.receiver == self.uid) |
+                                        (Task.creator == self.uid))).get()
 
             TaskAdapter._update(task, obj)
 
@@ -379,13 +379,16 @@ class TaskAdapter(PrimaryAdapter):
         """
         # TODO: Is that good to have a recursive try except?
         try:
-            query = self._get_available_tasks().select().where(Task.parent == tid)
+            query = self._get_available_tasks().select().\
+                where(Task.parent == tid)
             for task in query:
                 self.remove_task_by_id(task.tid)
 
             logger.info('removing task by tid %s' % tid)
-            self._get_available_tasks().select().where(Task.tid == tid).get().\
-                delete_instance()
+            task = self._get_available_tasks().\
+                select().where(Task.tid == tid).get()
+
+            task.delete_instance()
 
         except DoesNotExist:
             logger.info(

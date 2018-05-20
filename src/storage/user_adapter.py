@@ -56,7 +56,7 @@ class UserAdapter(PrimaryAdapter):
         super().__init__(uid, db_name)
 
     @staticmethod
-    def get_users_by_filter(filter_instance):
+    def get_by_filter(filter_instance):
         """
         This function returns storage objects by the given UserFilter.
         :param filter_instance: UserFilter with defined filters

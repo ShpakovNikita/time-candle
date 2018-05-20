@@ -1,5 +1,5 @@
 from peewee import *
-from storage.adapter_classes import Project, UserProjectRelation
+from storage.adapter_classes import Project, UserProjectRelation, Task
 from storage.adapter_classes import Filter as PrimaryFilter
 from storage.adapter_classes import Adapter as PrimaryAdapter
 import exceptions.db_exceptions as db_e
@@ -73,11 +73,19 @@ class ProjectAdapter(PrimaryAdapter):
         """
         This function is used to store given project in database
         :param obj: type with fields:
+        - pid
         - admin_uid
         - description
         - title
         :return: None
         """
+        try:
+            self.has_rights(obj.pid)
+            project = Project.select().where(Project.pid == obj.pid).get()
+            self._update(project, obj)
+            return
+        except db_e.InvalidPidError:
+            logger.debug('adding project...')
 
         try:
             project = Project(admin=obj.admin_uid,
@@ -87,7 +95,6 @@ class ProjectAdapter(PrimaryAdapter):
             relation = UserProjectRelation(user=self.uid,
                                            project=project)
 
-            print(self.uid, obj.admin_uid, relation.project)
             # only if everything is ok we try save project to our database
             project.save()
             relation.save()
@@ -107,7 +114,6 @@ class ProjectAdapter(PrimaryAdapter):
         :type pid: Int
         :return: Project
         """
-        # TODO: FIX (need relations)
         try:
             # we are checking if there is a connection our user and selected
             # project
@@ -123,7 +129,8 @@ class ProjectAdapter(PrimaryAdapter):
         except DoesNotExist:
             logger.info('There is no such pid %s in the database for your user'
                         % pid)
-            raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
+            raise db_e.InvalidPidError(
+                db_e.ProjectMessages.PROJECT_DOES_NOT_EXISTS)
 
     def has_rights(self, pid):
         """
@@ -141,7 +148,7 @@ class ProjectAdapter(PrimaryAdapter):
 
         try:
             Project.select().where((Project.pid == pid) &
-                                   (Project.admin == self.uid))
+                                   (Project.admin == self.uid)).get()
 
             return True
 
@@ -163,13 +170,22 @@ class ProjectAdapter(PrimaryAdapter):
             UserProjectRelation.delete(). \
                 where(UserProjectRelation.project == pid).execute()
 
-            Project.delete(). \
-                where(Project.pid == pid).execute()
+            Project.delete().where(Project.pid == pid).execute()
+
+            Task.delete().where(Task.project == pid).execute()
 
             logger.debug('project fully removed')
 
         except DoesNotExist:
             db_e.InvalidPidError(db_e.ProjectMessages.PROJECT_DOES_NOT_EXISTS)
+
+    @staticmethod
+    def _update(project, obj):
+        project.admin = obj.admin_uid
+        project.description = obj.description
+        project.title = obj.title
+
+        project.save()
 
     @staticmethod
     def last_id():
@@ -189,11 +205,12 @@ class ProjectAdapter(PrimaryAdapter):
             return query.get().pid
 
         except DoesNotExist:
-            return 1
+            return 0
 
     def _get_available_projects(self):
         # get all tasks in project related to user
-        query_projects = UserProjectRelation. \
-            select().where(UserProjectRelation.user == self.uid)
+        query_projects = Project.select(). \
+            join(UserProjectRelation).\
+            where(UserProjectRelation.user == self.uid)
 
         return query_projects
