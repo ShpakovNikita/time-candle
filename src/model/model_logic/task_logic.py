@@ -1,4 +1,6 @@
 from model.model_logic import *
+import model.tokenizer
+from storage.task_adapter import TaskFilter
 
 
 def add_task(title, priority, status, time, parent_id, comment, pid, login):
@@ -18,7 +20,6 @@ def add_task(title, priority, status, time, parent_id, comment, pid, login):
     # logged user. The max func needed to set tasks status and priority not
     # lower then parent's
 
-    # TODO: parent pid match pid
     if parent_id is not None:
         parent_task = TaskInstance.make_task(
             Adapters.TASK_ADAPTER.get_task_by_id(parent_id, pid))
@@ -31,9 +32,6 @@ def add_task(title, priority, status, time, parent_id, comment, pid, login):
         deadline_time = validators.get_milliseconds(time)
 
     logger.debug('time in milliseconds %s' % deadline_time)
-
-    # TODO: MADE NOT ONLY ADMIN ADD, BUT USERS WITH LOW PRIORITY!!! Just change
-    # TODO: on is_admin(pid) maybe
 
     # Check for rights and id's
     if login is None:
@@ -82,3 +80,10 @@ def change_task(tid, priority, status, time, comment):
         task.comment = comment
 
     Adapters.TASK_ADAPTER.save(task)
+
+
+def get_tasks(string_fil):
+    # get tasks by filter
+    fil = model.tokenizer.parse_string(string_fil)
+    tasks = Adapters.TASK_ADAPTER.get_by_filter(fil)
+    return [TaskInstance.make_task(task) for task in tasks]

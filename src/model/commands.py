@@ -114,6 +114,17 @@ def change_task(tid, priority, status, time, comment):
     task.change_task(tid, priority, status, time, comment)
 
 
+def get_tasks(fil):
+    """
+    This function returns specific tasks that was taken from the database from
+    your available tasks by the filter.
+    :param fil: Filter with specific syntax
+    :type fil: String
+    :return: list of TaskInstance
+    """
+    return task.get_tasks(fil)
+
+
 def show_tasks(projects, all_flag):
     """
     This function prints the tasks for current user. It will print all tasks for

@@ -72,13 +72,16 @@ def parse_string(data):
     :param data: String of filters to show
     :return: None
     """
-    data = "(projects: 1 3 4 OR projects: 1 3 6) AND tids: 2 3 1"
+    # (projects: 1 3 4 OR projects: 1 3 6) AND tids: 2 3 1
+    data = " "
     result = _get_tokens(data)
-    pprint(result)
+    print(result)
 
-    print(list(shunting_yard(['(', 'some expr to make', '|', 'other', ')', '&', 'third'])))
-    print(calc(shunting_yard(_bond_expressions(result))))
-    return result
+    print(_bond_expressions(result))
+
+    fil = calc(shunting_yard(_bond_expressions(result)))
+    print(fil)
+    return fil
 
 
 def _get_tokens(data):
@@ -96,7 +99,7 @@ def _get_tokens(data):
                                         begin=tup_begin[1],
                                         end=tup_end[1]))
 
-    return result
+    return [token.value for token in result]
 
 
 def _process_tokens(tokens):
@@ -104,7 +107,8 @@ def _process_tokens(tokens):
 
 
 def _bond_expressions(tokens):
-    expr = [f.value for f in tokens]
+    expr = tokens
+    # expr = [f.value for f in tokens]
     i = 0
     filter_sequence = []
     # iterate all over the statements
@@ -131,10 +135,17 @@ def _bond_expressions(tokens):
 
             COMMANDS[command](lst, fil)
             filter_sequence.append(fil)
+            print('first')
             i += sub_i
-        elif expr[i] in OPERATORS or expr[i] in '()':
+        elif expr[i] in OPERATORS or expr[i] in '()' and expr[i]:
             filter_sequence.append(expr[i])
             i += 1
+            print('second')
+        elif not expr[i]:
+            if len(expr) == 1 and expr[0] == '':
+                filter_sequence.append(TaskFilter())
+
+            break
         else:
             raise sm_e.\
                 InvalidExpressionError(sm_e.ShowMeMessages.

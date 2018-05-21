@@ -333,7 +333,6 @@ class TaskAdapter(PrimaryAdapter):
 
         query = Task.select().where((Task.project << projects) |
                                     (Task.creator == self.uid))
-
         return query
 
     @staticmethod

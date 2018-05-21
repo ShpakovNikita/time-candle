@@ -80,7 +80,6 @@ class User(BaseModel):
     # for UserModel's own_tasks we have a relation field in Task class from
     # storage.task_adapter
 
-    # TODO: Nani???
     # projects [] -> see the UserProjectRelation table
     login = CharField(unique=True)
 
@@ -144,22 +143,6 @@ class UserProjectRelation(BaseModel):
     user = ForeignKeyField(User, related_name='user')
     project = ForeignKeyField(Project, related_name='project')
 
-    # TODO: rights as class with the relations
-    rights = CharField(default='')
-
-
-class TagTaskRelation(BaseModel):
-    """
-    This class is class for connecting search tag and tasks, because one tag can
-    have more then one task, and one task can have multiple tags. From it we can
-    extract tasks that current tag have or tags, that current task have. Also we
-    should keep project id, because tags works only inside projects.
-    """
-
-    tag = ForeignKeyField(User, related_name='tag')
-    task = ForeignKeyField(Task, related_name='tasks')
-    project = ForeignKeyField(Project, related_name='project')
-
 
 # Maybe it is wise to create another relations table with the time rules and etc
 # but for not we have only deadline time. So simple.
@@ -196,7 +179,6 @@ class Adapter:
         User.create_table()
         Project.create_table()
         UserProjectRelation.create_table()
-        TagTaskRelation.create_table()
         Task.create_table()
         logger.debug("Database created")
 

@@ -7,7 +7,7 @@ import sys
 from exceptions import custom_excepthook
 
 
-def start_session(dev_opt='dev'):
+def start_session(dev_opt='dev', db_file=None):
     if dev_opt == 'dev':
         pass
     elif dev_opt == 'user':
@@ -16,13 +16,13 @@ def start_session(dev_opt='dev'):
         raise ValueError('session option is wrong!')
 
     Adapters.TASK_ADAPTER = storage.task_adapter.\
-        TaskAdapter()
+        TaskAdapter(db_file)
 
     Adapters.PROJECT_ADAPTER = storage.project_adapter.\
-        ProjectAdapter()
+        ProjectAdapter(db_file)
 
     Adapters.USER_ADAPTER = storage.user_adapter.\
-        UserAdapter()
+        UserAdapter(db_file)
 
     Singleton.GLOBAL_USER = _login()
 
