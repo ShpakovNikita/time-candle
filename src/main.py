@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import commands_parser
+from console import commands_parser
 import app_logger
 import model.tokenizer
 from model.session_control import start_session
@@ -11,7 +11,7 @@ def main():
     start_session('dev')
 
     commands_parser.run()
-    model.tokenizer.parse_string('')
+    # model.tokenizer.parse_string('')
     # pprint(tokenizer.parse_string("data:'name', 'field' ; this_is_sparta:'huh', 1.2 > 2"))
 
     app_logger.custom_logger('root').info('Leaving the program.')

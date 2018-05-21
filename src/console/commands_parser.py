@@ -2,6 +2,7 @@ import argparse
 from collections import namedtuple
 from model import commands
 import app_logger
+import console.print_functions
 
 logger = app_logger.custom_logger('controller')
 
@@ -120,10 +121,10 @@ class _Args:
                           parser syntax""")
 
     # show tasks filter
-    FILTERS = Argument(long='filters',
-                       short='f',
-                       docstring="""Filter all available tasks by one 
-                       expression with own syntax""")
+    FILTER = Argument(long='filter',
+                      short='f',
+                      docstring="""Filter all available tasks by one 
+                      expression with own syntax""")
 
     # TODO: filter will replace this argument?
     ALL_TASKS = Argument(long='all',
@@ -405,27 +406,14 @@ def _init_show_tasks_parser(root_args):
                                 help=_Args.SHOW_TASKS.docstring)
 
     # TODO: now we count nargs + as 1
-    show.add_argument(_Args.prefix().PROJECT.long,
-                      _Args.prefix().PROJECT.short,
-                      help=_Args.PROJECT.docstring,
-                      nargs='+',
-                      default=[])
-
-    show.add_argument(_Args.prefix().FILTERS.long,
-                      _Args.prefix().FILTERS.short,
-                      help=_Args.FILTERS.docstring,
-                      nargs=1)
-
-    show.add_argument(_Args.prefix().ALL_TASKS.long,
-                      _Args.prefix().ALL_TASKS.short,
-                      help=_Args.ALL_TASKS.docstring,
-                      action='store_true')
+    show.add_argument(_Args.prefix().FILTER.long,
+                      _Args.prefix().FILTER.short,
+                      help=_Args.FILTER.docstring,
+                      nargs=1,
+                      default=[''])
 
 
 # Process parsed arguments
-# TODO: Change everything on getattr
-
-
 def _process_login(parsed_args):
     logger.debug('login')
     commands.log_in(parsed_args.login, parsed_args.password)
@@ -516,4 +504,5 @@ def _process_add_project(parsed_args):
 
 
 def _process_show_tasks(parsed_args):
-    commands.show_tasks(parsed_args.project, parsed_args.all)
+    tasks = commands.get_tasks(parsed_args.filter)
+    console.print_functions.print_tasks(tasks)
