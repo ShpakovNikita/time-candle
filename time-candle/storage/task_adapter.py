@@ -59,7 +59,16 @@ class TaskFilter(PrimaryFilter):
             self.ops.append(op)
 
         if isinstance(pid, (list,)):
-            self.result.append(Task.project << pid)
+            try:
+                if pid[0] is None:
+                    self.result.append(Task.project.is_null(True))
+                else:
+                    self.result.append(Task.project << pid)
+            except IndexError:
+                raise ValueError('Ooops. Unexpected list without args')
+
+        elif pid is None:
+            self.result.append(Task.project.is_null(True))
         else:
             self.result.append(Task.project == pid)
 

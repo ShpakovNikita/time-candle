@@ -93,8 +93,8 @@ _USERS = [
                nickname='Xo4Y_V_YanDex')]
 
 _TASKS = [
-    TaskDummie(uid=1, creator_uid=1, tid=1, deadline=None, title='test task'),
-    TaskDummie(uid=1, creator_uid=1, tid=2, deadline=None, title='test task 1',
+    TaskDummie(uid=1, creator_uid=1, tid=1, deadline=None, title='tesg task'),
+    TaskDummie(uid=1, creator_uid=1, tid=2, deadline=None, title='tesg task 1',
                parent=1),
     TaskDummie(uid=1, creator_uid=1, priority=Priority.HIGH, tid=3,
                deadline=222222222222, title='test task 2', parent=1),

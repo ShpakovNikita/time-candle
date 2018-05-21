@@ -18,3 +18,5 @@ class InvalidExpressionError(Exception):
 class ShowMeMessages(Enum):
     NO_ELEMENTS_FOR_FILTER = 'Specify the elements for selected command'
     UNEXPECTED_SYMBOL_FOUND = 'Make sure that your request is right'
+    UNEXPECTED_LITERAL_TYPE = 'Please input correct literal of type or None'
+    NOT_LEGAL_OPERATOR_SEQUENCE = 'Make sure that you typed operators correctly'

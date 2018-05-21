@@ -3,7 +3,6 @@ from console import commands_parser
 import app_logger
 import model.tokenizer
 from model.session_control import start_session
-# TODO: cut down lower part of the code from this module
 
 
 def main():

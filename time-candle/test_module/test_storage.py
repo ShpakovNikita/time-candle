@@ -64,7 +64,6 @@ class TestTaskAdapter(unittest.TestCase):
         self.adapter.save(task)
         self.assertEqual(self.adapter.last_id(), 4)
 
-
     def test_get_by_filter_task(self):
         _init_task_table()
         _init_project_tasks_table()

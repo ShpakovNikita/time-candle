@@ -2,7 +2,7 @@ import argparse
 from collections import namedtuple
 from model import commands
 import app_logger
-import console.print_functions
+
 
 logger = app_logger.custom_logger('controller')
 
@@ -121,37 +121,16 @@ class _Args:
                           parser syntax""")
 
     # show tasks filter
-    FILTER = Argument(long='filter',
-                      short='f',
-                      docstring="""Filter all available tasks by one 
-                      expression with own syntax""")
+    FILTERS = Argument(long='filters',
+                       short='f',
+                       docstring="""Filter all available tasks by one 
+                       expression with own syntax""")
 
     # TODO: filter will replace this argument?
     ALL_TASKS = Argument(long='all',
                          short='a',
                          docstring="""If this flag is set, we will show all 
                          tasks, with the project user's tasks""")
-
-    PLANNER = Argument(long='planner',
-                       short='l',
-                       docstring="""In this argument you may pass up to 7 unique
-                       numbers from 0 to 6 by the spaces. This will allow you to
-                       make task planner, with the period of 7 days (weekly 
-                       tasks). Also it conflicts with period argument.""")
-
-    PERIOD = Argument(long='period',
-                      short='e',
-                      docstring="""This argument made for periodical tasks. You 
-                      should pass one string parameter in format * * *, where 
-                      first star is day, second is week, third is month. Star as
-                      argument means 'every'. Example: 
-                      0 * * - every first day of the every week in every month.
-                      1 4 * - every second day of 5th week every month. But be 
-                      sure, if there is a 28 days in the month, it can be in the
-                      29 day in terms of current month. In this case task will 
-                      not be shown in this month.Also it conflicts with planner 
-                      argument.""")
-
     """
     Also project argument
     """
@@ -160,11 +139,6 @@ class _Args:
     CLEAR_LOG = Argument(long='clearlog',
                          short='l',
                          docstring="""This argument clears output logs""")
-
-    # logout tree arguments
-    LOGOUT = Argument(long='logout',
-                      short='u',
-                      docstring="""This argument logouts current user""")
 
     # TODO: split_task?
     # TODO: alias?
@@ -219,10 +193,6 @@ def run():
     root_args.add_parser(_Args.CLEAR_LOG.long,
                          help=_Args.CLEAR_LOG.docstring)
 
-    # simple logout arg
-    root_args.add_parser(_Args.LOGOUT.long,
-                         help=_Args.LOGOUT.docstring)
-
     parsed = parser.parse_args()
     logger.debug(parsed)
 
@@ -239,9 +209,6 @@ def run():
     elif parsed.action == _Args.CLEAR_LOG.long:
         open(app_logger.LOG_FILENAME, 'w').close()
         logger.info('log has been cleared')
-
-    elif parsed.action == _Args.LOGOUT.long:
-        _process_logout()
 
     elif parsed.action == _Args.ADD_PROJECT.long:
         _process_add_project(parsed)
@@ -260,8 +227,6 @@ def run():
 The functions below are private. So do not use it int any cases outside this 
 commands parser module.
 """
-
-
 # Initialize parsers
 
 
@@ -322,18 +287,6 @@ def _init_add_task_parser(root_args):
                       default=[''],
                       nargs=1)
 
-    task.add_argument(_Args.prefix().PERIOD.long,
-                      _Args.prefix().PERIOD.short,
-                      help=_Args.PERIOD.docstring,
-                      default=[None],
-                      nargs='+')
-
-    task.add_argument(_Args.prefix().PLANNER.long,
-                      _Args.prefix().PLANNER.short,
-                      help=_Args.PLANNER.docstring,
-                      default=[None],
-                      nargs=1)
-
 
 def _init_remove_task_parser(root_args):
     # create new parser for removetask command
@@ -367,7 +320,7 @@ def _init_change_task_parser(root_args):
     task.add_argument(_Args.prefix().COMMENT.long,
                       _Args.prefix().COMMENT.short,
                       help=_Args.COMMENT.docstring,
-                      default=[None],
+                      default=[''],
                       nargs=1)
 
 
@@ -406,14 +359,26 @@ def _init_show_tasks_parser(root_args):
                                 help=_Args.SHOW_TASKS.docstring)
 
     # TODO: now we count nargs + as 1
-    show.add_argument(_Args.prefix().FILTER.long,
-                      _Args.prefix().FILTER.short,
-                      help=_Args.FILTER.docstring,
-                      nargs=1,
-                      default=[''])
+    show.add_argument(_Args.prefix().PROJECT.long,
+                      _Args.prefix().PROJECT.short,
+                      help=_Args.PROJECT.docstring,
+                      nargs='+',
+                      default=[])
 
+    show.add_argument(_Args.prefix().FILTERS.long,
+                      _Args.prefix().FILTERS.short,
+                      help=_Args.FILTERS.docstring,
+                      nargs=1)
+
+    show.add_argument(_Args.prefix().ALL_TASKS.long,
+                      _Args.prefix().ALL_TASKS.short,
+                      help=_Args.ALL_TASKS.docstring,
+                      action='store_true')
 
 # Process parsed arguments
+# TODO: Change everything on getattr
+
+
 def _process_login(parsed_args):
     logger.debug('login')
     commands.log_in(parsed_args.login, parsed_args.password)
@@ -438,9 +403,7 @@ def _process_add_task(parsed_args):
                           parsed_args.status[0],
                           time,
                           parent,
-                          parsed_args.comment[0],
-                          None,
-                          None)
+                          parsed_args.comment[0])
 
     else:
         # set the uid None if it is not in the list
@@ -450,14 +413,14 @@ def _process_add_task(parsed_args):
         else:
             uid = parsed_args.project[1]
 
-        commands.add_task(parsed_args.title,
-                          parsed_args.priority[0],
-                          parsed_args.status[0],
-                          time,
-                          parent,
-                          parsed_args.comment[0],
-                          parsed_args.project[0],
-                          uid)
+        commands.add_task_to_project(parsed_args.title,
+                                     parsed_args.priority[0],
+                                     parsed_args.status[0],
+                                     time,
+                                     parent,
+                                     parsed_args.comment[0],
+                                     parsed_args.project[0],
+                                     uid)
 
 
 def _process_change_task(parsed_args):
@@ -480,10 +443,6 @@ def _process_remove_task(parsed_args):
     commands.remove_task(parsed_args.id)
 
 
-def _process_logout():
-    commands.logout()
-    
-
 def _process_add_user(parsed_args):
     logger.debug('add_user')
     if parsed_args.project is None:
@@ -504,5 +463,4 @@ def _process_add_project(parsed_args):
 
 
 def _process_show_tasks(parsed_args):
-    tasks = commands.get_tasks(parsed_args.filter)
-    console.print_functions.print_tasks(tasks)
+    commands.show_tasks(parsed_args.project, parsed_args.all)
