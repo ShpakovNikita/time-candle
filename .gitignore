@@ -12,6 +12,7 @@ db/
 build/
 develop-eggs/
 dist/
+backup/
 downloads/
 eggs/
 .eggs/
@@ -50,6 +51,9 @@ htmlcov/
 
 # Django stuff:
 *.log
+*.db
+*.log
+*.ini
 
 # Sphinx documentation
 docs/_build/

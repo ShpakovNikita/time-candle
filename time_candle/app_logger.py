@@ -1,9 +1,11 @@
 import logging
 import logging.config
+from os import path
 
 
 _loggers = []
 LOG_FILENAME = 'config.log'
+CONFIG_PATH = path.join(path.dirname(path.abspath(__file__)), 'logging.conf')
 
 
 def custom_logger(logger_name):
@@ -17,7 +19,7 @@ def custom_logger(logger_name):
     global _loggers
 
     if not _loggers:
-        logging.config.fileConfig('logging.conf')
+        logging.config.fileConfig(CONFIG_PATH)
 
     if logger_name not in [lg.name for lg in _loggers]:
         logger = logging.getLogger(logger_name)
