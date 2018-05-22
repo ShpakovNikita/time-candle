@@ -264,7 +264,6 @@ def run():
                                       help='sub-command help')
 
     # for each command initialize parser and it's specific arguments
-    # TODO: check the description and help difference
     _init_add_user_parser(root_args)
     _init_add_task_parser(root_args)
     _init_login_parser(root_args)
@@ -416,19 +415,21 @@ def _init_add_task_parser(root_args):
     task.add_argument(_Args.prefix().TIME.long,
                       _Args.prefix().TIME.short,
                       help=_Args.TIME.docstring,
-                      nargs=1)
+                      nargs=1,
+                      default=[None])
 
     task.add_argument(_Args.prefix().PARENT.long,
                       _Args.prefix().PARENT.short,
                       help=_Args.PARENT.docstring,
                       type=int,
-                      nargs=1)
+                      nargs=1,
+                      default=[None])
 
-    # TODO: todo, you know?
     task.add_argument(_Args.prefix().PROJECT.long,
                       _Args.prefix().PROJECT.short,
                       help=_Args.PROJECT.docstring,
-                      nargs='+')
+                      default=[None],
+                      nargs=1)
 
     task.add_argument(_Args.prefix().COMMENT.long,
                       _Args.prefix().COMMENT.short,
@@ -440,11 +441,17 @@ def _init_add_task_parser(root_args):
                       _Args.prefix().PERIOD.short,
                       help=_Args.PERIOD.docstring,
                       default=[None],
-                      nargs='+')
+                      nargs=1)
 
     task.add_argument(_Args.prefix().PLANNER.long,
                       _Args.prefix().PLANNER.short,
                       help=_Args.PLANNER.docstring,
+                      default=[None],
+                      nargs=1)
+
+    task.add_argument(_Args.prefix().RECEIVER.long,
+                      _Args.prefix().RECEIVER.short,
+                      help=_Args.RECEIVER.docstring,
                       default=[None],
                       nargs=1)
 
@@ -543,6 +550,13 @@ def _init_show_users_parser(root_args):
                       nargs=1,
                       default=[''])
 
+    show.add_argument(_Args.prefix().PROJECT.long,
+                      _Args.prefix().PROJECT.short,
+                      help=_Args.PROJECT.docstring,
+                      type=int,
+                      nargs=1,
+                      default=[None])
+
 
 def _init_show_projects_parser(root_args):
     # create new parser for login command
@@ -592,42 +606,17 @@ def _process_login(parsed_args):
 def _process_add_task(parsed_args):
     logger.debug('add_task')
 
-    # time, parent and comment is list value, so we have to extract data from it
-    time = None
-    if parsed_args.time is not None:
-        time = parsed_args.time[0]
-
-    parent = None
-    if parsed_args.parent is not None:
-        parent = parsed_args.parent[0]
-
-    # TODO: multiple times
-    if parsed_args.project is None:
-        commands.add_task(parsed_args.title,
-                          parsed_args.priority[0],
-                          parsed_args.status[0],
-                          time,
-                          parent,
-                          parsed_args.comment[0],
-                          None,
-                          None)
-
-    else:
-        # set the uid None if it is not in the list
-        if len(parsed_args.project) == 1:
-            uid = None
-
-        else:
-            uid = parsed_args.project[1]
-
-        commands.add_task(parsed_args.title,
-                          parsed_args.priority[0],
-                          parsed_args.status[0],
-                          time,
-                          parent,
-                          parsed_args.comment[0],
-                          parsed_args.project[0],
-                          uid)
+    commands.add_task(parsed_args.title,
+                      parsed_args.priority[0],
+                      parsed_args.status[0],
+                      parsed_args.time[0],
+                      parsed_args.parent[0],
+                      parsed_args.comment[0],
+                      parsed_args.project[0],
+                      parsed_args.receiver[0],
+                      parsed_args.period[0],
+                      parsed_args.planner[0],
+                      parsed_args.receiver[0])
 
 
 def _process_change_task(parsed_args):
@@ -683,7 +672,7 @@ def _process_show_tasks(parsed_args):
 
 
 def _process_show_users(parsed_args):
-    users = commands.get_users(parsed_args.filter[0])
+    users = commands.get_users(parsed_args.filter[0], parsed_args.project[0])
     console.print_functions.print_users(users)
 
 

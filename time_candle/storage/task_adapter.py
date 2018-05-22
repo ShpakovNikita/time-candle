@@ -294,6 +294,10 @@ class TaskAdapter(PrimaryAdapter):
         except DoesNotExist:
             logger.debug('adding task...')
         try:
+            # check that if receiver is not us, that we have rights to do smt in
+            # the project
+            if obj.pid is not None:
+                pass
             table_task = Task.create(creator=obj.creator_uid,
                                      receiver=obj.uid,
                                      project=obj.pid,

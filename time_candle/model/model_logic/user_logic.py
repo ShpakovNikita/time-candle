@@ -27,10 +27,14 @@ def add_user(login, password, nickname, about, mail):
     Adapters.USER_ADAPTER.save(user)
 
 
-def get_users(substr):
+def get_users(substr, pid=None):
     # get users by passed substring
     fil = UserFilter().nickname_substring(substr)
-    users = Adapters.USER_ADAPTER.get_by_filter(fil)
+    if pid is not None:
+        users = Adapters.USER_ADAPTER.get_by_project(pid)
+    else:
+        users = Adapters.USER_ADAPTER.get_by_filter(fil)
+
     return [UserInstance.make_user(user) for user in users]
 
 

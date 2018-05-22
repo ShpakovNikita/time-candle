@@ -9,10 +9,10 @@ def print_tasks(tasks):
 
 def print_task(task):
     print('Task: {}, tid: {}, creator: {}, receiver: {}, deadline: {}, status: '
-          '{}, priority: {}'.format(task.title, task.tid, task.creator_uid,
-                                    task.uid, task.deadline,
-                                    status_dict[task.status],
-                                    priority_dict[task.priority]))
+          '{}, priority: {}, project id: {}'.
+          format(task.title, task.tid, task.creator_uid, task.uid,
+                 task.deadline, status_dict[task.status],
+                 priority_dict[task.priority], task.pid))
 
 
 def print_users(users):

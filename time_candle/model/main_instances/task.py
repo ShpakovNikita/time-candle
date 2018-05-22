@@ -49,6 +49,7 @@ class Task:
         :type obj: type with fields:
         - other obj receiver with uid
         - other obj creator with uid
+        - other obj project with pid
         - tid
         - deadline_time
         - title
@@ -66,12 +67,17 @@ class Task:
         else:
             parent_id = obj.parent.tid
 
+        if obj.project is None:
+            project_id = None
+        else:
+            project_id = obj.project.pid
+
         task = cls(obj.receiver.uid,
                    obj.creator.uid,
                    obj.tid,
                    obj.deadline_time,
                    obj.title,
-                   None,
+                   project_id,
                    obj.status,
                    obj.priority,
                    parent_id,

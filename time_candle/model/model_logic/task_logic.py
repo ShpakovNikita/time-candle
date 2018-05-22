@@ -31,7 +31,14 @@ def add_task(title, priority, status, time, parent_id, comment, pid, login):
         task_uid = Adapters.USER_ADAPTER.get_id_by_login(login)
 
     if pid is not None:
-        Adapters.PROJECT_ADAPTER.has_rights(pid)
+        logger.debug('pid is not none')
+        if task_uid != Singleton.GLOBAL_USER.uid:
+            logger.debug('the receiver is not us')
+            Adapters.PROJECT_ADAPTER.has_rights(pid)
+        else:
+            logger.debug('we are the receiver')
+            Adapters.USER_ADAPTER.is_user_in_project(
+                Singleton.GLOBAL_USER.login, pid)
 
     task = TaskInstance(task_uid,
                         Singleton.GLOBAL_USER.uid,

@@ -110,7 +110,7 @@ class Task(BaseModel):
     receiver = ForeignKeyField(User, related_name='receiver')
 
     # if the task is not project task this field equals null
-    project = ForeignKeyField(User, related_name='project', null=True)
+    project = ForeignKeyField(Project, related_name='project', null=True)
     status = SmallIntegerField()
     parent = ForeignKeyField('self', null=True)
 

@@ -272,3 +272,12 @@ class UserAdapter(PrimaryAdapter):
 
         except DoesNotExist:
             raise db_e.InvalidPidError(db_e.LoginMessages.USER_DOES_NOT_EXISTS)
+
+    # TODO: tests
+    def get_by_project(self, pid):
+        self.is_user_in_project(self.get_user_by_id(self.uid).login, pid)
+
+        query = UserProjectRelation.select(UserProjectRelation.user).\
+            join(Project).where(UserProjectRelation.project == pid)
+
+        return [q.user for q in query]

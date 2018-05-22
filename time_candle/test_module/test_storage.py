@@ -232,6 +232,39 @@ class TestUserAdapter(unittest.TestCase):
         with self.assertRaises(db_e.InvalidUidError):
             self.adapter.get_user_by_id(100)
 
+    def test_remove_get_by_project(self):
+        _init_user_table()
+
+        # check our function on correct by length
+        self.adapter.uid = 1
+        self.assertEqual(len(self.adapter.get_by_project(1)), 4)
+
+        # remove element and test again
+        self.adapter.remove_from_project_by_login('Shaft', 1)
+        with self.assertRaises(db_e.InvalidLoginError):
+            self.adapter.remove_from_project_by_login('Andy', 1)
+
+        result = self.adapter.get_by_project(1)
+        self.assertEqual(len(result), 3)
+        self.assertEqual(len(self.adapter.get_by_project(2)), 2)
+
+        # if the uid is invalid...
+        self.adapter.uid = None
+        with self.assertRaises(db_e.InvalidUidError):
+            self.adapter.get_by_project(1)
+
+        # if there is no such project to this user
+        self.adapter.uid = 7
+        with self.assertRaises(db_e.InvalidPidError):
+            self.adapter.get_by_project(1)
+
+        self.adapter.uid = 3
+        with self.assertRaises(db_e.InvalidPidError):
+            self.adapter.get_by_project(2)
+
+        for user in result:
+            self.assertIn(user.uid, [3, 5, 1])
+
     def test_get_filter(self):
         _init_user_table()
 

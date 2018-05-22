@@ -81,7 +81,10 @@ def add_task(title,
              parent_id,
              comment,
              pid,
-             login):
+             login,
+             period,
+             planner,
+             receiver):
     """
     This function will add passed task to the database, with the creator and
     executor that named in the config.ini (i.e current logged user)
@@ -90,9 +93,12 @@ def add_task(title,
     :param comment: Task's comment for some detailed explanation
     :param parent_id: Parent's task id
     :param time: Time in following format: YYYY-MM-DD HH:MM:SS
-    :param title: Tasks title
-    :param priority: Tasks priority (enum from Priority)
-    :param status: Tasks status (enum from Status)
+    :param title: Task's title
+    :param priority: Task's priority (enum from Priority)
+    :param status: Task's status (enum from Status)
+    :param period: Task's period in hours TODO:some format?
+    :param planner: Task's planner in format of string from 1 to 7
+    :param receiver: Uid of task's executioner
     :type pid: Int
     :type login: String
     :type comment: String
@@ -101,15 +107,26 @@ def add_task(title,
     :type title: String
     :type priority: Int
     :type status: Int
+    :type period: String TODO: string?
+    :type planner: String
+    :type receiver: Int
     :return: None
     """
     if priority is None:
         logger.debug('Default priority has been set')
         priority = Priority.MEDIUM
+    elif priority > Priority.MAX:
+        priority = Priority.MAX
+    elif priority < Priority.MIN:
+        priority = Priority.MIN
 
     if status is None:
         logger.debug('Default status has been set')
         status = Status.IN_PROGRESS
+    elif status > Status.DONE:
+        status = Status.DONE
+    elif status < Status.EXPIRED:
+        status = Status.EXPIRED
 
     task.add_task(title, priority, status, time, parent_id, comment, pid, login)
 
@@ -184,14 +201,16 @@ def get_tasks(fil):
     return task.get_tasks(fil)
 
 
-def get_users(substr):
+def get_users(substr, pid=None):
     """
     This function returns found users.
     :param substr: Filter for nickname search
+    :param pid: Project's id in where to search users
     :type substr: String
+    :type pid: Int
     :return: list of UserInstance
     """
-    return user.get_users(substr)
+    return user.get_users(substr, pid)
 
 
 def get_current_user():
