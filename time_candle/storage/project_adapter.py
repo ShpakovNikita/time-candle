@@ -29,11 +29,18 @@ class ProjectFilter(PrimaryFilter):
         self.result.append(Project.admin == uid)
         return self
 
-    def title(self, title, op=PrimaryFilter.OP_AND):
+    def title_substring(self, substring, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)
 
-        self.result.append(Project.title == title)
+        self.result.append(Project.title.contains(substring))
+        return self
+
+    def title_regex(self, regex, op=PrimaryFilter.OP_AND):
+        if self.result:
+            self.ops.append(op)
+
+        self.result.append(Project.title.regexp(regex))
         return self
 
     def description_substring(self, substring, op=PrimaryFilter.OP_AND):

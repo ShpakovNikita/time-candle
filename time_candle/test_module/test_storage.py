@@ -1,10 +1,13 @@
 from test_module import *
 
 
+TEST_DB = ':memory:'
+
+
 class TestTaskAdapter(unittest.TestCase):
 
     def setUp(self):
-        self.adapter = TaskAdapter(db_name=':memory:')
+        self.adapter = TaskAdapter(db_name=TEST_DB)
         _init_project_table()
         _init_user_table()
 
@@ -158,7 +161,7 @@ class TestTaskAdapter(unittest.TestCase):
 
 class TestUserAdapter(unittest.TestCase):
     def setUp(self):
-        self.adapter = UserAdapter(db_name=':memory:')
+        self.adapter = UserAdapter(db_name=TEST_DB)
         _init_task_table()
         _init_project_table()
 
@@ -301,7 +304,7 @@ class TestUserAdapter(unittest.TestCase):
 
 class TestProjectAdapter(unittest.TestCase):
     def setUp(self):
-        self.adapter = ProjectAdapter(db_name=':memory:')
+        self.adapter = ProjectAdapter(db_name=TEST_DB)
         _init_task_table()
         _init_project_tasks_table()
         _init_user_table()

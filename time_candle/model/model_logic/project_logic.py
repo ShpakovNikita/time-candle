@@ -46,3 +46,10 @@ def change_project(pid, title, description):
         project.title = title
 
     Adapters.PROJECT_ADAPTER.save(project)
+
+
+def get_projects(substr):
+    # get projects by passed substring
+    fil = ProjectFilter().title_substring(substr)
+    projects = Adapters.PROJECT_ADAPTER.get_by_filter(fil)
+    return [ProjectInstance.make_project(project) for project in projects]

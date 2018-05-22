@@ -63,6 +63,12 @@ class _Args:
                            the admin from the name of current user""")
     # TODO: maybe delete creator id to have more flexible rights (but it's hard)
 
+    # show projects
+    SHOW_PROJECTS = Argument(long='showprojects',
+                             short='sp',
+                             docstring="""Show all available projects to the 
+                             current person""")
+
     # project members
     MEMBERS = Argument(long='members',
                        short='m',
@@ -112,9 +118,35 @@ class _Args:
                       status marks on it's all childs. To create parent task
                       pass parent's id to this argument""")
 
+    # task period
+    PERIOD = Argument(long='period',
+                      short='e',
+                      docstring="""task\'s period. It can be set up in hours.
+                      Note that if it used with planner, then period 
+                      automatically will became equals to 7 days ignoring the
+                      fact of this period""")
+
+    # task period
+    PLANNER = Argument(long='planner',
+                       short='l',
+                       docstring="""task\'s planner. This argument is a string
+                       in format of sequence of numbers from 1 to 7. This 
+                       argument suppress period argument. It gives auto 7 day
+                       period to the task""")
+
+    # task receiver
+    RECEIVER = Argument(long='receiver',
+                        short='c',
+                        docstring="""task\'s receiver, i e user's login, whom
+                        will be the task's executioner in the project.""")
+
     """
     Also project argument
     """
+    # current user
+    WHO_AM_I = Argument(long='whoami',
+                        short='w',
+                        docstring="""show the info about logged user""")
 
     # remove task
     REMOVE_TASK = Argument(long='removetask',
@@ -139,6 +171,7 @@ class _Args:
                               docstring="""Changing one of the possible values 
                               to the project by it's id and optional parameters
                               """)
+
     # project's title
     TITLE = Argument(long='title',
                      short='t',
@@ -176,26 +209,6 @@ class _Args:
                          short='a',
                          docstring="""If this flag is set, we will show all 
                          tasks, with the project user's tasks""")
-
-    PLANNER = Argument(long='planner',
-                       short='l',
-                       docstring="""In this argument you may pass up to 7 unique
-                       numbers from 0 to 6 by the spaces. This will allow you to
-                       make task planner, with the period of 7 days (weekly 
-                       tasks). Also it conflicts with period argument.""")
-
-    PERIOD = Argument(long='period',
-                      short='e',
-                      docstring="""This argument made for periodical tasks. You 
-                      should pass one string parameter in format * * *, where 
-                      first star is day, second is week, third is month. Star as
-                      argument means 'every'. Example: 
-                      0 * * - every first day of the every week in every month.
-                      1 4 * - every second day of 5th week every month. But be 
-                      sure, if there is a 28 days in the month, it can be in the
-                      29 day in terms of current month. In this case task will 
-                      not be shown in this month.Also it conflicts with planner 
-                      argument.""")
 
     """
     Also project argument
@@ -263,6 +276,8 @@ def run():
     _init_show_users_parser(root_args)
     _init_change_project_parser(root_args)
     _init_remove_user_parser(root_args)
+    _init_whoami_parser(root_args)
+    _init_show_projects_parser(root_args)
 
     # simple clear log arg
     root_args.add_parser(_Args.CLEAR_LOG.long,
@@ -315,6 +330,12 @@ def run():
 
     elif parsed.action == _Args.SHOW_USERS.long:
         _process_show_users(parsed)
+
+    elif parsed.action == _Args.SHOW_PROJECTS.long:
+        _process_show_projects(parsed)
+
+    elif parsed.action == _Args.WHO_AM_I.long:
+        _process_whoami()
 
 
 """
@@ -493,6 +514,12 @@ def _init_login_parser(root_args):
     user.add_argument('password', help='user password')
 
 
+def _init_whoami_parser(root_args):
+    # create new parser for whoami command
+    root_args.add_parser(_Args.WHO_AM_I.long,
+                         help=_Args.WHO_AM_I.docstring)
+
+
 def _init_show_tasks_parser(root_args):
     # create new parser for login command
     show = root_args.add_parser(_Args.SHOW_TASKS.long,
@@ -509,6 +536,18 @@ def _init_show_users_parser(root_args):
     # create new parser for login command
     show = root_args.add_parser(_Args.SHOW_USERS.long,
                                 help=_Args.SHOW_USERS.docstring)
+
+    show.add_argument(_Args.prefix().FILTER.long,
+                      _Args.prefix().FILTER.short,
+                      help=_Args.FILTER.docstring,
+                      nargs=1,
+                      default=[''])
+
+
+def _init_show_projects_parser(root_args):
+    # create new parser for login command
+    show = root_args.add_parser(_Args.SHOW_PROJECTS.long,
+                                help=_Args.SHOW_PROJECTS.docstring)
 
     show.add_argument(_Args.prefix().FILTER.long,
                       _Args.prefix().FILTER.short,
@@ -646,6 +685,16 @@ def _process_show_tasks(parsed_args):
 def _process_show_users(parsed_args):
     users = commands.get_users(parsed_args.filter[0])
     console.print_functions.print_users(users)
+
+
+def _process_show_projects(parsed_args):
+    projects = commands.get_projects(parsed_args.filter[0])
+    console.print_functions.print_projects(projects)
+
+
+def _process_whoami():
+    user = commands.get_current_user()
+    console.print_functions.print_user(user)
 
 
 def _process_change_project(parsed_args):

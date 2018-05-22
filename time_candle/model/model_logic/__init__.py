@@ -9,3 +9,4 @@ from model import validators, config_parser
 from model.session_control import Singleton, Adapters
 from model import logger
 from storage.user_adapter import UserFilter
+from storage.project_adapter import ProjectFilter

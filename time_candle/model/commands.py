@@ -5,6 +5,8 @@ import model.validators as v
 from model import logger
 from enums.status import Status
 from enums.priority import Priority
+from copy import copy
+from model.session_control import Singleton
 """
 This is commands module. Commands from argparse and django will go to this 
 module and it will help to separate argparser from the model. In this module 
@@ -190,6 +192,24 @@ def get_users(substr):
     :return: list of UserInstance
     """
     return user.get_users(substr)
+
+
+def get_current_user():
+    """
+    This function returns current user.
+    :return: UserInstance
+    """
+    return copy(Singleton.GLOBAL_USER)
+
+
+def get_projects(substr):
+    """
+    This function returns found projects for your user.
+    :param substr: Filter for title search
+    :type substr: String
+    :return: list of ProjectInstance
+    """
+    return project.get_projects(substr)
 
 
 def logout():

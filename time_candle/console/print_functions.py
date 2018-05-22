@@ -23,3 +23,14 @@ def print_users(users):
 def print_user(user):
     print('login: {}, nickname: {}, about: {}, mail: {}, id: {}'.
           format(user.login, user.nickname, user.about, user.mail, user.uid))
+
+
+def print_projects(projects):
+    for project in projects:
+        print_project(project)
+
+
+def print_project(project):
+    print('id: {}, title: {}, admin id: {}, description: {}'.
+          format(project.pid, project.title, project.admin_uid,
+                 project.description))

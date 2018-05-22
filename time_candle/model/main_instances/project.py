@@ -27,12 +27,14 @@ class Project:
         - pid
         - other obj admin with pid
         - title
+        - description
         :return: Project
         """
         logger.debug('convert storage to model project')
 
         project = cls(obj.pid,
-                      obj.admin.pid,
-                      obj.title)
+                      obj.admin.uid,
+                      obj.title,
+                      obj.description)
 
         return project
