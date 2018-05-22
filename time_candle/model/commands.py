@@ -1,6 +1,10 @@
 import model.model_logic.project_logic as project
 import model.model_logic.task_logic as task
 import model.model_logic.user_logic as user
+import model.validators as v
+from model import logger
+from enums.status import Status
+from enums.priority import Priority
 """
 This is commands module. Commands from argparse and django will go to this 
 module and it will help to separate argparser from the model. In this module 
@@ -19,15 +23,30 @@ def log_in(login, password):
     user.log_in(login, password)
 
 
-def add_user(login, password):
+def add_user(login, password, mail=None, nickname=None, about=''):
     """
     This function adds user to the database, if there is no users with given
     login
     :type login: String
     :type password: String
+    :type mail: String
+    :type nickname: String
+    :type about: String
     :return: None
     """
-    user.add_user(login, password)
+    if mail is not None:
+        v.check_mail(mail)
+
+    if nickname is None:
+        nickname = login
+
+    if not about:
+        about = 'Hello, it\'s me, ' + nickname
+
+    v.check_login(login)
+    v.check_name(nickname)
+    v.check_password(password)
+    user.add_user(login, password, nickname, about, mail)
 
 
 def add_user_to_project(login, pid):
@@ -82,6 +101,14 @@ def add_task(title,
     :type status: Int
     :return: None
     """
+    if priority is None:
+        logger.debug('Default priority has been set')
+        priority = Priority.MEDIUM
+
+    if status is None:
+        logger.debug('Default status has been set')
+        status = Status.IN_PROGRESS
+
     task.add_task(title, priority, status, time, parent_id, comment, pid, login)
 
 
@@ -89,10 +116,32 @@ def remove_task(tid):
     """
     This function removes selected task and it's all childs recursively or
     raises an exception if task does not exists
-    :param tid: Tasks id
+    :param tid: Task's id
     :return: None
     """
     task.remove_task(tid)
+
+
+def remove_project(pid):
+    """
+    This function removes selected project or raises an exception if project
+    does not exists or you simply don't have rights to do that
+    :param pid: Project's id
+    :return: None
+    """
+    project.remove_project(pid)
+
+
+def remove_user_from_project(login, pid):
+    """
+    This function removes selected user from the project or raises an exception
+    if user does not exists or you simply don't have rights to do that. Note
+    that you can delete yourself from the project
+    :param login: User's login
+    :param pid: Project's id
+    :return: None
+    """
+    project.remove_user_from_project(login, pid)
 
 
 def change_task(tid, priority, status, time, comment):
@@ -104,14 +153,22 @@ def change_task(tid, priority, status, time, comment):
     :param time: Time in following format: YYYY-MM-DD HH:MM:SS
     :param priority: Tasks priority (enum from Priority)
     :param status: Tasks status (enum from Status)
-    :type tid: Int
-    :type comment: String
-    :type time: String
-    :type priority: Int
-    :type status: Int
     :return: None
     """
+    # TODO: validate all params (esp Time)
     task.change_task(tid, priority, status, time, comment)
+
+
+def change_project(pid, title, description):
+    """
+    This function will change task in the database, with the creator and
+    executor that named in the config.ini (i.e current logged user)
+    :param pid: Project's id
+    :param title: Project's title
+    :param description: Project's short (or long) description
+    :return: None
+    """
+    project.change_project(pid, title, description)
 
 
 def get_tasks(fil):
@@ -123,6 +180,16 @@ def get_tasks(fil):
     :return: list of TaskInstance
     """
     return task.get_tasks(fil)
+
+
+def get_users(substr):
+    """
+    This function returns found users.
+    :param substr: Filter for nickname search
+    :type substr: String
+    :return: list of UserInstance
+    """
+    return user.get_users(substr)
 
 
 def logout():

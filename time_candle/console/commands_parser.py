@@ -24,6 +24,22 @@ class _Args:
                         database or project, according to the given login and 
                         password, if it possible""")
 
+    # mail
+    MAIL = Argument(long='mail',
+                    short='m',
+                    docstring="""This argument adds user email""")
+
+    # about
+    ABOUT = Argument(long='about',
+                     short='f',
+                     docstring="""This arguments shows more info about user""")
+
+    # nickname
+    NICKNAME = Argument(long='nickname',
+                        short='n',
+                        docstring="""This arguments allows user to specify nickname
+                        by his own""")
+
     # TODO: low priority if not admin and etc.
     PROJECT = Argument(long='project',
                        short='o',
@@ -102,23 +118,52 @@ class _Args:
 
     # remove task
     REMOVE_TASK = Argument(long='removetask',
-                           short='rm',
+                           short='rmt',
                            docstring="""Remove task from the database by id""")
 
     # change task
     CHANGE_TASK = Argument(long='changetask',
-                           short='c',
+                           short='ct',
                            docstring="""Changing one of the possible values to 
                            the task by it's id and optional parameters""")
 
+    # remove project
+    REMOVE_PROJECT = Argument(long='removeproject',
+                              short='rmp',
+                              docstring="""Remove project from the database by 
+                              id""")
+
+    # change project
+    CHANGE_PROJECT = Argument(long='changeproject',
+                              short='cp',
+                              docstring="""Changing one of the possible values 
+                              to the project by it's id and optional parameters
+                              """)
+    # project's title
+    TITLE = Argument(long='title',
+                     short='t',
+                     docstring="""This argument can be used to change project's
+                     title""")
+
+    # remove user
+    REMOVE_USER = Argument(long='removeuser',
+                           short='rmu',
+                           docstring="""Remove user or something related to 
+                           the user from the database""")
+
     # show tasks
-    # TODO: special parser syntax?
     SHOW_TASKS = Argument(long='showtasks',
-                          short='s',
+                          short='st',
                           docstring="""Show all available tasks to the current 
                           person, including tasks where he is a creator. To 
                           show some type of sorted tasks, see the special 
                           parser syntax""")
+
+    # show users
+    SHOW_USERS = Argument(long='showusers',
+                          short='su',
+                          docstring="""Show all users by filter (just user 
+                          substring)""")
 
     # show tasks filter
     FILTER = Argument(long='filter',
@@ -214,6 +259,10 @@ def run():
     _init_change_task_parser(root_args)
     _init_remove_task_parser(root_args)
     _init_show_tasks_parser(root_args)
+    _init_remove_project_parser(root_args)
+    _init_show_users_parser(root_args)
+    _init_change_project_parser(root_args)
+    _init_remove_user_parser(root_args)
 
     # simple clear log arg
     root_args.add_parser(_Args.CLEAR_LOG.long,
@@ -229,6 +278,9 @@ def run():
     # try to process each command
     if parsed.action == _Args.ADD_USER.long:
         _process_add_user(parsed)
+
+    elif parsed.action == _Args.REMOVE_USER.long:
+        _process_remove_user(parsed)
 
     elif parsed.action == _Args.LOGIN.long:
         _process_login(parsed)
@@ -246,6 +298,12 @@ def run():
     elif parsed.action == _Args.ADD_PROJECT.long:
         _process_add_project(parsed)
 
+    elif parsed.action == _Args.REMOVE_PROJECT.long:
+        _process_remove_project(parsed)
+
+    elif parsed.action == _Args.CHANGE_PROJECT.long:
+        _process_change_project(parsed)
+
     elif parsed.action == _Args.CHANGE_TASK.long:
         _process_change_task(parsed)
 
@@ -254,6 +312,9 @@ def run():
 
     elif parsed.action == _Args.SHOW_TASKS.long:
         _process_show_tasks(parsed)
+
+    elif parsed.action == _Args.SHOW_USERS.long:
+        _process_show_users(parsed)
 
 
 """
@@ -274,6 +335,38 @@ def _init_add_user_parser(root_args):
     user.add_argument('login', help='user login')
     user.add_argument('--password', '-p',
                       help='user password', default='')
+
+    user.add_argument(_Args.prefix().PROJECT.long,
+                      _Args.prefix().PROJECT.short,
+                      help=_Args.PROJECT.docstring,
+                      nargs=1)
+
+    user.add_argument(_Args.prefix().MAIL.long,
+                      _Args.prefix().MAIL.short,
+                      help=_Args.MAIL.docstring,
+                      nargs=1,
+                      default=[None])
+
+    user.add_argument(_Args.prefix().NICKNAME.long,
+                      _Args.prefix().NICKNAME.short,
+                      help=_Args.NICKNAME.docstring,
+                      nargs=1,
+                      default=[None])
+
+    user.add_argument(_Args.prefix().ABOUT.long,
+                      _Args.prefix().ABOUT.short,
+                      help=_Args.ABOUT.docstring,
+                      nargs=1,
+                      default=[''])
+
+
+def _init_remove_user_parser(root_args):
+    # create new parser for removeuser command
+    user = root_args.add_parser(_Args.REMOVE_USER.long,
+                                help=_Args.REMOVE_USER.docstring)
+
+    # define two positional arguments login password
+    user.add_argument('login', help='user login')
 
     user.add_argument(_Args.prefix().PROJECT.long,
                       _Args.prefix().PROJECT.short,
@@ -405,12 +498,50 @@ def _init_show_tasks_parser(root_args):
     show = root_args.add_parser(_Args.SHOW_TASKS.long,
                                 help=_Args.SHOW_TASKS.docstring)
 
-    # TODO: now we count nargs + as 1
     show.add_argument(_Args.prefix().FILTER.long,
                       _Args.prefix().FILTER.short,
                       help=_Args.FILTER.docstring,
                       nargs=1,
                       default=[''])
+
+
+def _init_show_users_parser(root_args):
+    # create new parser for login command
+    show = root_args.add_parser(_Args.SHOW_USERS.long,
+                                help=_Args.SHOW_USERS.docstring)
+
+    show.add_argument(_Args.prefix().FILTER.long,
+                      _Args.prefix().FILTER.short,
+                      help=_Args.FILTER.docstring,
+                      nargs=1,
+                      default=[''])
+
+
+def _init_change_project_parser(root_args):
+    # create new parser for changeproject command
+    project = root_args.add_parser(_Args.CHANGE_PROJECT.long,
+                                   help=_Args.CHANGE_PROJECT.docstring)
+
+    project.add_argument('id', help='project\'s id in database')
+    project.add_argument(_Args.prefix().TITLE.long,
+                         _Args.prefix().TITLE.short,
+                         help=_Args.TITLE.docstring,
+                         nargs=1,
+                         default=[None])
+
+    project.add_argument(_Args.prefix().DESCRIPTION.long,
+                         _Args.prefix().DESCRIPTION.short,
+                         help=_Args.DESCRIPTION.docstring,
+                         nargs=1,
+                         default=[None])
+
+
+def _init_remove_project_parser(root_args):
+    # create new parser for removeproject command
+    project = root_args.add_parser(_Args.REMOVE_PROJECT.long,
+                                   help=_Args.REMOVE_PROJECT.docstring)
+
+    project.add_argument('id', help='project\'s id in database')
 
 
 # Process parsed arguments
@@ -482,7 +613,7 @@ def _process_remove_task(parsed_args):
 
 def _process_logout():
     commands.logout()
-    
+
 
 def _process_add_user(parsed_args):
     logger.debug('add_user')
@@ -490,7 +621,11 @@ def _process_add_user(parsed_args):
         if parsed_args.password == '':
             raise ValueError('You must specify the password!')
 
-        commands.add_user(parsed_args.login, parsed_args.password)
+        commands.add_user(parsed_args.login,
+                          parsed_args.password,
+                          parsed_args.mail[0],
+                          parsed_args.nickname[0],
+                          parsed_args.about[0])
 
     else:
         commands.add_user_to_project(parsed_args.login, parsed_args.project)
@@ -506,3 +641,26 @@ def _process_add_project(parsed_args):
 def _process_show_tasks(parsed_args):
     tasks = commands.get_tasks(parsed_args.filter[0])
     console.print_functions.print_tasks(tasks)
+
+
+def _process_show_users(parsed_args):
+    users = commands.get_users(parsed_args.filter[0])
+    console.print_functions.print_users(users)
+
+
+def _process_change_project(parsed_args):
+    commands.change_project(parsed_args.id,
+                            parsed_args.title[0],
+                            parsed_args.description[0])
+
+
+def _process_remove_project(parsed_args):
+    commands.remove_project(parsed_args.id)
+
+
+def _process_remove_user(parsed_args):
+    if parsed_args.project is not None:
+        commands.remove_user_from_project(
+            parsed_args.login, parsed_args.project)
+
+    print('nothing to expect')

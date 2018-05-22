@@ -6,16 +6,6 @@ from storage.task_adapter import TaskFilter
 def add_task(title, priority, status, time, parent_id, comment, pid, login):
     # add task to the database
 
-    # This max func needed to set tasks status and priority not lower then
-    # parent's
-    if priority is None:
-        logger.debug('Default priority has been set')
-        priority = Priority.MEDIUM
-
-    if status is None:
-        logger.debug('Default status has been set')
-        status = Status.IN_PROGRESS
-
     # This code is also checking is our parent tid exists in the database for
     # logged user. The max func needed to set tasks status and priority not
     # lower then parent's

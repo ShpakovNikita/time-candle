@@ -89,7 +89,7 @@ class User(BaseModel):
     nickname = CharField(default='')
 
     # time_zone will be saved in the form of shift in milliseconds
-    time_zone = IntegerField(default=0)
+    # time_zone = IntegerField(default=0)
     about = CharField(default='')
 
 

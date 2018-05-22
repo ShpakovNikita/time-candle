@@ -68,9 +68,10 @@ class UserAdapter(PrimaryAdapter):
         def _init_usr(self, obj):
             self.uid = obj.uid
             self.login = obj.login
-            self.time_zone = obj.time_zone
+            self.time_zone = None
             self.nickname = obj.nickname
             self.about = obj.about
+            self.mail = obj.mail
 
         user_dummie = type('user_dummie', (), {'__init__': _init_usr,
                                                'password': None})
@@ -110,25 +111,29 @@ class UserAdapter(PrimaryAdapter):
         return obj
 
     @staticmethod
-    def add_user(login, password, nickname=None):
+    def save(obj):
         """
         This function if checking is current user exists, and if so we are
         raising an exception. Or we are adding it to the database.
-        :param login: String
-        :param password: String
-        :param nickname: String
+        This function is used to store given task to the database. Note, that
+        tasks can be with similar names and dates (but on that case I have a
+        task below)
+        :param obj: type with fields:
+         - login,
+         - password
+         - nickname,
+         - about,
+         - mail
         :return: None
         """
-        if User.select().where(User.login == login).exists():
+        if User.select().where(User.login == obj.login).exists():
             raise db_e.InvalidLoginError(db_e.LoginMessages.USER_EXISTS)
 
-        if not nickname:
-            nickname = login
-
-        User.create(login=login,
-                    password=password,
-                    about='Hello, it\'s me, {}'.format(login),
-                    nickname=nickname)
+        User.create(login=obj.login,
+                    password=obj.password,
+                    about=obj.about,
+                    nickname=obj.nickname,
+                    mail=obj.mail)
 
     def add_user_to_project_by_id(self, login, pid):
         """

@@ -15,6 +15,8 @@ class LoginMessages(Enum):
     USER_DOES_NOT_EXISTS = 'Current user is not exists.'
     ALREADY_LOGGED_IN = 'Already logged in'
     NO_USER_TO_DELETE = 'There is no such user to delete'
+    ADMIN_CANNOT_REMOVE_HIMSELF = 'You are an admin of this project, you' \
+                                  ' cannot be removed'
 
 
 # Uid related things

@@ -17,9 +17,21 @@ def log_in(login, password):
     config_parser.write_user(login, password)
 
 
-def add_user(login, password):
+def add_user(login, password, nickname, about, mail):
     # add user to the database
-    Adapters.USER_ADAPTER.add_user(login, password)
+    user = UserInstance(login=login,
+                        password=password,
+                        nickname=nickname,
+                        about=about,
+                        mail=mail)
+    Adapters.USER_ADAPTER.save(user)
+
+
+def get_users(substr):
+    # get users by passed substring
+    fil = UserFilter().nickname_substring(substr)
+    users = Adapters.USER_ADAPTER.get_by_filter(fil)
+    return [UserInstance.make_user(user) for user in users]
 
 
 def logout():

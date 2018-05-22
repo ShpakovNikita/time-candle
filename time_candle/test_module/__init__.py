@@ -70,13 +70,15 @@ def _user_init(self,
                password=None,
                time_zone=None,
                nickname='guest',
-               about=''):
+               about='',
+               mail=None):
     self.uid = uid
     self.login = login
     self.nickname = nickname
     self.password = password
     self.time_zone = time_zone
     self.about = about
+    self.mail = mail
 
 
 UserDummie = type('UserDummie', (), {'__init__': _user_init})

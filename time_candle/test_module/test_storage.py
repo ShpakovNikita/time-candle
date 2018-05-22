@@ -169,10 +169,10 @@ class TestUserAdapter(unittest.TestCase):
         UserProjectRelation.delete().execute()
 
     def test_add_user(self):
-        self.adapter.add_user(_USERS[0].login, _USERS[0].password)
+        self.adapter.save(_USERS[0])
 
         with self.assertRaises(db_e.InvalidLoginError):
-            self.adapter.add_user(_USERS[0].login, _USERS[0].password)
+            self.adapter.save(_USERS[0])
 
         for user in _USERS[1:]:
             User.create(login=user.login,

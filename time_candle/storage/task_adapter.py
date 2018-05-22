@@ -385,7 +385,6 @@ class TaskAdapter(PrimaryAdapter):
         :param tid: Tasks id
         :return: None
         """
-        # TODO: Is that good to have a recursive try except?
         try:
             query = self._get_available_tasks().select().\
                 where(Task.parent == tid)
@@ -394,7 +393,9 @@ class TaskAdapter(PrimaryAdapter):
 
             logger.info('removing task by tid %s' % tid)
             task = self._get_available_tasks().\
-                select().where(Task.tid == tid).get()
+                select().where((Task.tid == tid) &
+                               ((Task.receiver == self.uid) |
+                                (Task.creator == self.uid))).get()
 
             task.delete_instance()
 

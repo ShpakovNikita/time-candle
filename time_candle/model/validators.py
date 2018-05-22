@@ -2,6 +2,7 @@ import re
 from datetime import datetime, date, time
 import app_logger
 import exceptions.exceptions
+import exceptions.validation_exceptions as v_e
 """
 This module is module for most validations some inner values and conversions. 
 Also it has some other mini helper functions.
@@ -16,7 +17,7 @@ def check_mail(mail):
     pattern. More about this regex you can read at http://emailregex.com/
     :param mail: The user mail
     :type mail: String
-    :return: Nothing
+    :return: None
     """
     raw_mail_pattern = (
                         r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/="
@@ -30,7 +31,45 @@ def check_mail(mail):
                         )
 
     if re.match(raw_mail_pattern, mail) is None:
-        raise ValueError("Please, input correct email")
+        raise v_e.InvalidMailError(v_e.MailMessages.INVALID_MAIL)
+
+
+def check_login(login):
+    """
+    Validates typed login.
+    :param login: String
+    :return: None
+    """
+    raw_login_pattern = (r"^(?=.{4,15}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<!"
+                         r"[_.])$")
+
+    if re.match(raw_login_pattern, login) is None:
+        raise v_e.InvalidNameError(v_e.NameMessages.INVALID_LOGIN)
+
+
+def check_name(name):
+    """
+    Validates typed login or nickname.
+    :param name: String
+    :return: None
+    """
+    raw_name_pattern = (r"^(?=.{4,15}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<!["
+                        r"_.])$")
+
+    if re.match(raw_name_pattern, name) is None:
+        raise v_e.InvalidNameError(v_e.NameMessages.INVALID_NICKNAME)
+
+
+def check_password(password):
+    """
+    Validates typed password.
+    :param password: String
+    :return: None
+    """
+    raw_password_pattern = r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+
+    if re.match(raw_password_pattern, password) is None:
+        raise v_e.InvalidPasswordError(v_e.PasswordMessages.INVALID_PASSWORD)
 
 
 # This format is given only for example, you should specify it from the call
