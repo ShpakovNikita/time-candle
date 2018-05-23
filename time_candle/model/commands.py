@@ -135,10 +135,22 @@ def add_task(title,
     if time is not None:
         time = model.time_formatter.get_milliseconds(time)
 
+    # if period not is none we convert it to the milliseconds
+    if period is not None:
+        period = model.time_formatter.days_to_milliseconds(period)
+
     v.check_comment(comment)
     v.check_title(title)
 
-    task.add_task(title, priority, status, time, parent_id, comment, pid, login)
+    task.add_task(title,
+                  priority,
+                  status,
+                  time,
+                  parent_id,
+                  comment,
+                  pid,
+                  login,
+                  period)
 
 
 def remove_task(tid):

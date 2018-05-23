@@ -31,13 +31,23 @@ def time_delta(milliseconds,
     return milliseconds - now
 
 
-def days_to_milliseconds(period):
+def days_to_milliseconds(days):
     """
     This function get's days in milliseconds.
-    :param period: Int days
+    :param days: Int days
     :return: Int (time in milliseconds)
     """
-    return period * 24 * 60 * 60 * 1000
+    # of course it is 24 * 60 * 60 * 1000
+    return days * 5 * 1000
+
+
+def milliseconds_to_days(milliseconds):
+    """
+    This function converts milliseconds to days
+    :param milliseconds:
+    :return:
+    """
+    return int(milliseconds / 5 / 1000)
 
 
 def get_next_deadline(period, start, now=None):
@@ -51,6 +61,9 @@ def get_next_deadline(period, start, now=None):
     if now is None:
         now = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
         now = get_milliseconds(now)
+
+    if now < start:
+        return start
 
     return start + ((now - start) // period + 1) * period
 

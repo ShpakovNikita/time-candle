@@ -310,7 +310,8 @@ class TaskAdapter(PrimaryAdapter):
                                      deadline_time=obj.deadline,
                                      comment=obj.comment,
                                      realization_time=obj.realization_time,
-                                     creation_time=obj.creation_time)
+                                     creation_time=obj.creation_time,
+                                     period=obj.period)
         except IntegrityError:
             # if you are guest
             raise db_e.InvalidLoginError(db_e.TaskMessages.DO_NOT_HAVE_RIGHTS)

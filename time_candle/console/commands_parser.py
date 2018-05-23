@@ -450,6 +450,7 @@ def _init_add_task_parser(root_args):
                       _Args.prefix().PERIOD.short,
                       help=_Args.PERIOD.docstring,
                       default=[None],
+                      type=int,
                       nargs=1)
 
     task.add_argument(_Args.prefix().RECEIVER.long,

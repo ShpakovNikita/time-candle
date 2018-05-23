@@ -9,7 +9,7 @@ from enums.status import Status
 
 
 def add_task(title, priority, status, deadline_time,
-             parent_id, comment, pid, login):
+             parent_id, comment, pid, login, period):
     # add task to the database
 
     # This code is also checking is our parent tid exists in the database for
@@ -31,6 +31,7 @@ def add_task(title, priority, status, deadline_time,
         Adapters.USER_ADAPTER.is_user_in_project(login, pid)
         task_uid = Adapters.USER_ADAPTER.get_id_by_login(login)
 
+    # check that if we are in the project that we has proper rights
     if pid is not None:
         logger.debug('pid is not none')
         if task_uid != Singleton.GLOBAL_USER.uid:
@@ -41,9 +42,22 @@ def add_task(title, priority, status, deadline_time,
             Adapters.USER_ADAPTER.is_user_in_project(
                 Singleton.GLOBAL_USER.login, pid)
 
-    if deadline_time is not None and \
-            model.time_formatter.time_delta(deadline_time) < 0:
-        raise m_e.InvalidTimeError(m_e.TimeMessages.TIME_SHIFT)
+    # if deadline is not none
+    if deadline_time is not None:
+        # we checking that deadline is in the future
+        if model.time_formatter.time_delta(deadline_time) < 0:
+            raise m_e.InvalidTimeError(m_e.TimeMessages.TIME_SHIFT)
+
+        # and if there is a period we make sure that period is bigger than
+        # delta time between now and deadline
+        if period is not None and \
+                period < deadline_time - model.time_formatter.\
+                get_now_milliseconds():
+            raise m_e.InvalidTimeError(m_e.TimeMessages.NOT_VALID_PERIOD)
+
+    # also we must specify deadline if there is a period
+    if period is not None and deadline_time is None:
+        raise m_e.InvalidTimeError(m_e.TimeMessages.NO_DEADLINE)
 
     if status == Status.DONE:
         realization_time = model.time_formatter.get_now_milliseconds()
@@ -62,7 +76,8 @@ def add_task(title, priority, status, deadline_time,
                         comment=comment,
                         realization_time=realization_time,
                         creation_time=model.time_formatter.
-                        get_now_milliseconds())
+                        get_now_milliseconds(),
+                        period=period)
 
     logger.debug('task configured and ready to save , the task id is %s'
                  % task.tid)
@@ -99,7 +114,17 @@ def change_task(tid, priority, status, time, comment, pid):
             task.realization_time = model.time_formatter.get_now_milliseconds()
 
     if time is not None:
+        # we cannot allow to make deadline in the past
+        if model.time_formatter.time_delta(time) < 0:
+            raise m_e.InvalidTimeError(m_e.TimeMessages.TIME_SHIFT)
+
+        # also we should make task unexpired if we moved deadline and it was
+        # expired
+        if task.status == Status.EXPIRED:
+            task.status = Status.IN_PROGRESS
+
         task.deadline = time
+
     if comment is not None:
         task.comment = comment
 
@@ -113,19 +138,34 @@ def get_tasks(string_fil):
     task_instances = [TaskInstance.make_task(task) for task in tasks]
     for task in task_instances:
         _update(task)
-    print()
     # TODO: update query
     return task_instances
 
 
 def _update(task):
     changed_flag = False
+    # make tasks expired if deadline is crossed
     if task.deadline is not None \
             and model.time_formatter.time_delta(task.deadline) < 0 \
             and task.status == Status.IN_PROGRESS:
         task.status = Status.EXPIRED
         logger.debug('tasks status updated')
         changed_flag = True
+
+    # make new deadline to the period task if there is need to do so and if
+    # we are not expired our task
+    if task.period is not None:
+        old_deadline = task.deadline
+        # check on expired and maybe change deadline
+        if task.status != Status.EXPIRED:
+            task.deadline = model.time_formatter.get_next_deadline(
+                task.period, task.deadline)
+
+        # if we are changed it then we are in progress
+        if old_deadline != task.deadline:
+            task.status = Status.IN_PROGRESS
+            logger.debug('status in progress for period task %s' % task.tid)
+            changed_flag = True
 
     if changed_flag:
         Adapters.TASK_ADAPTER.save(task)

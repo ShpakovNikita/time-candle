@@ -23,7 +23,8 @@ class Task:
                  # controller=None
                  comment='',
                  realization_time=None,
-                 creation_time=0):
+                 creation_time=0,
+                 period=None):
         logger.debug('creating a task...')
 
         self.uid = uid
@@ -36,6 +37,7 @@ class Task:
         self.childs = []
         self.priority = priority
         self.parent = parent
+        self.period = period
         # self._controller = controller
         self.deadline = deadline
         self.comment = comment
@@ -55,6 +57,7 @@ class Task:
         - title
         - status
         - priority
+        - period
         - other obj parent with tid or None
         - comment
         :return: Task
@@ -83,6 +86,7 @@ class Task:
                    parent_id,
                    obj.comment,
                    obj.realization_time,
-                   obj.creation_time)
+                   obj.creation_time,
+                   obj.period)
 
         return task

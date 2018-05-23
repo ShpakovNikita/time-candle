@@ -3,6 +3,7 @@ from model.session_control import *
 from model.commands import *
 from model.tokenizer import *
 import exceptions.show_me_exceptions as sm_e
+import exceptions.model_exceptions as m_e
 
 
 # TODO: Mock. It is really hard to implement here. Like very-very-very hard.
@@ -93,6 +94,9 @@ class TestTaskLogic(unittest.TestCase):
             get_tasks('projects: 1 2 3 AND ()')
 
     def test_add_validations(self):
+        pass
+
+    def test_period_tasks(self):
         pass
 
     def test_union(self):

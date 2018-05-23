@@ -47,7 +47,8 @@ def _task_init(self,
                parent=None,
                comment='',
                realization_time=-1,
-               creation_time=0):
+               creation_time=0,
+               period=None):
     self.uid = uid
     self.creator_uid = creator_uid
     self.tid = tid
@@ -60,6 +61,7 @@ def _task_init(self,
     self.comment = comment
     self.realization_time = realization_time
     self.creation_time = creation_time
+    self.period = period
 
 
 TaskDummie = type('TaskDummie', (), {'__init__': _task_init})

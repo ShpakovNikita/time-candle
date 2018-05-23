@@ -23,10 +23,10 @@ def print_task(task):
 
     # TODO: CURSES
     print('==============@_@==============')
-    print('task: {}, \t creator: {}, \t receiver: {}, \n'
+    print('task: {}, \t creator: {}, \t receiver: {}, \t period: {} \n'
           'deadline: {}, \t status: {}, \t realization time: {}, \n'
           'creation time: {}, \t priority: {}, \t project id: {}, \t tid: {}'.
-          format(task.title, task.creator_uid, task.uid,
+          format(task.title, task.creator_uid, task.uid, task.period,
                  deadline_time, status_dict[task.status], realization_time,
                  model.time_formatter.milliseconds_to_string(task.creation_time)
                  , priority_dict[task.priority], task.pid, task.tid))
