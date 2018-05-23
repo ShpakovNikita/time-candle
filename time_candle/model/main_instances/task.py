@@ -23,7 +23,7 @@ class Task:
                  # controller=None
                  comment='',
                  chat=None,
-                 realization_time=-1):
+                 realization_time=None):
         logger.debug('creating a task...')
 
         self.uid = uid

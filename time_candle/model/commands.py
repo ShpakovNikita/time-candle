@@ -22,9 +22,9 @@ def log_in(login, password):
     This function writes current user to the config.ini
     :type login: String
     :type password: String
-    :return: None
+    :return: Bool
     """
-    user.log_in(login, password)
+    return user.log_in(login, password)
 
 
 def add_user(login, password, mail=None, nickname=None, about=''):

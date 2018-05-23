@@ -119,7 +119,7 @@ class Task(BaseModel):
 
     # Time in milliseconds. Nullable for further functionality TODO:
     deadline_time = BigIntegerField(null=True)
-    realization_time = BigIntegerField(default=-1)
+    realization_time = BigIntegerField(null=True, default=None)
 
     comment = CharField(default='')
     period = BigIntegerField(null=True)

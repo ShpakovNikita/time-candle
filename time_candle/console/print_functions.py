@@ -14,10 +14,16 @@ def print_task(task):
     else:
         deadline_time = 'unlimited'
 
-    print('Task: {}, tid: {}, creator: {}, receiver: {}, deadline: {}, status: '
-          '{}, priority: {}, project id: {}'.
+    if task.realization_time is not None:
+        realization_time = model.\
+            time_formatter.get_datetime(task.realization_time)
+    else:
+        realization_time = 'undone'
+
+    print('Task: {}, \t tid: {}, \t creator: {}, \t receiver: {}, deadline: {}, status: '
+          '{}, realization time: {}, priority: {}, project id: {}'.
           format(task.title, task.tid, task.creator_uid, task.uid,
-                 deadline_time, status_dict[task.status],
+                 deadline_time, status_dict[task.status], realization_time,
                  priority_dict[task.priority], task.pid))
 
 

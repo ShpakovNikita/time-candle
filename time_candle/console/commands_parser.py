@@ -601,8 +601,10 @@ def _init_remove_project_parser(root_args):
 # Process parsed arguments
 def _process_login(parsed_args):
     logger.debug('login')
-    commands.log_in(parsed_args.login, parsed_args.password)
-    print('user %s logged' % parsed_args.login)
+    if commands.log_in(parsed_args.login, parsed_args.password):
+        print('user %s logged' % parsed_args.login)
+    else:
+        print('user %s is not logged' % parsed_args.login)
 
 
 def _process_add_task(parsed_args):

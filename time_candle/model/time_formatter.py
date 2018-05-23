@@ -28,6 +28,15 @@ def time_stamp(milliseconds,
     return milliseconds - now
 
 
+def get_now_milliseconds():
+    """
+    This functions returns now datetime in milliseconds with epoch calculations
+    :return: Int
+    """
+    now = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+    return get_milliseconds(now)
+
+
 # This format is given only for example, you should specify it from the call
 def get_milliseconds(formatted_time):
     """
@@ -50,13 +59,12 @@ def get_milliseconds(formatted_time):
         # Note that here we are subtracting 1970's to define them as lower point
         final_time = (date_time - epoch).total_seconds() * 1000
         if final_time < 0:
-            raise exceptions.model_exceptions.InvalidArgumentFormat('date must be '
-                                                              'from 1970\'s')
+            raise exceptions.model_exceptions.\
+                InvalidArgumentFormat('date must be from 1970\'s')
 
         return int(final_time)
     except ValueError:
-        logger.warning('the date must be '
-                                                  + date_format)
+        logger.warning('the date must be ' + date_format)
         msg = "Not a valid date: '{0}'.".format(formatted_time)
         raise exceptions.model_exceptions.InvalidArgumentFormat(msg)
 

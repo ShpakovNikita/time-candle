@@ -33,7 +33,11 @@ def run_config():
         # from database
         logger.debug('login has been set {} {}'.format(login, password))
 
-        user_field = type('user_field', (), {'uid': None})
+        user_field = type('user_field', (), {'uid': None,
+                                             'login': 'Guest',
+                                             'nickname': 'Guestto',
+                                             'about': '',
+                                             'mail': None})
         try:
             config_dict['user'] = storage.user_adapter.UserAdapter.login_user(
                 login, password)

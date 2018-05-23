@@ -45,16 +45,22 @@ def add_task(title, priority, status, deadline_time,
             model.time_formatter.time_stamp(deadline_time) < 0:
         raise m_e.InvalidTimeError(m_e.TimeMessages.TIME_STAMP)
 
-    task = TaskInstance(task_uid,
-                        Singleton.GLOBAL_USER.uid,
-                        Adapters.TASK_ADAPTER.last_id() + 1,
-                        deadline_time,
-                        title,
-                        pid,
-                        status,
-                        priority,
-                        parent_id,
-                        comment)
+    if status == Status.DONE:
+        realization_time = model.time_formatter.get_now_milliseconds()
+    else:
+        realization_time = None
+
+    task = TaskInstance(uid=task_uid,
+                        creator_uid=Singleton.GLOBAL_USER.uid,
+                        tid=Adapters.TASK_ADAPTER.last_id() + 1,
+                        deadline=deadline_time,
+                        title=title,
+                        pid=pid,
+                        status=status,
+                        priority=priority,
+                        parent=parent_id,
+                        comment=comment,
+                        realization_time=realization_time)
 
     logger.debug('task configured and ready to save , the task id is %s'
                  % task.tid)
@@ -75,7 +81,20 @@ def change_task(tid, priority, status, time, comment):
     if priority is not None:
         task.priority = priority
     if status is not None:
+        # if status is not done, then realization time is None
+        if status != Status.DONE:
+            task.realization_time = None
+
+        # we cannot change done task to the expired. Note, that we can make done
+        # task as some other task and then we may change it to expired
+        elif status == Status.EXPIRED and task.status == Status.DONE:
+            raise m_e.InvalidStatusError(m_e.StatusMessages.EXPIRED_NOT_VALID)
+
         task.status = status
+        # mark time for the done task
+        if status == Status.DONE:
+            task.realization_time = model.time_formatter.get_now_milliseconds()
+
     if time is not None:
         task.deadline = time
     if comment is not None:

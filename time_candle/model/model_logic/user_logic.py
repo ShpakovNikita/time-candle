@@ -9,18 +9,22 @@ from storage.user_adapter import UserFilter
 
 def log_in(login, password):
     # logging in writing the config file
+    success = False
     try:
         UserInstance.make_user(
             Adapters.USER_ADAPTER.login_user(login, password))
+
+        success = True
     except db_e.InvalidPasswordError:
-        logger.debug('Invalid password! Now you act like a guest here')
+        logger.info('Invalid password! Now you act like a guest here')
 
     except db_e.InvalidLoginError:
-        logger.debug('Invalid login! Now you act like a guest here')
+        logger.info('Invalid login! Now you act like a guest here')
 
     # if everything is ok, we will write our login and password to the
     # config.ini
     config_parser.write_user(login, password)
+    return success
 
 
 def add_user(login, password, nickname, about, mail):

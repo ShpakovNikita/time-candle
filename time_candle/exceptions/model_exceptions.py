@@ -25,3 +25,17 @@ class TimeMessages(Enum):
     # This is pre defined messages that will be associated with password all
     # over the project
     TIME_STAMP = 'You cannot create tasks in the past'
+
+
+# Status related things
+class InvalidStatusError(Exception):
+    def __init__(self, errors=None, message='The status is invalid! {}'):
+        super().__init__(message.format(errors))
+        self.errors = errors
+
+
+class StatusMessages(Enum):
+    # This is pre defined messages that will be associated with password all
+    # over the project
+    EXPIRED_NOT_VALID = 'You cannot make done task as expired. First you have' \
+                        ' to make task undone'
