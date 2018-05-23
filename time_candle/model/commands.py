@@ -2,11 +2,13 @@ import model.model_logic.project_logic as project
 import model.model_logic.task_logic as task
 import model.model_logic.user_logic as user
 import model.validators as v
+import exceptions.validation_exceptions as v_e
 from model import logger
-from enums.status import Status
-from enums.priority import Priority
+from enums.status import key_status_dict
+from enums.priority import key_priority_dict
 from copy import copy
 from model.session_control import Singleton
+import model.time_formatter
 """
 This is commands module. Commands from argparse and django will go to this 
 module and it will help to separate argparser from the model. In this module 
@@ -114,19 +116,28 @@ def add_task(title,
     """
     if priority is None:
         logger.debug('Default priority has been set')
-        priority = Priority.MEDIUM
-    elif priority > Priority.MAX:
-        priority = Priority.MAX
-    elif priority < Priority.MIN:
-        priority = Priority.MIN
+        priority = key_priority_dict['medium']
+    else:
+        try:
+            priority = key_priority_dict[priority]
+        except KeyError:
+            raise v_e.InvalidPriorityError(
+                v_e.PriorityMessages.INVALID_PRIORITY)
 
     if status is None:
         logger.debug('Default status has been set')
-        status = Status.IN_PROGRESS
-    elif status > Status.DONE:
-        status = Status.DONE
-    elif status < Status.EXPIRED:
-        status = Status.EXPIRED
+        status = key_status_dict['in_progress']
+    else:
+        try:
+            status = key_status_dict[status]
+        except KeyError:
+            raise v_e.InvalidStatusError(v_e.StatusMessages.INVALID_STATUS)
+
+    if time is not None:
+        time = model.time_formatter.get_milliseconds(time)
+
+    v.check_comment(comment)
+    v.check_title(title)
 
     task.add_task(title, priority, status, time, parent_id, comment, pid, login)
 
@@ -174,7 +185,27 @@ def change_task(tid, priority, status, time, comment):
     :param status: Tasks status (enum from Status)
     :return: None
     """
-    # TODO: validate all params (esp Time)
+    if priority is None:
+        logger.debug('Default priority has been set')
+        priority = Priority.MEDIUM
+    elif priority > Priority.MAX:
+        priority = Priority.MAX
+    elif priority < Priority.MIN:
+        priority = Priority.MIN
+
+    if status is None:
+        logger.debug('Default status has been set')
+        status = Status.IN_PROGRESS
+    elif status > Status.DONE:
+        status = Status.DONE
+    elif status < Status.EXPIRED:
+        status = Status.EXPIRED
+
+    if time is not None:
+        time = model.time_formatter.get_milliseconds(time)
+
+    v.check_comment(comment)
+
     task.change_task(tid, priority, status, time, comment)
 
 
@@ -232,4 +263,8 @@ def get_projects(substr):
 
 
 def logout():
+    """
+    This function logging out current user.
+    :return: None
+    """
     user.logout()

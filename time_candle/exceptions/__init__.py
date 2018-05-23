@@ -1,3 +1,9 @@
+"""This is the primary exceptions for the whole project. Every module in the
+application uses this exceptions for more organized project structure.
+
+"""
+
+
 def custom_excepthook(exc_type, exc_value, tb):
     # Uncomment it for detailed exception explanation
 

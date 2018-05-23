@@ -90,7 +90,7 @@ class _Args:
     PRIORITY = Argument(long='priority',
                         short='r',
                         docstring="""task\'s priority, that can be changed 
-                        later""")
+                        later. Can be: min, low, medium, high, max.""")
 
     # task time
     TIME = Argument(long='time',
@@ -102,7 +102,8 @@ class _Args:
     # task status
     STATUS = Argument(long='status',
                       short='s',
-                      docstring="""task\'s status, that can be changed later""")
+                      docstring="""task\'s status, that can be changed later.
+                      Can be: expired, cancelled, in_progress, done.""")
 
     # task comment
     COMMENT = Argument(long='comment',
@@ -601,6 +602,7 @@ def _init_remove_project_parser(root_args):
 def _process_login(parsed_args):
     logger.debug('login')
     commands.log_in(parsed_args.login, parsed_args.password)
+    print('user %s logged' % parsed_args.login)
 
 
 def _process_add_task(parsed_args):
@@ -617,6 +619,7 @@ def _process_add_task(parsed_args):
                       parsed_args.period[0],
                       parsed_args.planner[0],
                       parsed_args.receiver[0])
+    print('task %s added' % parsed_args.title)
 
 
 def _process_change_task(parsed_args):
@@ -632,15 +635,18 @@ def _process_change_task(parsed_args):
                          parsed_args.status,
                          time,
                          parsed_args.comment[0])
+    print('task %s changed' % parsed_args.id)
 
 
 def _process_remove_task(parsed_args):
     logger.debug('remove_task')
     commands.remove_task(parsed_args.id)
+    print('task %s removed' % parsed_args.id)
 
 
 def _process_logout():
     commands.logout()
+    print('successfully logged out')
 
 
 def _process_add_user(parsed_args):
@@ -654,9 +660,12 @@ def _process_add_user(parsed_args):
                           parsed_args.mail[0],
                           parsed_args.nickname[0],
                           parsed_args.about[0])
+        print('user %s added' % parsed_args.login)
 
     else:
         commands.add_user_to_project(parsed_args.login, parsed_args.project)
+        print('user %s added to project %s' %
+              (parsed_args.login, parsed_args.project[0]))
 
 
 def _process_add_project(parsed_args):
@@ -664,6 +673,7 @@ def _process_add_project(parsed_args):
     commands.add_project(parsed_args.title,
                          parsed_args.description[0],
                          parsed_args.members)
+    print('project %s added' % parsed_args.title)
 
 
 def _process_show_tasks(parsed_args):
@@ -690,15 +700,19 @@ def _process_change_project(parsed_args):
     commands.change_project(parsed_args.id,
                             parsed_args.title[0],
                             parsed_args.description[0])
+    print('project %s changed' % parsed_args.id)
 
 
 def _process_remove_project(parsed_args):
     commands.remove_project(parsed_args.id)
+    print('project %s removed' % parsed_args.id)
 
 
 def _process_remove_user(parsed_args):
     if parsed_args.project is not None:
         commands.remove_user_from_project(
             parsed_args.login, parsed_args.project)
-
-    print('nothing to expect')
+        print('user %s removed from %s project' %
+              (parsed_args.login, parsed_args.id))
+    else:
+        print('nothing to expect')

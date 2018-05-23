@@ -1,4 +1,10 @@
-from model.model_logic import *
+from model.main_instances.user import User as UserInstance
+from storage import *
+import exceptions.db_exceptions as db_e
+from model import config_parser
+from model.session_control import Singleton, Adapters
+from model import logger
+from storage.user_adapter import UserFilter
 
 
 def log_in(login, password):

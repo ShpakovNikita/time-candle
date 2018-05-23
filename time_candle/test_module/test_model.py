@@ -1,5 +1,4 @@
 from test_module import *
-# TODO: later cleanup
 from model.session_control import *
 from model.commands import *
 from model.tokenizer import *

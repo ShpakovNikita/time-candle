@@ -1,6 +1,6 @@
 import configparser
 import app_logger
-import exceptions.exceptions
+import exceptions.model_exceptions
 import storage.user_adapter
 from model.main_instances.user import User
 import exceptions.db_exceptions as db_e
@@ -48,9 +48,9 @@ def run_config():
         return config_dict
 
     except KeyError:
-        raise exceptions.exceptions.InvalidLoginException
+        raise exceptions.model_exceptions.InvalidLoginException
 
-    except exceptions.exceptions.InvalidLoginException:
+    except exceptions.model_exceptions.InvalidLoginException:
         config_dict['user'] = User()
         logger.debug('user is invalid. Logging as guest')
 

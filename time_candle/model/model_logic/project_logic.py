@@ -1,4 +1,7 @@
-from model.model_logic import *
+from model.main_instances.project import Project as ProjectInstance
+import exceptions.db_exceptions as db_e
+from model.session_control import Singleton, Adapters
+from storage.project_adapter import ProjectFilter
 
 
 def add_user_to_project(login, pid):

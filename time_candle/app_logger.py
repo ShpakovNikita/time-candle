@@ -1,11 +1,18 @@
 import logging
 import logging.config
 from os import path
+from pathlib import Path
+import platform
 
 
 _loggers = []
 LOG_FILENAME = 'config.log'
-CONFIG_PATH = path.join(path.dirname(path.abspath(__file__)), 'logging.conf')
+
+if platform.system() == 'Linux':
+    CONFIG_PATH = path.join(str(Path.home()), 'logging.conf')
+else:
+    CONFIG_PATH = path.join(
+        path.dirname(path.abspath(__file__)), 'logging.conf')
 
 
 def custom_logger(logger_name):

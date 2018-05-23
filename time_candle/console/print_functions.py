@@ -1,5 +1,6 @@
 from enums.priority import priority_dict
 from enums.status import status_dict
+import model.time_formatter
 
 
 def print_tasks(tasks):
@@ -8,10 +9,15 @@ def print_tasks(tasks):
 
 
 def print_task(task):
+    if task.deadline is not None:
+        deadline_time = model.time_formatter.get_datetime(task.deadline)
+    else:
+        deadline_time = 'unlimited'
+
     print('Task: {}, tid: {}, creator: {}, receiver: {}, deadline: {}, status: '
           '{}, priority: {}, project id: {}'.
           format(task.title, task.tid, task.creator_uid, task.uid,
-                 task.deadline, status_dict[task.status],
+                 deadline_time, status_dict[task.status],
                  priority_dict[task.priority], task.pid))
 
 

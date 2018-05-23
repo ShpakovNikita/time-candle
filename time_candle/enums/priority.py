@@ -11,3 +11,9 @@ priority_dict = {0: 'min',
                  2: 'medium',
                  3: 'high',
                  4: 'max'}
+
+key_priority_dict = {'min': 0,
+                     'low': 1,
+                     'medium': 2,
+                     'high': 3,
+                     'max': 4}

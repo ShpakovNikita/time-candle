@@ -1,9 +1,15 @@
-from model.model_logic import *
+from model.main_instances.task import Task as TaskInstance
+from storage import *
+from model.session_control import Singleton, Adapters
+import exceptions.model_exceptions as m_e
+from model import logger
 import model.tokenizer
-from storage.task_adapter import TaskFilter
+import model.time_formatter
+from enums.status import Status
 
 
-def add_task(title, priority, status, time, parent_id, comment, pid, login):
+def add_task(title, priority, status, deadline_time,
+             parent_id, comment, pid, login):
     # add task to the database
 
     # This code is also checking is our parent tid exists in the database for
@@ -15,11 +21,6 @@ def add_task(title, priority, status, time, parent_id, comment, pid, login):
             Adapters.TASK_ADAPTER.get_task_by_id(parent_id, pid))
         status = max(status, parent_task.status)
         priority = max(priority, parent_task.priority)
-
-    deadline_time = None
-
-    if time is not None:
-        deadline_time = validators.get_milliseconds(time)
 
     logger.debug('time in milliseconds %s' % deadline_time)
 
@@ -39,6 +40,10 @@ def add_task(title, priority, status, time, parent_id, comment, pid, login):
             logger.debug('we are the receiver')
             Adapters.USER_ADAPTER.is_user_in_project(
                 Singleton.GLOBAL_USER.login, pid)
+
+    if deadline_time is not None and \
+            model.time_formatter.time_stamp(deadline_time) < 0:
+        raise m_e.InvalidTimeError(m_e.TimeMessages.TIME_STAMP)
 
     task = TaskInstance(task_uid,
                         Singleton.GLOBAL_USER.uid,
@@ -83,4 +88,23 @@ def get_tasks(string_fil):
     # get tasks by filter
     fil = model.tokenizer.parse_string(string_fil)
     tasks = Adapters.TASK_ADAPTER.get_by_filter(fil)
-    return [TaskInstance.make_task(task) for task in tasks]
+    task_instances = [TaskInstance.make_task(task) for task in tasks]
+    for task in task_instances:
+        _update(task)
+    print()
+    # TODO: update query
+    return task_instances
+
+
+def _update(task):
+    changed_flag = False
+    if task.deadline is not None \
+            and model.time_formatter.time_stamp(task.deadline) < 0 \
+            and task.status == Status.IN_PROGRESS:
+        task.status = Status.EXPIRED
+        logger.debug('tasks status updated')
+        changed_flag = True
+
+    if changed_flag:
+        Adapters.TASK_ADAPTER.save(task)
+        logger.debug('task updated')
