@@ -15,10 +15,9 @@ def run_config():
     file.
     :return: dict in the following format:
     {
-        'user':User
+        'user':User or user_field
     }
     """
-    # TODO: Check if user is in database and password is correct
     config = configparser.ConfigParser()
     config.read(CONFIG_NAME)
 

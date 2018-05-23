@@ -1,6 +1,7 @@
 from enums.priority import priority_dict
 from enums.status import status_dict
 import model.time_formatter
+import os
 
 
 def print_tasks(tasks):
@@ -20,11 +21,15 @@ def print_task(task):
     else:
         realization_time = 'undone'
 
-    print('Task: {}, \t tid: {}, \t creator: {}, \t receiver: {}, deadline: {}, status: '
-          '{}, realization time: {}, priority: {}, project id: {}'.
-          format(task.title, task.tid, task.creator_uid, task.uid,
+    # TODO: CURSES
+    print('==============@_@==============')
+    print('task: {}, \t creator: {}, \t receiver: {}, \n'
+          'deadline: {}, \t status: {}, \t realization time: {}, \n'
+          'creation time: {}, \t priority: {}, \t project id: {}, \t tid: {}'.
+          format(task.title, task.creator_uid, task.uid,
                  deadline_time, status_dict[task.status], realization_time,
-                 priority_dict[task.priority], task.pid))
+                 model.time_formatter.milliseconds_to_string(task.creation_time)
+                 , priority_dict[task.priority], task.pid, task.tid))
 
 
 def print_users(users):
@@ -33,8 +38,16 @@ def print_users(users):
 
 
 def print_user(user):
-    print('login: {}, nickname: {}, about: {}, mail: {}, id: {}'.
-          format(user.login, user.nickname, user.about, user.mail, user.uid))
+    info = ('login: {}, nickname: {}, about: {}, mail: {}, id: {}'.
+            format(user.login, user.nickname, user.about, user.mail, user.uid))
+    print(info)
+
+
+def cow_print_user(user):
+    info = ('login: {}, nickname: {}, about: {}, mail: {}, id: {}'.
+            format(user.login, user.nickname, user.about, user.mail, user.uid))
+
+    os.system('cowsay ' + '"' + info + '"')
 
 
 def print_projects(projects):
@@ -46,3 +59,7 @@ def print_project(project):
     print('id: {}, title: {}, admin id: {}, description: {}'.
           format(project.pid, project.title, project.admin_uid,
                  project.description))
+
+
+def watch():
+    os.system('telnet towel.blinkenlights.nl')

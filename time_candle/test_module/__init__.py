@@ -46,7 +46,8 @@ def _task_init(self,
                priority=Priority.MEDIUM,
                parent=None,
                comment='',
-               realization_time=-1):
+               realization_time=-1,
+               creation_time=0):
     self.uid = uid
     self.creator_uid = creator_uid
     self.tid = tid
@@ -58,6 +59,7 @@ def _task_init(self,
     self.deadline = deadline
     self.comment = comment
     self.realization_time = realization_time
+    self.creation_time = creation_time
 
 
 TaskDummie = type('TaskDummie', (), {'__init__': _task_init})
@@ -177,7 +179,9 @@ def _init_task_table():
                     title=task.title,
                     priority=task.priority,
                     deadline_time=task.deadline,
-                    comment=task.comment)
+                    comment=task.comment,
+                    realization_time=task.realization_time,
+                    creation_time=task.creation_time)
 
 
 def _init_project_table():
@@ -207,4 +211,7 @@ def _init_project_tasks_table():
                     title=task.title,
                     priority=task.priority,
                     deadline_time=task.deadline,
-                    comment=task.comment)
+                    comment=task.comment,
+                    realization_time=task.realization_time,
+                    creation_time=task.creation_time
+                    )

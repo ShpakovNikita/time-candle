@@ -71,7 +71,7 @@ def check_title(title):
     :param title: Title string
     :return: None
     """
-    if len(title) > 100:
+    if len(title) > 100 or len(title) < 1:
         raise v_e.InvalidTitleError(v_e.TitleMessages.INVALID_TITLE)
 
 

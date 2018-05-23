@@ -1,4 +1,4 @@
-from storage.adapter_classes import Task, User, UserProjectRelation, Project
+from storage.adapter_classes import Task, User, UserProjectRelation
 from storage.adapter_classes import Filter as PrimaryFilter
 from storage.adapter_classes import Adapter as PrimaryAdapter
 from storage import logger
@@ -279,6 +279,8 @@ class TaskAdapter(PrimaryAdapter):
         - priority
         - parent with tid or None
         - comment
+        - realization_time or None
+        - creation_time
         :return: None
         """
         try:
@@ -306,7 +308,9 @@ class TaskAdapter(PrimaryAdapter):
                                      title=obj.title,
                                      priority=obj.priority,
                                      deadline_time=obj.deadline,
-                                     comment=obj.comment)
+                                     comment=obj.comment,
+                                     realization_time=obj.realization_time,
+                                     creation_time=obj.creation_time)
         except IntegrityError:
             # if you are guest
             raise db_e.InvalidLoginError(db_e.TaskMessages.DO_NOT_HAVE_RIGHTS)
@@ -325,7 +329,6 @@ class TaskAdapter(PrimaryAdapter):
         :type tid: Int
         :return: Task
         """
-        # TODO: more flexible user dependency find for projects
         task = Task.select().where((Task.tid == tid) &
                                    ((Task.creator == self.uid) |
                                     (Task.receiver == self.uid)) &
@@ -336,7 +339,15 @@ class TaskAdapter(PrimaryAdapter):
         except DoesNotExist:
             logger.info('There is no such tid %s in the database for your user'
                         % tid)
-            raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
+            try:
+                # if we can find such tid, then we don't have rights
+                self._get_available_tasks().select().\
+                    where(Task.tid == tid).get()
+                raise db_e.InvalidTidError(db_e.TaskMessages.DO_NOT_HAVE_RIGHTS)
+
+            except DoesNotExist:
+                raise db_e.InvalidTidError(
+                    db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
 
     def _get_available_tasks(self):
         # get all tasks in project related to user and his personal tasks
@@ -359,6 +370,8 @@ class TaskAdapter(PrimaryAdapter):
         task.priority = obj.priority
         task.deadline_time = obj.deadline
         task.comment = obj.comment
+        task.creation_time = obj.creation_time
+        task.realization_time = obj.realization_time
 
         task.save()
 

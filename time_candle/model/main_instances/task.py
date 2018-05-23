@@ -22,8 +22,8 @@ class Task:
                  # instead of controller for now we have only deadline
                  # controller=None
                  comment='',
-                 chat=None,
-                 realization_time=None):
+                 realization_time=None,
+                 creation_time=0):
         logger.debug('creating a task...')
 
         self.uid = uid
@@ -39,8 +39,8 @@ class Task:
         # self._controller = controller
         self.deadline = deadline
         self.comment = comment
-        self.chat = chat
         self.realization_time = realization_time
+        self.creation_time = creation_time
 
     @classmethod
     def make_task(cls, obj):
@@ -81,6 +81,8 @@ class Task:
                    obj.status,
                    obj.priority,
                    parent_id,
-                   obj.comment)
+                   obj.comment,
+                   obj.realization_time,
+                   obj.creation_time)
 
         return task

@@ -34,8 +34,7 @@ class TestTaskLogic(unittest.TestCase):
         _change_user(_USERS[0].uid)
         # check that we can add tasks
         self.assertEqual(len(get_tasks('')), 0)
-        add_task('asd', None, None, None, None, '', None, None, None, None,
-                 None)
+        add_task('asd', None, None, None, None, '', None, None, None, None)
         self.assertEqual(len(get_tasks('')), 1)
 
         # check that we do not have rights to see user's tasks

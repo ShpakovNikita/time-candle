@@ -85,7 +85,6 @@ def add_task(title,
              pid,
              login,
              period,
-             planner,
              receiver):
     """
     This function will add passed task to the database, with the creator and
@@ -174,7 +173,7 @@ def remove_user_from_project(login, pid):
     project.remove_user_from_project(login, pid)
 
 
-def change_task(tid, priority, status, time, comment):
+def change_task(tid, priority, status, time, comment, project):
     """
     This function will change task in the database, with the creator and
     executor that named in the config.ini (i.e current logged user)
@@ -183,30 +182,28 @@ def change_task(tid, priority, status, time, comment):
     :param time: Time in following format: YYYY-MM-DD HH:MM:SS
     :param priority: Tasks priority (enum from Priority)
     :param status: Tasks status (enum from Status)
+    :param project: Project related to task or None
     :return: None
     """
-    if priority is None:
-        logger.debug('Default priority has been set')
-        priority = Priority.MEDIUM
-    elif priority > Priority.MAX:
-        priority = Priority.MAX
-    elif priority < Priority.MIN:
-        priority = Priority.MIN
+    if priority is not None:
+        try:
+            priority = key_priority_dict[priority]
+        except KeyError:
+            raise v_e.InvalidPriorityError(
+                v_e.PriorityMessages.INVALID_PRIORITY)
 
-    if status is None:
-        logger.debug('Default status has been set')
-        status = Status.IN_PROGRESS
-    elif status > Status.DONE:
-        status = Status.DONE
-    elif status < Status.EXPIRED:
-        status = Status.EXPIRED
+    if status is not None:
+        try:
+            status = key_status_dict[status]
+        except KeyError:
+            raise v_e.InvalidStatusError(v_e.StatusMessages.INVALID_STATUS)
 
     if time is not None:
         time = model.time_formatter.get_milliseconds(time)
 
     v.check_comment(comment)
 
-    task.change_task(tid, priority, status, time, comment)
+    task.change_task(tid, priority, status, time, comment, project)
 
 
 def change_project(pid, title, description):
@@ -218,6 +215,7 @@ def change_project(pid, title, description):
     :param description: Project's short (or long) description
     :return: None
     """
+    v.check_title(title)
     project.change_project(pid, title, description)
 
 

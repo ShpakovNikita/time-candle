@@ -42,8 +42,8 @@ def add_task(title, priority, status, deadline_time,
                 Singleton.GLOBAL_USER.login, pid)
 
     if deadline_time is not None and \
-            model.time_formatter.time_stamp(deadline_time) < 0:
-        raise m_e.InvalidTimeError(m_e.TimeMessages.TIME_STAMP)
+            model.time_formatter.time_delta(deadline_time) < 0:
+        raise m_e.InvalidTimeError(m_e.TimeMessages.TIME_SHIFT)
 
     if status == Status.DONE:
         realization_time = model.time_formatter.get_now_milliseconds()
@@ -60,7 +60,9 @@ def add_task(title, priority, status, deadline_time,
                         priority=priority,
                         parent=parent_id,
                         comment=comment,
-                        realization_time=realization_time)
+                        realization_time=realization_time,
+                        creation_time=model.time_formatter.
+                        get_now_milliseconds())
 
     logger.debug('task configured and ready to save , the task id is %s'
                  % task.tid)
@@ -75,9 +77,10 @@ def remove_task(tid):
     Adapters.TASK_ADAPTER.remove_task_by_id(tid)
 
 
-def change_task(tid, priority, status, time, comment):
+def change_task(tid, priority, status, time, comment, pid):
     # change task in the database
-    task = TaskInstance.make_task(Adapters.TASK_ADAPTER.get_task_by_id(tid))
+    task = TaskInstance.make_task(
+        Adapters.TASK_ADAPTER.get_task_by_id(tid, pid))
     if priority is not None:
         task.priority = priority
     if status is not None:
@@ -118,7 +121,7 @@ def get_tasks(string_fil):
 def _update(task):
     changed_flag = False
     if task.deadline is not None \
-            and model.time_formatter.time_stamp(task.deadline) < 0 \
+            and model.time_formatter.time_delta(task.deadline) < 0 \
             and task.status == Status.IN_PROGRESS:
         task.status = Status.EXPIRED
         logger.debug('tasks status updated')

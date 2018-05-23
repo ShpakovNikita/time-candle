@@ -1,5 +1,5 @@
 import re
-from datetime import datetime, date, time
+from datetime import datetime, time
 import exceptions.model_exceptions
 from model import logger
 """
@@ -10,9 +10,12 @@ All date logic is placed in this module.
 # We will be storing data only from 1970 year
 epoch = datetime.utcfromtimestamp(1970)
 
+# One hour error that are got from the epoch timestamp
+error = 60 * 60 * 1000
+
 
 # Get time_stamp func
-def time_stamp(milliseconds,
+def time_delta(milliseconds,
                now=None):
     """
     This function gets timestamp from passed time and now time (now can be
@@ -26,6 +29,30 @@ def time_stamp(milliseconds,
         now = get_milliseconds(now)
 
     return milliseconds - now
+
+
+def days_to_milliseconds(period):
+    """
+    This function get's days in milliseconds.
+    :param period: Int days
+    :return: Int (time in milliseconds)
+    """
+    return period * 24 * 60 * 60 * 1000
+
+
+def get_next_deadline(period, start, now=None):
+    """
+    This function calculates next deadline according to the start and now time
+    :param period: period in milliseconds
+    :param start: start point in milliseconds
+    :param now: now time in milliseconds
+    :return: Int (next deadline)
+    """
+    if now is None:
+        now = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+        now = get_milliseconds(now)
+
+    return start + ((now - start) // period + 1) * period
 
 
 def get_now_milliseconds():
@@ -57,7 +84,7 @@ def get_milliseconds(formatted_time):
         logger.debug('date converted')
 
         # Note that here we are subtracting 1970's to define them as lower point
-        final_time = (date_time - epoch).total_seconds() * 1000
+        final_time = (date_time - epoch).total_seconds() * 1000 - error
         if final_time < 0:
             raise exceptions.model_exceptions.\
                 InvalidArgumentFormat('date must be from 1970\'s')
@@ -116,3 +143,13 @@ def date_to_string(date_time):
     :return: String
     """
     return datetime.strftime(date_time, '%Y-%m-%d %H:%M:%S')
+
+
+def milliseconds_to_string(milliseconds):
+    """
+    This function converts milliseconds to formatted string
+    :param milliseconds: Int time
+    :return: String
+    """
+    date_time = get_datetime(milliseconds)
+    return date_to_string(date_time)

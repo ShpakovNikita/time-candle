@@ -120,12 +120,10 @@ class Task(BaseModel):
     # Time in milliseconds. Nullable for further functionality TODO:
     deadline_time = BigIntegerField(null=True)
     realization_time = BigIntegerField(null=True, default=None)
+    creation_time = BigIntegerField()
 
     comment = CharField(default='')
     period = BigIntegerField(null=True)
-
-    # crontab style planner?
-    planner = CharField(null=True)
 
     # Chat will be organized later. But we are planning to create a new
     # relations table that will be holding task id, message id (not necessary),

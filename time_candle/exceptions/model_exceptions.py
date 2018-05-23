@@ -24,7 +24,7 @@ class InvalidTimeError(Exception):
 class TimeMessages(Enum):
     # This is pre defined messages that will be associated with password all
     # over the project
-    TIME_STAMP = 'You cannot create tasks in the past'
+    TIME_SHIFT = 'You cannot create tasks in the past'
 
 
 # Status related things

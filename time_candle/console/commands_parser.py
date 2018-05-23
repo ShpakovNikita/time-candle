@@ -60,7 +60,9 @@ class _Args:
     ADD_PROJECT = Argument(long='addproject',
                            short='p',
                            docstring="""This argument adds a new project with 
-                           the admin from the name of current user""")
+                           the admin from the name of current user. If in change
+                           task, then it specifies the project within task is 
+                           placed""")
     # TODO: maybe delete creator id to have more flexible rights (but it's hard)
 
     # show projects
@@ -287,6 +289,9 @@ def run():
     root_args.add_parser(_Args.LOGOUT.long,
                          help=_Args.LOGOUT.docstring)
 
+    # easter egg
+    root_args.add_parser('watch')
+
     parsed = parser.parse_args()
     logger.debug(parsed)
 
@@ -336,6 +341,9 @@ def run():
 
     elif parsed.action == _Args.WHO_AM_I.long:
         _process_whoami()
+
+    elif parsed.action == 'watch':
+        console.print_functions.watch()
 
 
 """
@@ -444,12 +452,6 @@ def _init_add_task_parser(root_args):
                       default=[None],
                       nargs=1)
 
-    task.add_argument(_Args.prefix().PLANNER.long,
-                      _Args.prefix().PLANNER.short,
-                      help=_Args.PLANNER.docstring,
-                      default=[None],
-                      nargs=1)
-
     task.add_argument(_Args.prefix().RECEIVER.long,
                       _Args.prefix().RECEIVER.short,
                       help=_Args.RECEIVER.docstring,
@@ -474,22 +476,31 @@ def _init_change_task_parser(root_args):
     task.add_argument(_Args.prefix().PRIORITY.long,
                       _Args.prefix().PRIORITY.short,
                       help=_Args.PRIORITY.docstring,
-                      nargs=1)
+                      nargs=1,
+                      default=[None])
 
     task.add_argument(_Args.prefix().STATUS.long,
                       _Args.prefix().STATUS.short,
                       help=_Args.STATUS.docstring,
-                      nargs=1)
+                      nargs=1,
+                      default=[None])
 
     task.add_argument(_Args.prefix().TIME.long,
                       _Args.prefix().TIME.short,
                       help=_Args.TIME.docstring,
-                      nargs=1)
+                      nargs=1,
+                      default=[None])
+
+    task.add_argument(_Args.prefix().PROJECT.long,
+                      _Args.prefix().PROJECT.short,
+                      help=_Args.PROJECT.docstring,
+                      nargs=1,
+                      default=[None])
 
     task.add_argument(_Args.prefix().COMMENT.long,
                       _Args.prefix().COMMENT.short,
                       help=_Args.COMMENT.docstring,
-                      default=[None],
+                      default=[''],
                       nargs=1)
 
 
@@ -619,7 +630,6 @@ def _process_add_task(parsed_args):
                       parsed_args.project[0],
                       parsed_args.receiver[0],
                       parsed_args.period[0],
-                      parsed_args.planner[0],
                       parsed_args.receiver[0])
     print('task %s added' % parsed_args.title)
 
@@ -627,16 +637,12 @@ def _process_add_task(parsed_args):
 def _process_change_task(parsed_args):
     logger.debug('change_task')
 
-    # time and comment is list value, so we have to extract data from it
-    time = None
-    if parsed_args.time is not None:
-        time = parsed_args.time[0]
-
     commands.change_task(parsed_args.id,
-                         parsed_args.priority,
-                         parsed_args.status,
-                         time,
-                         parsed_args.comment[0])
+                         parsed_args.priority[0],
+                         parsed_args.status[0],
+                         parsed_args.time[0],
+                         parsed_args.comment[0],
+                         parsed_args.project[0])
     print('task %s changed' % parsed_args.id)
 
 
@@ -695,7 +701,7 @@ def _process_show_projects(parsed_args):
 
 def _process_whoami():
     user = commands.get_current_user()
-    console.print_functions.print_user(user)
+    console.print_functions.cow_print_user(user)
 
 
 def _process_change_project(parsed_args):
