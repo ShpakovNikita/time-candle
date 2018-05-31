@@ -1,4 +1,4 @@
-from peewee import *
+from peewee import DoesNotExist, IntegrityError
 from storage.adapter_classes import Project, UserProjectRelation, Task
 from storage.adapter_classes import Filter as PrimaryFilter
 from storage.adapter_classes import Adapter as PrimaryAdapter

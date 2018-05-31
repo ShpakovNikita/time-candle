@@ -3,7 +3,7 @@ from storage.adapter_classes import Filter as PrimaryFilter
 from storage.adapter_classes import Adapter as PrimaryAdapter
 from storage import logger
 import exceptions.db_exceptions as db_e
-from peewee import *
+from peewee import DoesNotExist, IntegrityError
 
 
 class TaskFilter(PrimaryFilter):
@@ -299,7 +299,9 @@ class TaskAdapter(PrimaryAdapter):
             # check that if receiver is not us, that we have rights to do smt in
             # the project
             if obj.pid is not None:
+                # But we hope that we are already checked this
                 pass
+
             table_task = Task.create(creator=obj.creator_uid,
                                      receiver=obj.uid,
                                      project=obj.pid,

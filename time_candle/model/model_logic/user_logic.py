@@ -1,53 +1,55 @@
 from model.main_instances.user import User as UserInstance
-from storage import *
 import exceptions.db_exceptions as db_e
 from model import config_parser
-from model.session_control import Singleton, Adapters
 from model import logger
 from storage.user_adapter import UserFilter
+from . import Logic
 
 
-def log_in(login, password):
-    # logging in writing the config file
-    success = False
-    try:
-        UserInstance.make_user(
-            Adapters.USER_ADAPTER.login_user(login, password))
+class UserLogic(Logic):
 
-        success = True
-    except db_e.InvalidPasswordError:
-        logger.info('Invalid password! Now you act like a guest here')
+    def __init__(self, db_name=None):
+        super().__init__(db_name)
 
-    except db_e.InvalidLoginError:
-        logger.info('Invalid login! Now you act like a guest here')
+    def log_in(self, login, password):
+        # logging in writing the config file
+        success = False
+        try:
+            UserInstance.make_user(
+                self.user_adapter.login_user(login, password))
 
-    # if everything is ok, we will write our login and password to the
-    # config.ini
-    config_parser.write_user(login, password)
-    return success
+            success = True
+        except db_e.InvalidPasswordError:
+            logger.info('Invalid password! Now you act like a guest here')
 
+        except db_e.InvalidLoginError:
+            logger.info('Invalid login! Now you act like a guest here')
 
-def add_user(login, password, nickname, about, mail):
-    # add user to the database
-    user = UserInstance(login=login,
-                        password=password,
-                        nickname=nickname,
-                        about=about,
-                        mail=mail)
-    Adapters.USER_ADAPTER.save(user)
+        # if everything is ok, we will write our login and password to the
+        # config.ini
+        config_parser.write_user(login, password)
+        return success
 
+    def add_user(self, login, password, nickname, about, mail):
+        # add user to the database
+        user = UserInstance(login=login,
+                            password=password,
+                            nickname=nickname,
+                            about=about,
+                            mail=mail)
+        self.user_adapter.save(user)
 
-def get_users(substr, pid=None):
-    # get users by passed substring
-    fil = UserFilter().nickname_substring(substr)
-    if pid is not None:
-        users = Adapters.USER_ADAPTER.get_by_project(pid)
-    else:
-        users = Adapters.USER_ADAPTER.get_by_filter(fil)
+    def get_users(self, substr, pid=None):
+        # get users by passed substring
+        fil = UserFilter().nickname_substring(substr)
+        if pid is not None:
+            users = self.user_adapter.get_by_project(pid)
+        else:
+            users = self.user_adapter.get_by_filter(fil)
 
-    return [UserInstance.make_user(user) for user in users]
+        return [UserInstance.make_user(user) for user in users]
 
-
-def logout():
-    # logging out writing the blank lines to the config
-    config_parser.write_user('', '')
+    @staticmethod
+    def logout():
+        # logging out writing the blank lines to the config
+        config_parser.write_user('', '')

@@ -10,9 +10,12 @@ import exceptions.db_exceptions as db_e
 from copy import copy
 
 
+db_file = ':memory:'
+
+
 __all__ = ['_init_user_table', '_init_project_table',
            '_init_task_table', '_init_project_tasks_table', '_USERS',
-           '_TASKS', '_PROJECTS', '_PROJECT_TASKS',
+           '_TASKS', '_PROJECTS', '_PROJECT_TASKS', 'db_file',
            'Task', 'User', 'Project', 'UserProjectRelation',
            'ProjectAdapter', 'ProjectFilter', 'unittest',
            'UserAdapter', 'UserFilter', 'TaskAdapter', 'TaskFilter',

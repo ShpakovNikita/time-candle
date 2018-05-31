@@ -1,6 +1,6 @@
 import argparse
 from collections import namedtuple
-from model import commands
+from controller.commands import Controller
 import app_logger
 import console.print_functions
 
@@ -613,7 +613,7 @@ def _init_remove_project_parser(root_args):
 # Process parsed arguments
 def _process_login(parsed_args):
     logger.debug('login')
-    if commands.log_in(parsed_args.login, parsed_args.password):
+    if Controller().log_in(parsed_args.login, parsed_args.password):
         print('user %s logged' % parsed_args.login)
     else:
         print('user %s is not logged' % parsed_args.login)
@@ -622,7 +622,7 @@ def _process_login(parsed_args):
 def _process_add_task(parsed_args):
     logger.debug('add_task')
 
-    commands.add_task(parsed_args.title,
+    Controller().add_task(parsed_args.title,
                       parsed_args.priority[0],
                       parsed_args.status[0],
                       parsed_args.time[0],
@@ -630,15 +630,14 @@ def _process_add_task(parsed_args):
                       parsed_args.comment[0],
                       parsed_args.project[0],
                       parsed_args.receiver[0],
-                      parsed_args.period[0],
-                      parsed_args.receiver[0])
+                      parsed_args.period[0])
     print('task %s added' % parsed_args.title)
 
 
 def _process_change_task(parsed_args):
     logger.debug('change_task')
 
-    commands.change_task(parsed_args.id,
+    Controller().change_task(parsed_args.id,
                          parsed_args.priority[0],
                          parsed_args.status[0],
                          parsed_args.time[0],
@@ -649,12 +648,12 @@ def _process_change_task(parsed_args):
 
 def _process_remove_task(parsed_args):
     logger.debug('remove_task')
-    commands.remove_task(parsed_args.id)
+    Controller().remove_task(parsed_args.id)
     print('task %s removed' % parsed_args.id)
 
 
 def _process_logout():
-    commands.logout()
+    Controller().logout()
     print('successfully logged out')
 
 
@@ -664,7 +663,7 @@ def _process_add_user(parsed_args):
         if parsed_args.password == '':
             raise ValueError('You must specify the password!')
 
-        commands.add_user(parsed_args.login,
+        Controller().add_user(parsed_args.login,
                           parsed_args.password,
                           parsed_args.mail[0],
                           parsed_args.nickname[0],
@@ -672,54 +671,54 @@ def _process_add_user(parsed_args):
         print('user %s added' % parsed_args.login)
 
     else:
-        commands.add_user_to_project(parsed_args.login, parsed_args.project)
+        Controller().add_user_to_project(parsed_args.login, parsed_args.project)
         print('user %s added to project %s' %
               (parsed_args.login, parsed_args.project[0]))
 
 
 def _process_add_project(parsed_args):
     logger.debug('add_project')
-    commands.add_project(parsed_args.title,
+    Controller().add_project(parsed_args.title,
                          parsed_args.description[0],
                          parsed_args.members)
     print('project %s added' % parsed_args.title)
 
 
 def _process_show_tasks(parsed_args):
-    tasks = commands.get_tasks(parsed_args.filter[0])
+    tasks = Controller().get_tasks(parsed_args.filter[0])
     console.print_functions.print_tasks(tasks)
 
 
 def _process_show_users(parsed_args):
-    users = commands.get_users(parsed_args.filter[0], parsed_args.project[0])
+    users = Controller().get_users(parsed_args.filter[0], parsed_args.project[0])
     console.print_functions.print_users(users)
 
 
 def _process_show_projects(parsed_args):
-    projects = commands.get_projects(parsed_args.filter[0])
+    projects = Controller().get_projects(parsed_args.filter[0])
     console.print_functions.print_projects(projects)
 
 
 def _process_whoami():
-    user = commands.get_current_user()
+    user = Controller().get_current_user()
     console.print_functions.cow_print_user(user)
 
 
 def _process_change_project(parsed_args):
-    commands.change_project(parsed_args.id,
+    Controller().change_project(parsed_args.id,
                             parsed_args.title[0],
                             parsed_args.description[0])
     print('project %s changed' % parsed_args.id)
 
 
 def _process_remove_project(parsed_args):
-    commands.remove_project(parsed_args.id)
+    Controller().remove_project(parsed_args.id)
     print('project %s removed' % parsed_args.id)
 
 
 def _process_remove_user(parsed_args):
     if parsed_args.project is not None:
-        commands.remove_user_from_project(
+        Controller().remove_user_from_project(
             parsed_args.login, parsed_args.project)
         print('user %s removed from %s project' %
               (parsed_args.login, parsed_args.id))

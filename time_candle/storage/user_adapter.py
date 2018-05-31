@@ -2,7 +2,7 @@ from storage.adapter_classes import User, Task, Project, UserProjectRelation
 from storage.adapter_classes import Filter as PrimaryFilter
 from storage.adapter_classes import Adapter as PrimaryAdapter
 import exceptions.db_exceptions as db_e
-from peewee import *
+from peewee import DoesNotExist
 from storage import logger
 
 

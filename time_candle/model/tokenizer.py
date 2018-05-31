@@ -1,10 +1,9 @@
 from tokenize import tokenize, untokenize, NUMBER, STRING, NAME, OP
 from io import BytesIO
 from collections import namedtuple
-from collections import defaultdict
 from storage.task_adapter import TaskFilter
 import exceptions.show_me_exceptions as sm_e
-from pprint import pprint
+
 
 _token_format = namedtuple('token_format',
                            ['type_code', 'value', 'begin', 'end'])
