@@ -1,13 +1,7 @@
-from time_candle.test_module import *
-from time_candle.model.session_control import start_session
+from test_module import *
 from time_candle.controller.commands import Controller
 from time_candle.model.tokenizer import parse_string
-from time_candle.model.model_logic.project_logic import ProjectLogic
-from time_candle.model.model_logic.user_logic import UserLogic
-from time_candle.model.model_logic.task_logic import TaskLogic
 import time_candle.exceptions.show_me_exceptions as sm_e
-import time_candle.exceptions.model_exceptions as m_e
-from unittest.mock import patch
 
 
 # TODO: Mock. It is really hard to implement here. Like very-very-very hard.
@@ -23,9 +17,8 @@ class TestTaskLogic(unittest.TestCase):
         self.controller.project_logic._login(_USERS[uid - 1])
 
     def setUp(self):
-        self.controller = Controller(db_file)
+        self.controller = Controller(mode='dev', db_file=db_file)
 
-        start_session('dev')
         _init_project_table()
         _init_user_table()
 

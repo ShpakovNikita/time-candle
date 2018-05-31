@@ -2,10 +2,11 @@ import argparse
 from collections import namedtuple
 from time_candle.controller.commands import Controller
 import time_candle.app_logger
-import time_candle.console.print_functions
-from time_candle.model.session_control import start_session
+import time_candle.module_app.print_functions
+
 
 logger = time_candle.app_logger.custom_logger('console')
+controller = None
 
 
 class _Args:
@@ -261,7 +262,8 @@ def run(mode='dev'):
     specific requests to our main model
     :return: None
     """
-    start_session(mode)
+    global controller
+    controller = Controller(mode)
     parser = argparse.ArgumentParser(prog='time_candle')
 
     # root_args is the main command arguments, that defines next action
@@ -311,7 +313,7 @@ def run(mode='dev'):
         _process_add_task(parsed)
 
     elif parsed.action == _Args.CLEAR_LOG.long:
-        open(app_logger.LOG_FILENAME, 'w').close()
+        open(time_candle.app_logger.LOG_FILENAME, 'w').close()
         logger.info('log has been cleared')
 
     elif parsed.action == _Args.LOGOUT.long:
@@ -345,7 +347,7 @@ def run(mode='dev'):
         _process_whoami()
 
     elif parsed.action == 'watch':
-        time_candle.console.print_functions.watch()
+        time_candle.module_app.print_functions.watch()
 
 
 """
@@ -615,7 +617,7 @@ def _init_remove_project_parser(root_args):
 # Process parsed arguments
 def _process_login(parsed_args):
     logger.debug('login')
-    if Controller().log_in(parsed_args.login, parsed_args.password):
+    if controller.log_in(parsed_args.login, parsed_args.password):
         print('user %s logged' % parsed_args.login)
     else:
         print('user %s is not logged' % parsed_args.login)
@@ -624,38 +626,38 @@ def _process_login(parsed_args):
 def _process_add_task(parsed_args):
     logger.debug('add_task')
 
-    Controller().add_task(parsed_args.title,
-                      parsed_args.priority[0],
-                      parsed_args.status[0],
-                      parsed_args.time[0],
-                      parsed_args.parent[0],
-                      parsed_args.comment[0],
-                      parsed_args.project[0],
-                      parsed_args.receiver[0],
-                      parsed_args.period[0])
+    controller.add_task(parsed_args.title,
+                        parsed_args.priority[0],
+                        parsed_args.status[0],
+                        parsed_args.time[0],
+                        parsed_args.parent[0],
+                        parsed_args.comment[0],
+                        parsed_args.project[0],
+                        parsed_args.receiver[0],
+                        parsed_args.period[0])
     print('task %s added' % parsed_args.title)
 
 
 def _process_change_task(parsed_args):
     logger.debug('change_task')
 
-    Controller().change_task(parsed_args.id,
-                         parsed_args.priority[0],
-                         parsed_args.status[0],
-                         parsed_args.time[0],
-                         parsed_args.comment[0],
-                         parsed_args.project[0])
+    controller.change_task(parsed_args.id,
+                           parsed_args.priority[0],
+                           parsed_args.status[0],
+                           parsed_args.time[0],
+                           parsed_args.comment[0],
+                           parsed_args.project[0])
     print('task %s changed' % parsed_args.id)
 
 
 def _process_remove_task(parsed_args):
     logger.debug('remove_task')
-    Controller().remove_task(parsed_args.id)
+    controller.remove_task(parsed_args.id)
     print('task %s removed' % parsed_args.id)
 
 
 def _process_logout():
-    Controller().logout()
+    controller.logout()
     print('successfully logged out')
 
 
@@ -665,62 +667,62 @@ def _process_add_user(parsed_args):
         if parsed_args.password == '':
             raise ValueError('You must specify the password!')
 
-        Controller().add_user(parsed_args.login,
-                          parsed_args.password,
-                          parsed_args.mail[0],
-                          parsed_args.nickname[0],
-                          parsed_args.about[0])
+        controller.add_user(parsed_args.login,
+                            parsed_args.password,
+                            parsed_args.mail[0],
+                            parsed_args.nickname[0],
+                            parsed_args.about[0])
         print('user %s added' % parsed_args.login)
 
     else:
-        Controller().add_user_to_project(parsed_args.login, parsed_args.project)
+        controller.add_user_to_project(parsed_args.login, parsed_args.project)
         print('user %s added to project %s' %
               (parsed_args.login, parsed_args.project[0]))
 
 
 def _process_add_project(parsed_args):
     logger.debug('add_project')
-    Controller().add_project(parsed_args.title,
-                         parsed_args.description[0],
-                         parsed_args.members)
+    controller.add_project(parsed_args.title,
+                           parsed_args.description[0],
+                           parsed_args.members)
     print('project %s added' % parsed_args.title)
 
 
 def _process_show_tasks(parsed_args):
-    tasks = Controller().get_tasks(parsed_args.filter[0])
-    time_candle.console.print_functions.print_tasks(tasks)
+    tasks = controller.get_tasks(parsed_args.filter[0])
+    time_candle.module_app.print_functions.print_tasks(tasks)
 
 
 def _process_show_users(parsed_args):
-    users = Controller().get_users(parsed_args.filter[0], parsed_args.project[0])
-    time_candle.console.print_functions.print_users(users)
+    users = controller.get_users(parsed_args.filter[0], parsed_args.project[0])
+    time_candle.module_app.print_functions.print_users(users)
 
 
 def _process_show_projects(parsed_args):
-    projects = Controller().get_projects(parsed_args.filter[0])
-    time_candle.console.print_functions.print_projects(projects)
+    projects = controller.get_projects(parsed_args.filter[0])
+    time_candle.module_app.print_functions.print_projects(projects)
 
 
 def _process_whoami():
-    user = Controller().get_current_user()
-    time_candle.console.print_functions.cow_print_user(user)
+    user = controller.get_current_user()
+    time_candle.module_app.print_functions.cow_print_user(user)
 
 
 def _process_change_project(parsed_args):
-    Controller().change_project(parsed_args.id,
-                                parsed_args.title[0],
-                                parsed_args.description[0])
+    controller.change_project(parsed_args.id,
+                              parsed_args.title[0],
+                              parsed_args.description[0])
     print('project %s changed' % parsed_args.id)
 
 
 def _process_remove_project(parsed_args):
-    Controller().remove_project(parsed_args.id)
+    controller.remove_project(parsed_args.id)
     print('project %s removed' % parsed_args.id)
 
 
 def _process_remove_user(parsed_args):
     if parsed_args.project is not None:
-        Controller().remove_user_from_project(
+        controller.remove_user_from_project(
             parsed_args.login, parsed_args.project)
         print('user %s removed from %s project' %
               (parsed_args.login, parsed_args.id))

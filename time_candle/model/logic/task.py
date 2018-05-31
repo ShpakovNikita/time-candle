@@ -1,4 +1,4 @@
-from time_candle.model.main_instances.task import Task as TaskInstance
+from time_candle.model.instances.task import Task as TaskInstance
 import time_candle.exceptions.model_exceptions as m_e
 from time_candle.model import logger
 import time_candle.model.tokenizer

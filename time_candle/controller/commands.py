@@ -1,6 +1,6 @@
-from time_candle.model.model_logic.project_logic import ProjectLogic
-from time_candle.model.model_logic.task_logic import TaskLogic
-from time_candle.model.model_logic.user_logic import UserLogic
+from time_candle.model.logic.project import ProjectLogic
+from time_candle.model.logic.task import TaskLogic
+from time_candle.model.logic.user import UserLogic
 import time_candle.controller.validators as v
 import time_candle.exceptions.validation_exceptions as v_e
 from time_candle.model import logger
@@ -18,7 +18,17 @@ Note, that we have to login anytime firstly before the actions from the user
 
 class Controller:
 
-    def __init__(self, db_file=None):
+    def __init__(self, mode='dev', db_file=None):
+        import sys
+        from time_candle.exceptions import custom_excepthook
+
+        if mode == 'dev':
+            pass
+        elif mode == 'user':
+            sys.excepthook = custom_excepthook
+        else:
+            raise ValueError('mode option is wrong!')
+
         self.user_logic = UserLogic(db_file)
         self.task_logic = TaskLogic(db_file)
         self.project_logic = ProjectLogic(db_file)

@@ -1,4 +1,4 @@
-from time_candle.model.main_instances.project import Project as ProjectInstance
+from time_candle.model.instances.project import Project as ProjectInstance
 import time_candle.exceptions.db_exceptions as db_e
 from time_candle.storage.project_adapter import ProjectFilter
 from . import Logic

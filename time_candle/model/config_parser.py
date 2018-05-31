@@ -2,7 +2,7 @@ import configparser
 import time_candle.app_logger
 import time_candle.exceptions.model_exceptions as m_e
 import time_candle.storage.user_adapter
-from time_candle.model.main_instances.user import User
+from time_candle.model.instances.user import User
 import time_candle.exceptions.db_exceptions as db_e
 from time_candle.model import logger
 

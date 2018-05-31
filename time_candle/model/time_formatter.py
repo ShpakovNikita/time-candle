@@ -1,5 +1,5 @@
 import re
-from datetime import datetime, time
+from datetime import datetime
 import time_candle.exceptions.model_exceptions as m_e
 from time_candle.model import logger
 """
@@ -11,7 +11,7 @@ All date logic is placed in this module.
 epoch = datetime.utcfromtimestamp(1970)
 
 # One hour error that are got from the epoch timestamp
-error = 60 * 60 * 1000
+error = 0
 
 
 # Get time_stamp func

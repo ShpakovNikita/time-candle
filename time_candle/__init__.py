@@ -5,5 +5,5 @@
 # TODO:
 # - Nice lexical parser
 # - Cron tab period maker
-# - Curses console UI
+# - Curses module_app UI
 # - More (in means of count) constructive tests

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-from console import commands_parser
+from time_candle.module_app import commands_parser
 import time_candle.app_logger
 
 
 def main():
     time_candle.app_logger.custom_logger('root').info('Entering the program.')
 
-    commands_parser.run('user')
+    commands_parser.run('dev')
 
     time_candle.app_logger.custom_logger('root').info('Leaving the program.')
 
