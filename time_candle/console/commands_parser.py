@@ -3,8 +3,9 @@ from collections import namedtuple
 from controller.commands import Controller
 import app_logger
 import console.print_functions
+from model.session_control import start_session
 
-logger = app_logger.custom_logger('controller')
+logger = app_logger.custom_logger('console')
 
 
 class _Args:
@@ -254,12 +255,13 @@ class _Args:
         return _Args._with_prefix
 
 
-def run():
+def run(mode='dev'):
     """
     This function runs parser module to parse command line arguments and form
     specific requests to our main model
     :return: None
     """
+    start_session(mode)
     parser = argparse.ArgumentParser(prog='time_candle')
 
     # root_args is the main command arguments, that defines next action
