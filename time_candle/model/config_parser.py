@@ -4,7 +4,6 @@ import time_candle.exceptions.model_exceptions as m_e
 import time_candle.storage.user_adapter
 from time_candle.model.instances.user import User
 import time_candle.exceptions.db_exceptions as db_e
-from time_candle.model import logger
 
 
 CONFIG_NAME = 'config.ini'
@@ -31,23 +30,19 @@ def run_config():
 
         # Create user by it's name and password. If it exists, we will get it
         # from database
-        logger.debug('login has been set {} {}'.format(login, password))
-
         user_field = type('user_field', (), {'uid': None,
                                              'login': 'Guest',
-                                             'nickname': 'Guestto',
+                                             'nickname': 'SansTheSkeleton',
                                              'about': '',
                                              'mail': None})
         try:
-            config_dict['user'] = time_candle.storage.user_adapter.UserAdapter.login_user(
-                login, password)
+            config_dict['user'] = time_candle.storage.user_adapter.UserAdapter.\
+                login_user(login, password)
 
         except db_e.InvalidPasswordError:
-            logger.debug('Invalid password! Now you act like a guest here')
             config_dict['user'] = user_field()
 
         except db_e.InvalidLoginError:
-            logger.debug('Invalid login! Now you act like a guest here')
             config_dict['user'] = user_field()
         return config_dict
 
@@ -56,7 +51,6 @@ def run_config():
 
     except m_e.InvalidLoginException:
         config_dict['user'] = User()
-        logger.debug('user is invalid. Logging as guest')
 
         return config_dict
 

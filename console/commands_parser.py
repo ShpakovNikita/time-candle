@@ -2,7 +2,7 @@ import argparse
 from collections import namedtuple
 from time_candle.controller.commands import Controller
 import time_candle.app_logger
-import time_candle.console.print_functions
+import console.print_functions
 
 
 logger = time_candle.app_logger.custom_logger('console')
@@ -347,7 +347,7 @@ def run(mode='dev'):
         _process_whoami()
 
     elif parsed.action == 'watch':
-        time_candle.console.print_functions.watch()
+        console.print_functions.watch()
 
 
 """
@@ -690,22 +690,22 @@ def _process_add_project(parsed_args):
 
 def _process_show_tasks(parsed_args):
     tasks = controller.get_tasks(parsed_args.filter[0])
-    time_candle.console.print_functions.print_tasks(tasks)
+    console.print_functions.print_tasks(tasks)
 
 
 def _process_show_users(parsed_args):
     users = controller.get_users(parsed_args.filter[0], parsed_args.project[0])
-    time_candle.console.print_functions.print_users(users)
+    console.print_functions.print_users(users)
 
 
 def _process_show_projects(parsed_args):
     projects = controller.get_projects(parsed_args.filter[0])
-    time_candle.console.print_functions.print_projects(projects)
+    console.print_functions.print_projects(projects)
 
 
 def _process_whoami():
     user = controller.get_current_user()
-    time_candle.console.print_functions.cow_print_user(user)
+    console.print_functions.cow_print_user(user)
 
 
 def _process_change_project(parsed_args):

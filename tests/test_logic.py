@@ -1,4 +1,4 @@
-from test_module import *
+from tests import *
 from time_candle.controller.commands import Controller
 from time_candle.model.tokenizer import parse_string
 import time_candle.exceptions.show_me_exceptions as sm_e

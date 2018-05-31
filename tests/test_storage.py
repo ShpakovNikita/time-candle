@@ -1,4 +1,4 @@
-from test_module import *
+from tests import *
 
 
 class TestTaskAdapter(unittest.TestCase):
