@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from time_candle.module_app import commands_parser
+from console import commands_parser
 import time_candle.app_logger
 
 
