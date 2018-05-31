@@ -4,6 +4,6 @@ contact to the storage module.
 """
 
 
-import app_logger
+import time_candle.app_logger
 
-logger = app_logger.custom_logger('model')
+logger = time_candle.app_logger.custom_logger('model')

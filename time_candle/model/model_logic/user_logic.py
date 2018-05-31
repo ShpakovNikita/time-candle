@@ -1,8 +1,8 @@
-from model.main_instances.user import User as UserInstance
-import exceptions.db_exceptions as db_e
-from model import config_parser
-from model import logger
-from storage.user_adapter import UserFilter
+from time_candle.model.main_instances.user import User as UserInstance
+import time_candle.exceptions.db_exceptions as db_e
+from time_candle.model import config_parser
+from time_candle.model import logger
+from time_candle.storage.user_adapter import UserFilter
 from . import Logic
 
 

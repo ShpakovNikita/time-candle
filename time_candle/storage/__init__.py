@@ -4,10 +4,10 @@ to remove, store, pull and add data to the DB.
 """
 
 
-import app_logger
+import time_candle.app_logger
 
 
-logger = app_logger.custom_logger('storage')
+logger = time_candle.app_logger.custom_logger('storage')
 
 
 # Database will be represented as directories with multiple files, each file

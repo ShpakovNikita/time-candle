@@ -1,9 +1,9 @@
-from model.main_instances.task import Task as TaskInstance
-import exceptions.model_exceptions as m_e
-from model import logger
-import model.tokenizer
-import model.time_formatter
-from enums.status import Status
+from time_candle.model.main_instances.task import Task as TaskInstance
+import time_candle.exceptions.model_exceptions as m_e
+from time_candle.model import logger
+import time_candle.model.tokenizer
+import time_candle.model.time_formatter
+from time_candle.enums.status import Status
 from . import Logic
 
 
@@ -48,13 +48,13 @@ class TaskLogic(Logic):
         # if deadline is not none
         if deadline_time is not None:
             # we checking that deadline is in the future
-            if model.time_formatter.time_delta(deadline_time) < 0:
+            if time_candle.model.time_formatter.time_delta(deadline_time) < 0:
                 raise m_e.InvalidTimeError(m_e.TimeMessages.TIME_SHIFT)
 
             # and if there is a period we make sure that period is bigger than
             # delta time between now and deadline
             if period is not None and \
-                    period < deadline_time - model.time_formatter.\
+                    period < deadline_time - time_candle.model.time_formatter.\
                     get_now_milliseconds():
                 raise m_e.InvalidTimeError(m_e.TimeMessages.NOT_VALID_PERIOD)
 
@@ -63,7 +63,8 @@ class TaskLogic(Logic):
             raise m_e.InvalidTimeError(m_e.TimeMessages.NO_DEADLINE)
 
         if status == Status.DONE:
-            realization_time = model.time_formatter.get_now_milliseconds()
+            realization_time = time_candle.model.time_formatter.\
+                get_now_milliseconds()
         else:
             realization_time = None
 
@@ -78,7 +79,7 @@ class TaskLogic(Logic):
                             parent=parent_id,
                             comment=comment,
                             realization_time=realization_time,
-                            creation_time=model.time_formatter.
+                            creation_time=time_candle.model.time_formatter.
                             get_now_milliseconds(),
                             period=period)
 
@@ -113,12 +114,12 @@ class TaskLogic(Logic):
             task.status = status
             # mark time for the done task
             if status == Status.DONE:
-                task.realization_time = model.time_formatter.\
+                task.realization_time = time_candle.model.time_formatter.\
                     get_now_milliseconds()
 
         if time is not None:
             # we cannot allow to make deadline in the past
-            if model.time_formatter.time_delta(time) < 0:
+            if time_candle.model.time_formatter.time_delta(time) < 0:
                 raise m_e.InvalidTimeError(m_e.TimeMessages.TIME_SHIFT)
 
             # also we should make task unexpired if we moved deadline and it was
@@ -135,7 +136,7 @@ class TaskLogic(Logic):
 
     def get_tasks(self, string_fil):
         # get tasks by filter
-        fil = model.tokenizer.parse_string(string_fil)
+        fil = time_candle.model.tokenizer.parse_string(string_fil)
         tasks = self.task_adapter.get_by_filter(fil)
         task_instances = [TaskInstance.make_task(task) for task in tasks]
         for task in task_instances:
@@ -147,7 +148,8 @@ class TaskLogic(Logic):
         changed_flag = False
         # make tasks expired if deadline is crossed
         if task.deadline is not None \
-                and model.time_formatter.time_delta(task.deadline) < 0 \
+                and time_candle.model.\
+                time_formatter.time_delta(task.deadline) < 0 \
                 and task.status == Status.IN_PROGRESS:
             task.status = Status.EXPIRED
             logger.debug('tasks status updated')
@@ -159,8 +161,8 @@ class TaskLogic(Logic):
             old_deadline = task.deadline
             # check on expired and maybe change deadline
             if task.status != Status.EXPIRED:
-                task.deadline = model.time_formatter.get_next_deadline(
-                    task.period, task.deadline)
+                task.deadline = time_candle.model.time_formatter.\
+                    get_next_deadline(task.period, task.deadline)
 
             # if we are changed it then we are in progress
             if old_deadline != task.deadline:

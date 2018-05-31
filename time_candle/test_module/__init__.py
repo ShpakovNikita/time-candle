@@ -1,12 +1,12 @@
 import unittest
-from storage.adapter_classes import Task, User, Project, UserProjectRelation
-from storage.adapter_classes import Filter as PrimaryFilter
-from storage.project_adapter import ProjectAdapter, ProjectFilter
-from storage.user_adapter import UserAdapter, UserFilter
-from storage.task_adapter import TaskAdapter, TaskFilter
-from enums.priority import Priority
-from enums.status import Status
-import exceptions.db_exceptions as db_e
+from time_candle.storage.adapter_classes import Task, User, Project, UserProjectRelation
+from time_candle.storage.adapter_classes import Filter as PrimaryFilter
+from time_candle.storage.project_adapter import ProjectAdapter, ProjectFilter
+from time_candle.storage.user_adapter import UserAdapter, UserFilter
+from time_candle.storage.task_adapter import TaskAdapter, TaskFilter
+from time_candle.enums.priority import Priority
+from time_candle.enums.status import Status
+import time_candle.exceptions.db_exceptions as db_e
 from copy import copy
 
 

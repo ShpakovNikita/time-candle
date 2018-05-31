@@ -1,11 +1,11 @@
 import argparse
 from collections import namedtuple
-from controller.commands import Controller
-import app_logger
-import console.print_functions
-from model.session_control import start_session
+from time_candle.controller.commands import Controller
+import time_candle.app_logger
+import time_candle.console.print_functions
+from time_candle.model.session_control import start_session
 
-logger = app_logger.custom_logger('console')
+logger = time_candle.app_logger.custom_logger('console')
 
 
 class _Args:
@@ -345,7 +345,7 @@ def run(mode='dev'):
         _process_whoami()
 
     elif parsed.action == 'watch':
-        console.print_functions.watch()
+        time_candle.console.print_functions.watch()
 
 
 """
@@ -688,28 +688,28 @@ def _process_add_project(parsed_args):
 
 def _process_show_tasks(parsed_args):
     tasks = Controller().get_tasks(parsed_args.filter[0])
-    console.print_functions.print_tasks(tasks)
+    time_candle.console.print_functions.print_tasks(tasks)
 
 
 def _process_show_users(parsed_args):
     users = Controller().get_users(parsed_args.filter[0], parsed_args.project[0])
-    console.print_functions.print_users(users)
+    time_candle.console.print_functions.print_users(users)
 
 
 def _process_show_projects(parsed_args):
     projects = Controller().get_projects(parsed_args.filter[0])
-    console.print_functions.print_projects(projects)
+    time_candle.console.print_functions.print_projects(projects)
 
 
 def _process_whoami():
     user = Controller().get_current_user()
-    console.print_functions.cow_print_user(user)
+    time_candle.console.print_functions.cow_print_user(user)
 
 
 def _process_change_project(parsed_args):
     Controller().change_project(parsed_args.id,
-                            parsed_args.title[0],
-                            parsed_args.description[0])
+                                parsed_args.title[0],
+                                parsed_args.description[0])
     print('project %s changed' % parsed_args.id)
 
 

@@ -1,8 +1,8 @@
-import storage.adapter_classes
-import storage.task_adapter
-import storage.user_adapter
-import storage.project_adapter
-from model import config_parser
+import time_candle.storage.adapter_classes
+import time_candle.storage.task_adapter
+import time_candle.storage.user_adapter
+import time_candle.storage.project_adapter
+from time_candle.model import config_parser
 
 
 """This is the module for basic model logic. It uses storage adapters for some
@@ -14,13 +14,13 @@ logical validation and to send requests to the database.
 class Logic:
 
     def __init__(self, db_file=None):
-        self.task_adapter = storage.task_adapter. \
+        self.task_adapter = time_candle.storage.task_adapter. \
             TaskAdapter(db_file)
 
-        self.project_adapter = storage.project_adapter. \
+        self.project_adapter = time_candle.storage.project_adapter. \
             ProjectAdapter(db_file)
 
-        self.user_adapter = storage.user_adapter. \
+        self.user_adapter = time_candle.storage.user_adapter. \
             UserAdapter(db_file)
 
         self._login()

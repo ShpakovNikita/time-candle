@@ -1,12 +1,12 @@
-from . import *
-from model.session_control import start_session
-from controller.commands import Controller
-from model.tokenizer import parse_string
-from model.model_logic.project_logic import ProjectLogic
-from model.model_logic.user_logic import UserLogic
-from model.model_logic.task_logic import TaskLogic
-import exceptions.show_me_exceptions as sm_e
-import exceptions.model_exceptions as m_e
+from time_candle.test_module import *
+from time_candle.model.session_control import start_session
+from time_candle.controller.commands import Controller
+from time_candle.model.tokenizer import parse_string
+from time_candle.model.model_logic.project_logic import ProjectLogic
+from time_candle.model.model_logic.user_logic import UserLogic
+from time_candle.model.model_logic.task_logic import TaskLogic
+import time_candle.exceptions.show_me_exceptions as sm_e
+import time_candle.exceptions.model_exceptions as m_e
 from unittest.mock import patch
 
 

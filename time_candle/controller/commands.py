@@ -1,13 +1,13 @@
-from model.model_logic.project_logic import ProjectLogic
-from model.model_logic.task_logic import TaskLogic
-from model.model_logic.user_logic import UserLogic
-import controller.validators as v
-import exceptions.validation_exceptions as v_e
-from model import logger
-from enums.status import key_status_dict
-from enums.priority import key_priority_dict
+from time_candle.model.model_logic.project_logic import ProjectLogic
+from time_candle.model.model_logic.task_logic import TaskLogic
+from time_candle.model.model_logic.user_logic import UserLogic
+import time_candle.controller.validators as v
+import time_candle.exceptions.validation_exceptions as v_e
+from time_candle.model import logger
+from time_candle.enums.status import key_status_dict
+from time_candle.enums.priority import key_priority_dict
 from copy import copy
-import model.time_formatter
+import time_candle.model.time_formatter
 """
 This is commands module. Commands from argparse and django will go to this 
 module and it will help to separate argparser from the model. In this module 
@@ -136,11 +136,12 @@ class Controller:
                 raise v_e.InvalidStatusError(v_e.StatusMessages.INVALID_STATUS)
 
         if time is not None:
-            time = model.time_formatter.get_milliseconds(time)
+            time = time_candle.model.time_formatter.get_milliseconds(time)
 
         # if period not is none we convert it to the milliseconds
         if period is not None:
-            period = model.time_formatter.days_to_milliseconds(period)
+            period = time_candle.model.time_formatter.\
+                days_to_milliseconds(period)
 
         v.check_comment(comment)
         v.check_title(title)
@@ -210,11 +211,16 @@ class Controller:
                 raise v_e.InvalidStatusError(v_e.StatusMessages.INVALID_STATUS)
 
         if time is not None:
-            time = model.time_formatter.get_milliseconds(time)
+            time = time_candle.model.time_formatter.get_milliseconds(time)
 
         v.check_comment(comment)
 
-        self.task_logic.change_task(tid, priority, status, time, comment, project)
+        self.task_logic.change_task(tid,
+                                    priority,
+                                    status,
+                                    time,
+                                    comment,
+                                    project)
 
     def change_project(self, pid, title, description):
         """

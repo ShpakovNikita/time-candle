@@ -1,4 +1,4 @@
-from model import logger
+from time_candle.model import logger
 
 
 class User:

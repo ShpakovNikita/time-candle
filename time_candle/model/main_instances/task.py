@@ -1,6 +1,6 @@
-from enums.priority import Priority
-from enums.status import Status
-from model import logger
+from time_candle.enums.priority import Priority
+from time_candle.enums.status import Status
+from time_candle.model import logger
 
 
 class Task:

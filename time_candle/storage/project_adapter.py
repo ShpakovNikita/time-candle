@@ -1,9 +1,9 @@
 from peewee import DoesNotExist, IntegrityError
-from storage.adapter_classes import Project, UserProjectRelation, Task
-from storage.adapter_classes import Filter as PrimaryFilter
-from storage.adapter_classes import Adapter as PrimaryAdapter
-import exceptions.db_exceptions as db_e
-from storage import logger
+from time_candle.storage.adapter_classes import Project, UserProjectRelation, Task
+from time_candle.storage.adapter_classes import Filter as PrimaryFilter
+from time_candle.storage.adapter_classes import Adapter as PrimaryAdapter
+import time_candle.exceptions.db_exceptions as db_e
+from time_candle.storage import logger
 
 
 class ProjectFilter(PrimaryFilter):

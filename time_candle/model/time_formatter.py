@@ -1,7 +1,7 @@
 import re
 from datetime import datetime, time
-import exceptions.model_exceptions
-from model import logger
+import time_candle.exceptions.model_exceptions as m_e
+from time_candle.model import logger
 """
 All date logic is placed in this module.
 """
@@ -99,14 +99,14 @@ def get_milliseconds(formatted_time):
         # Note that here we are subtracting 1970's to define them as lower point
         final_time = (date_time - epoch).total_seconds() * 1000 - error
         if final_time < 0:
-            raise exceptions.model_exceptions.\
+            raise m_e.\
                 InvalidArgumentFormat('date must be from 1970\'s')
 
         return int(final_time)
     except ValueError:
         logger.warning('the date must be ' + date_format)
         msg = "Not a valid date: '{0}'.".format(formatted_time)
-        raise exceptions.model_exceptions.InvalidArgumentFormat(msg)
+        raise m_e.InvalidArgumentFormat(msg)
 
 
 def _time_get_formatted(formatted_time):
@@ -129,7 +129,7 @@ def _time_get_formatted(formatted_time):
     else:
         logger.warning('the date must be %Y-%m-%d or %Y-%m-%d %H:%M:%S')
         msg = "Not a valid date: '{0}'.".format(formatted_time)
-        raise exceptions.model_exceptions.InvalidArgumentFormat(msg)
+        raise m_e.InvalidArgumentFormat(msg)
 
 
 def get_datetime(milliseconds_time):

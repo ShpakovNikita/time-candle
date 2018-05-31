@@ -1,7 +1,7 @@
 from peewee import *
-import exceptions.db_exceptions as db_e
+import time_candle.exceptions.db_exceptions as db_e
 import os
-from storage import logger
+from time_candle.storage import logger
 
 
 db_filename = 'data.db'

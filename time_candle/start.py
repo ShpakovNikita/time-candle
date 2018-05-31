@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from console import commands_parser
-import app_logger
+from time_candle.console import commands_parser
+import time_candle.app_logger
 
 
 def main():

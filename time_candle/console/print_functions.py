@@ -1,6 +1,6 @@
-from enums.priority import priority_dict
-from enums.status import status_dict
-import model.time_formatter
+from time_candle.enums.priority import priority_dict
+from time_candle.enums.status import status_dict
+import time_candle.model.time_formatter
 import os
 
 
@@ -11,12 +11,13 @@ def print_tasks(tasks):
 
 def print_task(task):
     if task.deadline is not None:
-        deadline_time = model.time_formatter.get_datetime(task.deadline)
+        deadline_time = time_candle.model.time_formatter.\
+            get_datetime(task.deadline)
     else:
         deadline_time = 'unlimited'
 
     if task.realization_time is not None:
-        realization_time = model.\
+        realization_time = time_candle.model.\
             time_formatter.get_datetime(task.realization_time)
     else:
         realization_time = 'undone'
@@ -28,7 +29,8 @@ def print_task(task):
           'creation time: {}, \t priority: {}, \t project id: {}, \t tid: {}'.
           format(task.title, task.creator_uid, task.uid, task.period,
                  deadline_time, status_dict[task.status], realization_time,
-                 model.time_formatter.milliseconds_to_string(task.creation_time)
+                 time_candle.model.time_formatter.
+                 milliseconds_to_string(task.creation_time)
                  , priority_dict[task.priority], task.pid, task.tid))
 
 

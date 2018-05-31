@@ -1,4 +1,4 @@
-from . import *
+from time_candle.test_module import *
 
 
 class TestTaskAdapter(unittest.TestCase):

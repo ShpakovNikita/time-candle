@@ -1,12 +1,13 @@
 import configparser
-import app_logger
-import exceptions.model_exceptions
-import storage.user_adapter
-from model.main_instances.user import User
-import exceptions.db_exceptions as db_e
+import time_candle.app_logger
+import time_candle.exceptions.model_exceptions as m_e
+import time_candle.storage.user_adapter
+from time_candle.model.main_instances.user import User
+import time_candle.exceptions.db_exceptions as db_e
+from time_candle.model import logger
+
 
 CONFIG_NAME = 'config.ini'
-logger = app_logger.custom_logger('model')
 
 
 def run_config():
@@ -38,7 +39,7 @@ def run_config():
                                              'about': '',
                                              'mail': None})
         try:
-            config_dict['user'] = storage.user_adapter.UserAdapter.login_user(
+            config_dict['user'] = time_candle.storage.user_adapter.UserAdapter.login_user(
                 login, password)
 
         except db_e.InvalidPasswordError:
@@ -51,9 +52,9 @@ def run_config():
         return config_dict
 
     except KeyError:
-        raise exceptions.model_exceptions.InvalidLoginException
+        raise m_e.InvalidLoginException
 
-    except exceptions.model_exceptions.InvalidLoginException:
+    except m_e.InvalidLoginException:
         config_dict['user'] = User()
         logger.debug('user is invalid. Logging as guest')
 

@@ -1,5 +1,5 @@
 import sys
-from exceptions import custom_excepthook
+from time_candle.exceptions import custom_excepthook
 
 
 def start_session(dev_opt='dev'):
