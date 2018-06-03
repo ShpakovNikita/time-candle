@@ -6,21 +6,21 @@ from . import Logic
 
 class ProjectLogic(Logic):
 
-    def __init__(self, db_name=None):
-        super().__init__(db_name)
+    def __init__(self, db_name=None, uid=None):
+        super().__init__(db_name, uid)
 
-    def add_user_to_project(self, login, pid):
+    def add_user_to_project(self, uid, pid):
         # add user to the project
-        self.user_adapter.add_user_to_project_by_id(login, pid)
+        self.project_adapter.add_user_to_project_by_id(uid, pid)
 
-    def remove_user_from_project(self, login, pid):
+    def remove_user_from_project(self, uid, pid):
         # remove user from project
-        self.user_adapter.remove_from_project_by_login(login, pid)
+        self.project_adapter.remove_from_project_by_id(uid, pid)
 
     def add_project(self, title, description, members):
         # add project to the database
         project = ProjectInstance(self.project_adapter.last_id() + 1,
-                                  self.user.uid,
+                                  self.uid,
                                   title,
                                   description)
 
@@ -29,8 +29,8 @@ class ProjectLogic(Logic):
         # if we cannot add one member from list, we delete project and it's
         # relations
         try:
-            for login in members:
-                self.add_user_to_project(login, project.pid)
+            for uid_p in members:
+                self.add_user_to_project(uid_p, project.pid)
 
         except db_e.InvalidLoginError:
             self.project_adapter.remove_project_by_id(project.pid)
@@ -57,3 +57,7 @@ class ProjectLogic(Logic):
         fil = ProjectFilter().title_substring(substr)
         projects = self.project_adapter.get_by_filter(fil)
         return [ProjectInstance.make_project(project) for project in projects]
+
+    def get_users(self, pid):
+        # get users id
+        return self.project_adapter.get_users_by_project(pid)

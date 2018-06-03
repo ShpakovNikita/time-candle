@@ -5,7 +5,6 @@ from time_candle.storage import logger
 
 
 db_filename = 'data.db'
-new_db_flag = not os.path.exists(db_filename)
 _db_proxy = Proxy()
 
 
@@ -73,41 +72,21 @@ class BaseModel(Model):
         database = _db_proxy
 
 
-class User(BaseModel):
-    uid = PrimaryKeyField()
-
-    # user fields
-    # for UserModel's own_tasks we have a relation field in Task class from
-    # storage.task_adapter
-
-    # projects [] -> see the UserProjectRelation table
-    login = CharField(unique=True)
-
-    # settings field
-    password = CharField()
-    mail = CharField(null=True)
-    nickname = CharField(default='')
-
-    # time_zone will be saved in the form of shift in milliseconds
-    # time_zone = IntegerField(default=0)
-    about = CharField(default='')
-
-
 class Project(BaseModel):
     pid = PrimaryKeyField()
 
     title = CharField()
-    admin = ForeignKeyField(User, related_name='admin')
+    admin = IntegerField()
     description = TextField()
 
 
 class Task(BaseModel):
     tid = PrimaryKeyField()
 
-    creator = ForeignKeyField(User, related_name='creator')
+    creator = IntegerField()
 
     # if the task is not project task this field equals to the creator field
-    receiver = ForeignKeyField(User, related_name='receiver')
+    receiver = IntegerField()
 
     # if the task is not project task this field equals null
     project = ForeignKeyField(Project, related_name='project', null=True)
@@ -117,7 +96,7 @@ class Task(BaseModel):
     title = CharField()
     priority = SmallIntegerField()
 
-    # Time in milliseconds. Nullable for further functionality TODO:
+    # Time in milliseconds. Nullable for further functionality
     deadline_time = BigIntegerField(null=True)
     realization_time = BigIntegerField(null=True, default=None)
     creation_time = BigIntegerField()
@@ -138,16 +117,12 @@ class UserProjectRelation(BaseModel):
     project have.
     """
 
-    user = ForeignKeyField(User, related_name='user')
+    user = IntegerField()
     project = ForeignKeyField(Project, related_name='project')
 
 
 # Maybe it is wise to create another relations table with the time rules and etc
 # but for not we have only deadline time. So simple.
-
-# TODO: chat task relations table witch maybe messages
-# TODO: role tags relations?
-
 
 class Adapter:
 
@@ -174,7 +149,6 @@ class Adapter:
 
     @staticmethod
     def _create_database():
-        User.create_table()
         Project.create_table()
         UserProjectRelation.create_table()
         Task.create_table()

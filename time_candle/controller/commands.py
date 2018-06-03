@@ -1,12 +1,10 @@
 from time_candle.model.logic.project import ProjectLogic
 from time_candle.model.logic.task import TaskLogic
-from time_candle.model.logic.user import UserLogic
 import time_candle.controller.validators as v
 import time_candle.exceptions.validation_exceptions as v_e
 from time_candle.model import logger
 from time_candle.enums.status import key_status_dict
 from time_candle.enums.priority import key_priority_dict
-from copy import copy
 import time_candle.model.time_formatter
 """
 This is commands module. Commands from argparse and django will go to this 
@@ -18,7 +16,7 @@ Note, that we have to login anytime firstly before the actions from the user
 
 class Controller:
 
-    def __init__(self, mode='dev', db_file=None):
+    def __init__(self, mode='dev', db_file=None, uid=None):
         import sys
         from time_candle.exceptions import custom_excepthook
 
@@ -29,48 +27,8 @@ class Controller:
         else:
             raise ValueError('mode option is wrong!')
 
-        self.user_logic = UserLogic(db_file)
-        self.task_logic = TaskLogic(db_file)
-        self.project_logic = ProjectLogic(db_file)
-
-    def log_in(self, login, password):
-        """
-        This function writes current user to the config.ini
-        :type login: String
-        :type password: String
-        :return: Bool
-        """
-        return self.user_logic.log_in(login, password)
-
-    def add_user(self,
-                 login,
-                 password,
-                 mail=None,
-                 nickname=None,
-                 about=''):
-        """
-        This function adds user to the database, if there is no users with given
-        login
-        :type login: String
-        :type password: String
-        :type mail: String
-        :type nickname: String
-        :type about: String
-        :return: None
-        """
-        if mail is not None:
-            v.check_mail(mail)
-
-        if nickname is None:
-            nickname = login
-
-        if not about:
-            about = 'Hello, it\'s me, ' + nickname
-
-        v.check_login(login)
-        v.check_name(nickname)
-        v.check_password(password)
-        self.user_logic.add_user(login, password, nickname, about, mail)
+        self.task_logic = TaskLogic(db_file, uid)
+        self.project_logic = ProjectLogic(db_file, uid)
 
     def add_user_to_project(self, login, pid):
         """
@@ -101,29 +59,29 @@ class Controller:
                  parent_id,
                  comment,
                  pid,
-                 receiver_login,
+                 receiver_uid,
                  period):
         """
         This function will add passed task to the database, with the creator and
         executor that named in the config.ini (i.e current logged user)
         :param pid: Project's id
-        :param receiver_login: User's login
+        :param receiver_uid: User's login
         :param comment: Task's comment for some detailed explanation
         :param parent_id: Parent's task id
         :param time: Time in following format: YYYY-MM-DD HH:MM:SS
         :param title: Task's title
         :param priority: Task's priority (enum from Priority)
         :param status: Task's status (enum from Status)
-        :param period: Task's period in hours TODO:some format?
+        :param period: Task's period in hours
         :type pid: Int
-        :type receiver_login: String
+        :type receiver_uid: String
         :type comment: String
         :type parent_id: Int
         :type time: String
         :type title: String
         :type priority: Int
         :type status: Int
-        :type period: String TODO: string?
+        :type period: String
         :return: None
         """
         if priority is None:
@@ -163,7 +121,7 @@ class Controller:
                                  parent_id,
                                  comment,
                                  pid,
-                                 receiver_login,
+                                 receiver_uid,
                                  period)
 
     def remove_task(self, tid):
@@ -244,35 +202,6 @@ class Controller:
         v.check_title(title)
         self.project_logic.change_project(pid, title, description)
 
-    def get_tasks(self, fil):
-        """
-        This function returns specific tasks that was taken from the database from
-        your available tasks by the filter.
-        :param fil: Filter with specific syntax
-        :type fil: String
-        :return: list of TaskInstance
-        """
-        return self.task_logic.get_tasks(fil)
-
-    def get_users(self, substr, pid=None):
-        """
-        This function returns found users.
-        :param substr: Filter for nickname search
-        :param pid: Project's id in where to search users
-        :type substr: String
-        :type pid: Int
-        :return: list of UserInstance
-        """
-        return self.user_logic.get_users(substr, pid)
-
-    def get_current_user(self):
-        """
-        This function returns current user.
-        :return: UserInstance
-        """
-        user = self.user_logic.user
-        return copy(user)
-
     def get_projects(self, substr):
         """
         This function returns found projects for your user.
@@ -282,9 +211,21 @@ class Controller:
         """
         return self.project_logic.get_projects(substr)
 
-    def logout(self):
+    def get_users(self, pid):
         """
-        This function logging out current user.
-        :return: None
+        This function returns list of id of users in the chosen project
+        :param pid: Project's id
+        :type pid: Int
+        :return: List of integers
         """
-        self.user_logic.logout()
+        return self.project_logic.get_users(pid)
+
+    def get_tasks(self, fil):
+        """
+        This function returns specific tasks that was taken from the database
+        from your available tasks by the filter.
+        :param fil: Filter with specific syntax
+        :type fil: String
+        :return: list of TaskInstance
+        """
+        return self.task_logic.get_tasks(fil)

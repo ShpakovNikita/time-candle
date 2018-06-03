@@ -1,9 +1,9 @@
 import configparser
-import time_candle.app_logger
 import time_candle.exceptions.model_exceptions as m_e
-import time_candle.storage.user_adapter
-from time_candle.model.instances.user import User
+from time_candle.module_app.user import User
+from time_candle.module_app.user_adapter import UserAdapter
 import time_candle.exceptions.db_exceptions as db_e
+import os
 
 
 CONFIG_NAME = 'config.ini'
@@ -36,8 +36,7 @@ def run_config():
                                              'about': '',
                                              'mail': None})
         try:
-            config_dict['user'] = time_candle.storage.user_adapter.UserAdapter.\
-                login_user(login, password)
+            config_dict['user'] = UserAdapter.login_user(login, password)
 
         except db_e.InvalidPasswordError:
             config_dict['user'] = user_field()
@@ -56,18 +55,24 @@ def run_config():
 
 
 def write_config(user):
-    # TODO: Check if user is in database and password is correct
     config = configparser.ConfigParser()
     config['user'] = user.login
     config['password'] = user.password
 
 
-def write_user(login, password):
+def write_user(login, password, new=False):
     config = configparser.ConfigParser()
-    config.read(CONFIG_NAME)
+    if not new:
+        config.read(CONFIG_NAME)
+    else:
+        config['user'] = {'name': '', 'password': ''}
 
     config['user']['name'] = login
     config['user']['password'] = password
 
     with open(CONFIG_NAME, 'w') as configfile:
         config.write(configfile)
+
+
+if not os.path.exists(CONFIG_NAME):
+    write_user('', '', True)

@@ -163,6 +163,110 @@ class ProjectAdapter(PrimaryAdapter):
             raise db_e.InvalidLoginError(
                 db_e.ProjectMessages.DO_NOT_HAVE_RIGHTS)
 
+    def add_user_to_project_by_id(self, uid, pid):
+        """
+        This function adds user to the Project relationship table to make user a
+        member of the project, if both exists.
+        :param uid: User's id
+        :param pid: Project's id
+        :return: None
+        """
+        try:
+            # we get task where current user is admin and where project id is
+            # matching
+            project = Project.select(). \
+                where((self.uid == Project.admin) &
+                      (Project.pid == pid)).get()
+            logger.debug('such project exists')
+
+        except DoesNotExist:
+            raise db_e.InvalidPidError(
+                db_e.ProjectMessages.DO_NOT_HAVE_RIGHTS)
+
+        # NOTE: due to we don't have access to the users db, we BELIEVE, that
+        # user exists in the database (you should check that on the auth level)
+
+        try:
+            # and now we are checking if selected user already in the project.
+            # If the exception DoesNotExist was not raised, that means that user
+            # already in project and it's bad
+            UserProjectRelation.select(). \
+                where((UserProjectRelation.project == pid) &
+                      (UserProjectRelation.user == uid)).get()
+
+            logger.debug('such relation exists')
+            raise db_e.InvalidLoginError(
+                db_e.ProjectMessages.USER_ALREADY_EXISTS)
+        except DoesNotExist:
+            logger.debug('such user is not in project')
+
+            UserProjectRelation.create(user=uid, project=project)
+
+        logger.info('user_project relation created')
+
+    def remove_from_project_by_id(self, uid, pid):
+        """
+        This function removes user from the project by it's id
+        :param pid: Project's id
+        :param uid: User's id
+        :return: None
+        """
+        try:
+            # we get task where current user is admin and where project id is
+            # matching
+            Project.select().where(
+                (self.uid == Project.admin) & (Project.pid == pid)).get()
+            logger.debug('such project exists')
+            # if an admin tries to delete himself we deny it
+            if uid == self.uid:
+                raise db_e.InvalidPidError(
+                    db_e.ProjectMessages.DO_NOT_HAVE_RIGHTS)
+
+        except DoesNotExist:
+            # not admin can try to delete himself
+            if uid != self.uid:
+                raise db_e.InvalidPidError(
+                    db_e.ProjectMessages.DO_NOT_HAVE_RIGHTS)
+
+        # now we try to find and delete user
+        rows = UserProjectRelation.delete().where(
+            (UserProjectRelation.project == pid) &
+            (UserProjectRelation.user == uid)).\
+            execute()
+
+        if rows == 0:
+            raise db_e.InvalidUidError(db_e.LoginMessages.NO_USER_TO_DELETE)
+
+    # TODO: maybe add function get_id_by_login to change all login on uid
+    @staticmethod
+    def is_user_in_project(uid, pid):
+        """
+        This function checks if passed user exists in the selected project
+        :param uid: User's id
+        :param pid: Project's id
+        :return: Bool
+        """
+        logger.debug('the uid is %s' % uid)
+
+        try:
+            UserProjectRelation.select(). \
+                where((UserProjectRelation.project == pid) &
+                      (UserProjectRelation.user == uid)).get()
+
+            logger.debug('user exists in project')
+            return True
+
+        except DoesNotExist:
+            raise db_e.InvalidPidError(db_e.LoginMessages.USER_DOES_NOT_EXISTS)
+
+    def get_users_by_project(self, pid):
+        self.is_user_in_project(self.uid, pid)
+
+        query = UserProjectRelation.select().\
+            where(UserProjectRelation.project == pid)
+
+        return [q.user for q in query]
+
     def remove_project_by_id(self, pid):
         """
         This function removes project from id snd clears all relations between

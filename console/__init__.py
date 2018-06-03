@@ -3,3 +3,7 @@ messages, other gotten information, and make requests to the model from the
 console.
 
 """
+import time_candle.app_logger
+
+
+logger = time_candle.app_logger.custom_logger('console')

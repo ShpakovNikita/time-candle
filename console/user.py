@@ -1,4 +1,4 @@
-from time_candle.model import logger
+from time_candle.module_app import logger
 
 
 class User:
@@ -49,3 +49,4 @@ class User:
                    mail=obj.mail)
 
         return user
+

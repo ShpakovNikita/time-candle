@@ -49,8 +49,8 @@ class Task:
         """
         This function converts some data type to task
         :type obj: type with fields:
-        - other obj receiver with uid
-        - other obj creator with uid
+        - receiver uid
+        - creator uid
         - other obj project with pid
         - tid
         - deadline_time
@@ -75,8 +75,8 @@ class Task:
         else:
             project_id = obj.project.pid
 
-        task = cls(obj.receiver.uid,
-                   obj.creator.uid,
+        task = cls(obj.receiver,
+                   obj.creator,
                    obj.tid,
                    obj.deadline_time,
                    obj.title,

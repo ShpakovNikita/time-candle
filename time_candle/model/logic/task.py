@@ -9,11 +9,11 @@ from . import Logic
 
 class TaskLogic(Logic):
 
-    def __init__(self, db_name=None):
-        super().__init__(db_name)
+    def __init__(self, db_name=None, uid=None):
+        super().__init__(db_name, uid)
 
     def add_task(self, title, priority, status, deadline_time,
-                 parent_id, comment, pid, login, period):
+                 parent_id, comment, pid, uid, period):
         # add task to the database
 
         # This code is also checking is our parent tid exists in the database
@@ -29,21 +29,21 @@ class TaskLogic(Logic):
         logger.debug('time in milliseconds %s' % deadline_time)
 
         # Check for rights and id's
-        if login is None:
-            task_uid = self.user.uid
+        if uid is None:
+            task_uid = self.uid
         else:
-            self.user_adapter.is_user_in_project(login, pid)
-            task_uid = self.user_adapter.get_id_by_login(login)
+            self.project_adapter.is_user_in_project(uid, pid)
+            task_uid = uid
 
         # check that if we are in the project that we has proper rights
         if pid is not None:
             logger.debug('pid is not none')
-            if task_uid != self.user.uid:
+            if task_uid != self.uid:
                 logger.debug('the receiver is not us')
                 self.project_adapter.has_rights(pid)
             else:
                 logger.debug('we are the receiver')
-                self.user_adapter.is_user_in_project(self.user.login, pid)
+                self.project_adapter.is_user_in_project(self.uid, pid)
 
         # if deadline is not none
         if deadline_time is not None:
@@ -69,7 +69,7 @@ class TaskLogic(Logic):
             realization_time = None
 
         task = TaskInstance(uid=task_uid,
-                            creator_uid=self.user.uid,
+                            creator_uid=self.uid,
                             tid=self.task_adapter.last_id() + 1,
                             deadline=deadline_time,
                             title=title,
