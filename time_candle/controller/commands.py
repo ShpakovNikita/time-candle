@@ -228,4 +228,7 @@ class Controller:
         :type fil: String
         :return: list of TaskInstance
         """
+        print('++++++++++++++++++++++++++\n'
+              '++++++++++++++++++++++++++\n'
+              '++++++++++++++++++++++++++\n', self.task_logic.get_tasks, self.task_logic, fil)
         return self.task_logic.get_tasks(fil)

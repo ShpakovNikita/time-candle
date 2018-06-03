@@ -141,7 +141,6 @@ class TaskFilter(PrimaryFilter):
             self.result.append(Task.priority > priority)
 
         elif TaskFilter.OP_GREATER_OR_EQUALS == storage_op:
-            print(priority)
             self.result.append(Task.priority >= priority)
 
         elif TaskFilter.OP_EQUALS == storage_op:
@@ -355,7 +354,6 @@ class TaskAdapter(PrimaryAdapter):
         query_projects = UserProjectRelation. \
             select().where(UserProjectRelation.user == self.uid)
         projects = [rel.project.pid for rel in query_projects]
-
         query = Task.select().where((Task.project << projects) |
                                     (Task.creator == self.uid))
         return query

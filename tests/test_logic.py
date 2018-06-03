@@ -12,18 +12,15 @@ class TestTaskLogic(unittest.TestCase):
     # Note that we also testing our tokenizer
 
     def _change_user(self, uid):
-        self.controller.task_logic._auth(_USERS[uid - 1])
-        self.controller.user_logic._auth(_USERS[uid - 1])
-        self.controller.project_logic._auth(_USERS[uid - 1])
+        self.controller.task_logic._auth(_USERS[uid - 1].uid)
+        self.controller.project_logic._auth(_USERS[uid - 1].uid)
 
     def setUp(self):
         self.controller = Controller(mode='dev', db_file=db_file)
 
         _init_project_table()
-        _init_user_table()
 
     def tearDown(self):
-        User.delete().execute()
         Task.delete().execute()
         Project.delete().execute()
         UserProjectRelation.delete().execute()

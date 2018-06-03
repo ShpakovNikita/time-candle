@@ -237,7 +237,6 @@ class ProjectAdapter(PrimaryAdapter):
         if rows == 0:
             raise db_e.InvalidUidError(db_e.LoginMessages.NO_USER_TO_DELETE)
 
-    # TODO: maybe add function get_id_by_login to change all login on uid
     @staticmethod
     def is_user_in_project(uid, pid):
         """

@@ -141,7 +141,7 @@ class TaskLogic(Logic):
         task_instances = [TaskInstance.make_task(task) for task in tasks]
         for task in task_instances:
             self._update(task)
-        # TODO: update query
+
         return task_instances
 
     def _update(self, task):

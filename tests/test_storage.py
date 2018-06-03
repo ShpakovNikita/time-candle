@@ -6,10 +6,8 @@ class TestTaskAdapter(unittest.TestCase):
     def setUp(self):
         self.adapter = TaskAdapter(db_name=db_file)
         _init_project_table()
-        _init_user_table()
 
     def tearDown(self):
-        User.delete().execute()
         Task.delete().execute()
         Project.delete().execute()
         UserProjectRelation.delete().execute()
@@ -156,6 +154,155 @@ class TestTaskAdapter(unittest.TestCase):
         self.adapter.remove_task_by_id(25)
 
 
+class TestProjectAdapter(unittest.TestCase):
+    def setUp(self):
+        self.adapter = ProjectAdapter(db_name=db_file)
+        _init_task_table()
+        _init_project_tasks_table()
+
+    def tearDown(self):
+        Task.delete().execute()
+        Project.delete().execute()
+        UserProjectRelation.delete().execute()
+
+    def test_get_save_project(self):
+        # trying to add project with None admin.
+        with self.assertRaises(db_e.InvalidLoginError):
+            project = copy(_PROJECTS[0])
+            project.admin_uid = self.adapter.uid
+            self.adapter.save(project)
+
+        # check that there is no projects in database
+        self.assertEqual(self.adapter.last_id(), 0)
+
+        self.adapter.uid = 1
+        self.adapter.save(_PROJECTS[0])
+        self.assertEqual(self.adapter.last_id(), 1)
+
+        # check that project was updated
+        project = copy(_PROJECTS[0])
+        project.description = 'new_desc'
+        self.adapter.save(project)
+        self.assertEqual(self.adapter.last_id(), 1)
+
+        self.assertEqual(self.adapter.get_project_by_id(_PROJECTS[0].pid).
+                         description, project.description)
+
+        # check if we can remove project
+        self.adapter.remove_project_by_id(_PROJECTS[0].pid)
+
+        self.assertEqual(self.adapter.last_id(), 0)
+
+        # check on correct addition to the db after all
+        self.adapter.save(_PROJECTS[0])
+        self.adapter.save(_PROJECTS[1])
+        self.assertEqual(self.adapter.last_id(), 2)
+
+        self.adapter.uid = 2
+        # check that we cannot delete project if we are not admins
+        with self.assertRaises(db_e.InvalidLoginError):
+            self.adapter.remove_project_by_id(_PROJECTS[0].pid)
+
+        # check on the right message if we delete unexistent project
+        with self.assertRaises(db_e.InvalidPidError):
+            self.adapter.remove_project_by_id(100)
+
+    def test_remove_task_project(self):
+        _init_project_table()
+
+        self.adapter.uid = 1
+        self.adapter.remove_project_by_id(_PROJECTS[0].pid)
+
+        # check that all tasks was removed
+        tasks = [project_task.tid for project_task in _PROJECT_TASKS
+                 if project_task.pid == _PROJECTS[0].pid]
+
+        for task in Task.select().where(Task.tid.is_null(False)):
+            self.assertNotIn(task.tid, tasks)
+
+        # check just for sure that we do not deleted some other task
+        Task.select().where(Task.tid == 20).get()
+
+        # check that all relations between _PROJECT[0] was removed
+        with self.assertRaises(db_e.InvalidPidError):
+            self.adapter.get_project_by_id(_PROJECTS[0].pid)
+
+        for rel in UserProjectRelation.select().where(
+                UserProjectRelation.project.is_null(False)):
+            self.assertNotEqual(rel.project.pid, _PROJECTS[0].pid)
+
+    def test_get_by_filter(self):
+        _init_project_table()
+
+        self.adapter.uid = 1
+        # let's test search filters
+        self.assertEqual(len(self.adapter.get_by_filter(
+            ProjectFilter().description_substring(r'u'))), 2)
+        self.assertEqual(len(self.adapter.get_by_filter(
+            ProjectFilter().description_substring(r'Huh'))), 1)
+
+        self.adapter.uid = None
+        # test union filter
+        self.assertEqual(len(self.adapter.get_by_filter(ProjectFilter())), 0)
+
+        self.adapter.uid = 1
+        self.assertEqual(len(self.adapter.get_by_filter(ProjectFilter())), 3)
+
+        res_1, res_2 = 2, 3
+        # analogue to the union
+        fil_1 = ProjectFilter().admin(1)
+        self.assertEqual(len(self.adapter.get_by_filter(fil_1)), res_1)
+
+        fil_2 = ProjectFilter().description_substring(r'u'). \
+            description_substring(r'iii', PrimaryFilter.OP_OR)
+        self.assertEqual(len(self.adapter.get_by_filter(fil_2)), res_2)
+
+        self.assertEqual(len(self.adapter.get_by_filter(fil_1 | fil_2)), 3)
+
+        projects = self.adapter.get_by_filter(fil_1 & fil_2)
+        self.assertEqual(len(projects), 2)
+
+        # now we check the truth of the gotten values
+        for project in projects:
+            self.assertIn(project.pid, [1, 2])
+
+    def test_in_remove_from_project(self):
+        _init_project_table()
+
+        self.adapter.is_user_in_project(_USERS[0].uid, 3)
+
+        # if the user is not in project
+        with self.assertRaises(db_e.InvalidPidError):
+            self.adapter.is_user_in_project(_USERS[0].uid, 4)
+
+        # if the pid is invalid...
+        with self.assertRaises(db_e.InvalidPidError):
+            self.adapter.is_user_in_project(_USERS[0].uid, 10)
+
+        self.adapter.uid = 2
+
+        self.adapter.remove_from_project_by_id(_USERS[0].uid, 3)
+
+        # remove removed user in project
+        with self.assertRaises(db_e.InvalidUidError):
+            self.adapter.remove_from_project_by_id(_USERS[0].uid, 3)
+
+        # remove admin from the project with no rights
+        with self.assertRaises(db_e.InvalidPidError):
+            self.adapter.remove_from_project_by_id(_USERS[0].uid, 2)
+
+        self.adapter.uid = 1
+
+        # remove admin from the project with rights
+        with self.assertRaises(db_e.InvalidPidError):
+            self.adapter.remove_from_project_by_id(_USERS[0].uid, 2)
+
+        # try to remove myself when I'm not admin
+        self.adapter.uid = 2
+        self.adapter.remove_from_project_by_id(_USERS[1].uid, 1)
+
+
+"""
 class TestUserAdapter(unittest.TestCase):
     def setUp(self):
         self.adapter = UserAdapter(db_name=db_file)
@@ -330,118 +477,4 @@ class TestUserAdapter(unittest.TestCase):
         # try to remove myself when I'm not admin
         self.adapter.uid = 2
         self.adapter.remove_from_project_by_login(_USERS[1].login, 1)
-
-
-class TestProjectAdapter(unittest.TestCase):
-    def setUp(self):
-        self.adapter = ProjectAdapter(db_name=db_file)
-        _init_task_table()
-        _init_project_tasks_table()
-        _init_user_table()
-
-    def tearDown(self):
-        User.delete().execute()
-        Task.delete().execute()
-        Project.delete().execute()
-        UserProjectRelation.delete().execute()
-
-    def test_get_save_project(self):
-        # trying to add project with None admin.
-        with self.assertRaises(db_e.InvalidLoginError):
-            project = copy(_PROJECTS[0])
-            project.admin_uid = self.adapter.uid
-            self.adapter.save(project)
-
-        # check that there is no projects in database
-        self.assertEqual(self.adapter.last_id(), 0)
-
-        self.adapter.uid = 1
-        self.adapter.save(_PROJECTS[0])
-        self.assertEqual(self.adapter.last_id(), 1)
-
-        # check that project was updated
-        project = copy(_PROJECTS[0])
-        project.description = 'new_desc'
-        self.adapter.save(project)
-        self.assertEqual(self.adapter.last_id(), 1)
-
-        self.assertEqual(self.adapter.get_project_by_id(_PROJECTS[0].pid).
-                         description, project.description)
-
-        # check if we can remove project
-        self.adapter.remove_project_by_id(_PROJECTS[0].pid)
-
-        self.assertEqual(self.adapter.last_id(), 0)
-
-        # check on correct addition to the db after all
-        self.adapter.save(_PROJECTS[0])
-        self.adapter.save(_PROJECTS[1])
-        self.assertEqual(self.adapter.last_id(), 2)
-
-        self.adapter.uid = 2
-        # check that we cannot delete project if we are not admins
-        with self.assertRaises(db_e.InvalidLoginError):
-            self.adapter.remove_project_by_id(_PROJECTS[0].pid)
-
-        # check on the right message if we delete unexistent project
-        with self.assertRaises(db_e.InvalidPidError):
-            self.adapter.remove_project_by_id(100)
-
-    def test_remove_task_project(self):
-        _init_project_table()
-
-        self.adapter.uid = 1
-        self.adapter.remove_project_by_id(_PROJECTS[0].pid)
-
-        # check that all tasks was removed
-        tasks = [project_task.tid for project_task in _PROJECT_TASKS
-                 if project_task.pid == _PROJECTS[0].pid]
-
-        for task in Task.select().where(Task.tid.is_null(False)):
-            self.assertNotIn(task.tid, tasks)
-
-        # check just for sure that we do not deleted some other task
-        Task.select().where(Task.tid == 20).get()
-
-        # check that all relations between _PROJECT[0] was removed
-        with self.assertRaises(db_e.InvalidPidError):
-            self.adapter.get_project_by_id(_PROJECTS[0].pid)
-
-        for rel in UserProjectRelation.select().where(
-                UserProjectRelation.project.is_null(False)):
-            self.assertNotEqual(rel.project.pid, _PROJECTS[0].pid)
-
-    def test_get_by_filter(self):
-        _init_project_table()
-
-        self.adapter.uid = 1
-        # let's test search filters
-        self.assertEqual(len(self.adapter.get_by_filter(
-            ProjectFilter().description_substring(r'u'))), 2)
-        self.assertEqual(len(self.adapter.get_by_filter(
-            ProjectFilter().description_substring(r'Huh'))), 1)
-
-        self.adapter.uid = None
-        # test union filter
-        self.assertEqual(len(self.adapter.get_by_filter(ProjectFilter())), 0)
-
-        self.adapter.uid = 1
-        self.assertEqual(len(self.adapter.get_by_filter(ProjectFilter())), 3)
-
-        res_1, res_2 = 2, 3
-        # analogue to the union
-        fil_1 = ProjectFilter().admin(1)
-        self.assertEqual(len(self.adapter.get_by_filter(fil_1)), res_1)
-
-        fil_2 = ProjectFilter().description_substring(r'u'). \
-            description_substring(r'iii', PrimaryFilter.OP_OR)
-        self.assertEqual(len(self.adapter.get_by_filter(fil_2)), res_2)
-
-        self.assertEqual(len(self.adapter.get_by_filter(fil_1 | fil_2)), 3)
-
-        projects = self.adapter.get_by_filter(fil_1 & fil_2)
-        self.assertEqual(len(projects), 2)
-
-        # now we check the truth of the gotten values
-        for project in projects:
-            self.assertIn(project.pid, [1, 2])
+"""

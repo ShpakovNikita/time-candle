@@ -25,7 +25,7 @@ class Project:
         This function converts some data type to project
         :type obj: type with fields:
         - pid
-        - other obj admin with pid
+        - admin uid
         - title
         - description
         :return: Project
@@ -33,7 +33,7 @@ class Project:
         logger.debug('convert storage to model project')
 
         project = cls(obj.pid,
-                      obj.admin.uid,
+                      obj.admin,
                       obj.title,
                       obj.description)
 
