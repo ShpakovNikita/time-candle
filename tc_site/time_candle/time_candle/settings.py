@@ -21,14 +21,21 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$2z08@&k8^_vme__i=e-cw)fqp6bb_xjjexl+c^kgn$lyst@93'
 
+# During development only
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+
+LOGIN_REDIRECT_URL = '/polls/'
 
 # Application definition
 
 INSTALLED_APPS = [
+    'material',
+    'material.frontend',
     'polls.apps.PollsConfig',
     'django.contrib.admin',
     'django.contrib.auth',

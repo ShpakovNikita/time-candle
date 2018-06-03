@@ -1,4 +1,4 @@
-from time_candle.storage.adapter_classes import Task, User, UserProjectRelation
+from time_candle.storage.adapter_classes import Task, UserProjectRelation
 from time_candle.storage.adapter_classes import Filter as PrimaryFilter
 from time_candle.storage.adapter_classes import Adapter as PrimaryAdapter
 from time_candle.storage import logger
@@ -256,9 +256,7 @@ class TaskAdapter(PrimaryAdapter):
         # in this query we get all available tasks (our personal tasks and all
         # tasks our in projects)
         query = self._get_available_tasks().select(). \
-            join(User, on=((Task.creator == User.uid) |
-                           (Task.receiver == User.uid))). \
-            where(filter_instance.to_query()).group_by(Task)
+            where(filter_instance.to_query())
 
         # return converted query to the outer module
         result = [task for task in query]
