@@ -2,6 +2,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader
 from django.shortcuts import render
 from django.urls import reverse
+from time_candle.controller.commands import Controller
 
 from .models import Question, Choice, DoesNotExist
 
@@ -12,7 +13,7 @@ def err404(request, exception):
 
 
 def index(request):
-    latest_question_list = Question.select()[:5]
+    latest_question_list = Controller(uid=request.user.id, db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').get_tasks('')[:5]
     template = loader.get_template('polls/index.html')
     context = {
         'latest_question_list': latest_question_list
@@ -27,7 +28,7 @@ def detail(request, question_id):
     except DoesNotExist:
         raise Http404
 
-    context = {'question': question}
+    context = {'question': question} 
     return HttpResponse(template.render(context, request))
 
 

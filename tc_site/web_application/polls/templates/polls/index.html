@@ -24,8 +24,8 @@
             <!--Title-->
             <h4 class="card-title">Card title</h4>
             <!--Text-->
-            <p class="card-text">{{ question.question_text }}</p>
-            <a href="{% url 'polls:detail' question.id %}"
+            <p class="card-text">{{ question.title }}</p>
+            <a href="{% url 'polls:detail' question.tid %}"
                class="btn btn-indigo">Button</a>
         </div>
 
