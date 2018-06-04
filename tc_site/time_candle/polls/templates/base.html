@@ -19,14 +19,14 @@
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
 </head>
 
-<body>
+<body id="intro">
 
 <!--Main Navigation-->
 <header>
 
 
     <!--Navbar-->
-    <nav class="navbar navbar-expand-lg navbar-dark indigo">
+    <nav class="navbar navbar-expand-lg navbar-dark mdb-color">
         <div class="container">
 
             <!-- Navbar brand -->
@@ -88,6 +88,17 @@
     <!--/.Navbar-->
     </div>
 
+<!--Mask-->
+<div class="view">
+
+    <div class="mask">
+
+    </div>
+
+</div>
+<!--/.Mask-->
+
+
 </header>
 <!--Main Navigation-->
 
@@ -97,12 +108,9 @@
     <!--Main container-->
     <div class="container">
 
-        <!--Grid row-->
-        <div class="row">
-            {% block content %}
-            {% endblock %}
-        </div>
-        <!--Grid row-->
+        {% block content %}
+        {% endblock %}
+
 
     </div>
     <!--Main container-->
@@ -111,7 +119,7 @@
 <!--Main layout-->
 
 <!--Footer-->
-<footer class="page-footer text-center text-md-left font-small indigo pt-4 mt-4">
+<footer class="page-footer text-center text-md-left font-small mdb-color pt-4 mt-4">
 
     <!--Footer Links-->
     <div class="container text-center text-md-left">

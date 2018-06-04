@@ -1,10 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load staticfiles %}
 
-</body>
-</html>
+{% block content %}
+<div class="row justify-content-md-center">
+    <div class="col-md-4">
+        <img height="100%" width="100%" src="{% static 'img/svg/baseline-thumb_up-24px.svg' %}">
+    </div>
+</div>
+{% endblock %}

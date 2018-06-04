@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 {% if latest_question_list %}
+<div class="row">
 {% for question in latest_question_list %}
 
 <!--Grid column-->
@@ -33,6 +34,7 @@
 
 </div>
 {% endfor %}
+</div>
 </ul>
 {% else %}
 <p>No polls are available.</p>
