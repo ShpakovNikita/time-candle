@@ -1,8 +1,9 @@
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from time_candle.controller.commands import Controller
+from . import forms
 
 from .models import Question, Choice, DoesNotExist
 
@@ -49,7 +50,7 @@ def tasks(request):
     if not request.user.is_authenticated:
         raise Http404
 
-    tasks_list = Controller(uid=request.user.id - 1, db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').get_tasks('')[:5]
+    tasks_list = Controller(uid=request.user.id, db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').get_tasks('')[:5]
 
     context = {
         'tasks_list': tasks_list
@@ -69,6 +70,64 @@ def projects(request):
     }
 
     return render(request, 'polls/projects.html', context)
+
+
+from time_candle.enums.status import status_dict
+from time_candle.enums.priority import priority_dict
+
+
+def add_task(request):
+    if request.method == 'POST':
+        print(request.POST)
+        form = forms.AddTask(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data.get('title')
+            comment = form.cleaned_data.get('comment')
+            deadline_time = form.cleaned_data.get('deadline_time')
+            priority = form.cleaned_data.get('priority')
+            status = form.cleaned_data.get('status')
+            period = form.cleaned_data.get('period')
+            if not deadline_time:
+                deadline_time = None
+
+            Controller(uid=request.user.id,
+                       db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').\
+                add_task(title=title,
+                         time=deadline_time,
+                         priority=priority_dict[int(priority)],
+                         status=status_dict[int(status)],
+                         period=period,
+                         parent_id=None,
+                         comment=comment,
+                         pid=None,
+                         receiver_uid=None)
+
+            return redirect('/polls/tasks')
+    else:
+        form = forms.AddTask()
+
+    return render(request, 'polls/add_task.html', {'form': form})
+
+
+def add_project(request):
+    if request.method == 'POST':
+        print(request.POST)
+        form = forms.AddProject(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data.get('title')
+            description = form.cleaned_data.get('description')
+
+            Controller(uid=request.user.id,
+                       db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').\
+                add_project(title=title,
+                            description=description,
+                            members=[])
+
+            return redirect('/polls/projects')
+    else:
+        form = forms.AddProject()
+
+    return render(request, 'polls/add_project.html', {'form': form})
 
 
 def vote(request, question_id):

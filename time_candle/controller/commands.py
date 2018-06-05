@@ -40,7 +40,7 @@ class Controller:
         """
         self.project_logic.add_user_to_project(login, pid)
 
-    def add_project(self, title, description, members):
+    def add_project(self, title, description='', members=[]):
         """
         This function adds a new project to the database with the creator from
         logged user
@@ -53,14 +53,14 @@ class Controller:
 
     def add_task(self,
                  title,
-                 priority,
-                 status,
-                 time,
-                 parent_id,
-                 comment,
-                 pid,
-                 receiver_uid,
-                 period):
+                 priority=None,
+                 status=None,
+                 time=None,
+                 parent_id=None,
+                 comment='',
+                 pid=None,
+                 receiver_uid=None,
+                 period=None):
         """
         This function will add passed task to the database, with the creator and
         executor that named in the config.ini (i.e current logged user)
@@ -228,7 +228,4 @@ class Controller:
         :type fil: String
         :return: list of TaskInstance
         """
-        print('++++++++++++++++++++++++++\n'
-              '++++++++++++++++++++++++++\n'
-              '++++++++++++++++++++++++++\n', self.task_logic.get_tasks, self.task_logic, fil)
         return self.task_logic.get_tasks(fil)

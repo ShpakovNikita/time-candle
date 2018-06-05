@@ -42,3 +42,11 @@
 {% endif %}
 <!--Grid column-->
 {% endblock %}
+
+{% block add_buttons %}
+<div class="fixed-action-btn" style="bottom: 45px; right: 24px; z-index: 10000">
+    <a class="btn-floating btn-lg red" href="{% url 'polls:add_project' %}">
+        <i class="fa fa-plus"></i>
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-md-center">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <p class="h4 text-center mb-4">add project</p>
+                <br>
+                <form method="post" class="text-center">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <label class="grey-text h5">
+                        {{ field.label_tag }}</label>
+                    <br>
+                    <div class="container bm-2">
+                        {{ field }}
+                    </div>
+                    {% for error in field.errors %}
+                    <p style="color: red">{{ error }}</p>
+                    {% endfor %}
+                    <br>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-unique">Sign up
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
