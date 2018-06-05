@@ -14,7 +14,7 @@
     <!-- Bootstrap core CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     <!-- Material Design Bootstrap -->
-    <link href="{% static 'css/mdb.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/compiled.min.css' %}" rel="stylesheet">
     <!-- Your custom styles (optional) -->
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
 </head>
@@ -23,14 +23,12 @@
 
 <!--Main Navigation-->
 <header>
-
-
     <!--Navbar-->
     <nav class="navbar navbar-expand-lg navbar-dark mdb-color">
         <div class="container">
 
             <!-- Navbar brand -->
-            <a class="navbar-brand" href="#">Navbar</a>
+            <a class="navbar-brand" href="#">Time Candle</a>
 
             <!-- Collapse button -->
             <button class="navbar-toggler" type="button" data-toggle="collapse"
@@ -46,31 +44,20 @@
                 <!-- Links -->
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="#">Home
+                        <a class="nav-link" href="{% url 'polls:index' %}">Home
                             <span class="sr-only">(current)</span>
                         </a>
                     </li>
+                    {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Features</a>
+                        <a class="nav-link" href="{% url 'polls:tasks' %}">Tasks</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Pricing</a>
+                        <a class="nav-link" href="{% url 'polls:projects' %}">Projects</a>
                     </li>
-
-                    <!-- Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle"
-                           id="navbarDropdownMenuLink" data-toggle="dropdown"
-                           aria-haspopup="true"
-                           aria-expanded="false">Dropdown</a>
-                        <div class="dropdown-menu dropdown-primary"
-                             aria-labelledby="navbarDropdownMenuLink">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <a class="dropdown-item" href="#">Something else
-                                here</a>
-                        </div>
-                    </li>
+                    {% endif %}
+                    {% block navbar %}
+                    {% endblock %}
 
                 </ul>
                 <!-- Links -->
@@ -78,7 +65,7 @@
                 <form class="form-inline">
                     <div class="md-form mt-0">
                         <input class="form-control mr-sm-2" type="text"
-                               placeholder="Search" aria-label="Search">
+                               placeholder="Search users" aria-label="Search">
                     </div>
                 </form>
             </div>
@@ -88,15 +75,15 @@
     <!--/.Navbar-->
     </div>
 
-<!--Mask-->
-<div class="view">
+    <!--Mask-->
+    <div class="view">
 
-    <div class="mask">
+        <div class="mask">
+
+        </div>
 
     </div>
-
-</div>
-<!--/.Mask-->
+    <!--/.Mask-->
 
 
 </header>
@@ -117,9 +104,10 @@
 
 </main>
 <!--Main layout-->
-
+{% block add_buttons %}
+{% endblock %}
 <!--Footer-->
-<footer class="page-footer text-center text-md-left font-small mdb-color pt-4 mt-4">
+<footer class="page-footer fixed-bottom text-center text-md-left font-small mdb-color pt-4 mt-4">
 
     <!--Footer Links-->
     <div class="container text-center text-md-left">
@@ -159,8 +147,8 @@
     <!--Copyright-->
     <div class="footer-copyright py-3 text-center">
         © 2018 Copyright:
-        <a href="https://mdbootstrap.com/bootstrap-tutorial/">
-            MDBootstrap.com </a>
+        <a href="https://bitbucket.org/shpakov_nikita/">
+            Paul Fon Boudervill </a>
     </div>
     <!--/.Copyright-->
 
@@ -178,6 +166,7 @@
         src="{% static 'js/bootstrap.min.js' %}"></script>
 <!-- MDB core JavaScript -->
 <script type="text/javascript" src="{% static 'js/mdb.js' %}"></script>
+
 </body>
 
 </html>

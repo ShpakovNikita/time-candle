@@ -15,6 +15,10 @@ def err404(request, exception):
 def index(request):
     latest_question_list = Controller(uid=request.user.id, db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').get_tasks('')[:5]
     template = loader.get_template('polls/index.html')
+    Controller(uid=request.user.id,
+               db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').get_tasks(
+        'tids: 10')
+
     context = {
         'latest_question_list': latest_question_list
     }
@@ -28,7 +32,7 @@ def detail(request, question_id):
     except DoesNotExist:
         raise Http404
 
-    context = {'question': question} 
+    context = {'question': question}
     return HttpResponse(template.render(context, request))
 
 
@@ -39,6 +43,32 @@ def results(request, question_id):
         raise Http404
 
     return render(request, 'polls/results.html', {'question': question})
+
+
+def tasks(request):
+    if not request.user.is_authenticated:
+        raise Http404
+
+    tasks_list = Controller(uid=request.user.id - 1, db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').get_tasks('')[:5]
+
+    context = {
+        'tasks_list': tasks_list
+    }
+
+    return render(request, 'polls/tasks.html', context)
+
+
+def projects(request):
+    if not request.user.is_authenticated:
+        raise Http404
+
+    projects_list = Controller(uid=request.user.id, db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').get_projects('')[:5]
+
+    context = {
+        'projects_list': projects_list
+    }
+
+    return render(request, 'polls/projects.html', context)
 
 
 def vote(request, question_id):

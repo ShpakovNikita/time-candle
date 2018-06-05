@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if tasks_list %}
+<div class="row">
+{% for task in tasks_list %}
+
+<!--Grid column-->
+<div class="col-lg-4 col-md-6 mb-4">
+
+    <!--Card-->
+    <div class="card">
+
+        <!--Card image-->
+        <div class="view overlay">
+            <img src="https://mdbootstrap.com/img/Photos/Horizontal/Nature/4-col/img%20(72).jpg"
+                 class="card-img-top" alt="">
+            <a href="#">
+                <div class="mask rgba-white-slight"></div>
+            </a>
+        </div>
+
+        <!--Card content-->
+        <div class="card-body">
+            <!--Title-->
+            <h4 class="card-title">{{ task.title }}<span class="grey-text">@{{ task.tid }}</span></h4>
+            <!--Text-->
+            <p class="card-text">{{ task.comment }}</p>
+            <!--TODO: REAL url-->
+            <a href="{% url 'polls:detail' task.tid %}"
+               class="btn btn-indigo">Click!</a>
+        </div>
+
+    </div>
+    <!--/.Card-->
+
+</div>
+{% endfor %}
+</div>
+</ul>
+{% else %}
+<p>No tasks are available.</p>
+{% endif %}
+<!--Grid column-->
+{% endblock %}
+
+{% block add_buttons %}
+<div class="fixed-action-btn" style="bottom: 45px; right: 24px;">
+    <a class="btn-floating btn-lg red" href="{% url 'polls:index' %}">
+        <i class="fa fa-plus"></i>
+    </a>
+</div>
+{% endblock %}
