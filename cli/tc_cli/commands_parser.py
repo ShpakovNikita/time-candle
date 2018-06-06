@@ -4,6 +4,7 @@ from time_candle.controller.commands import Controller as AppController
 import time_candle.app_logger
 import time_candle.module_app.print_functions
 from time_candle.module_app.user_controller import UserController
+from . import settings as config
 
 
 logger = time_candle.app_logger.custom_logger('console')
@@ -263,9 +264,9 @@ def run(mode='dev'):
     :return: None
     """
     global app_controller, user_controller
-    user_controller = UserController()
+    user_controller = UserController(db_file=config.USERS_DATABASE_PATH)
     user = UserController.auth()
-    app_controller = AppController(mode, uid=user.uid)
+    app_controller = AppController(mode, db_file=config.DATABASE_PATH, uid=user.uid)
 
     parser = argparse.ArgumentParser(prog='time_candle')
 
@@ -316,7 +317,7 @@ def run(mode='dev'):
         _process_add_task(parsed)
 
     elif parsed.action == _Args.CLEAR_LOG.long:
-        open(time_candle.app_logger.LOG_FILENAME, 'w').close()
+        open(config.LOG_PATH, 'w').close()
         logger.info('log has been cleared')
 
     elif parsed.action == _Args.LOGOUT.long:
