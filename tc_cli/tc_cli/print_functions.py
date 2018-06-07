@@ -40,14 +40,14 @@ def print_users(users):
 
 
 def print_user(user):
-    info = ('login: {}, nickname: {}, about: {}, mail: {}, id: {}'.
-            format(user.login, user.nickname, user.about, user.mail, user.uid))
+    info = ('login: {}, nickname: {}, about: {}, id: {}'.
+            format(user.login, user.nickname, user.about, user.uid))
     print(info)
 
 
 def cow_print_user(user):
-    info = ('login: {}, nickname: {}, about: {}, mail: {}, id: {}'.
-            format(user.login, user.nickname, user.about, user.mail, user.uid))
+    info = ('login: {}, nickname: {}, about: {}, id: {}'.
+            format(user.login, user.nickname, user.about, user.uid))
 
     os.system('cowsay ' + '"' + info + '"')
 

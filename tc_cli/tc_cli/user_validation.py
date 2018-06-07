@@ -52,16 +52,3 @@ def check_login(login):
 
     if re.match(raw_login_pattern, login) is None:
         raise v_e.InvalidNameError(v_e.NameMessages.INVALID_LOGIN)
-
-
-def check_name(name):
-    """
-    Validates typed login or nickname.
-    :param name: String
-    :return: None
-    """
-    raw_name_pattern = (r"^(?=.{4,15}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<!["
-                        r"_.])$")
-
-    if re.match(raw_name_pattern, name) is None:
-        raise v_e.InvalidNameError(v_e.NameMessages.INVALID_NICKNAME)

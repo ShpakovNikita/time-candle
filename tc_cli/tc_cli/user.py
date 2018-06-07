@@ -1,4 +1,4 @@
-from time_candle.module_app import logger
+from . import logger
 
 
 class User:
@@ -11,18 +11,10 @@ class User:
                  uid=None,
                  login='guest',
                  password=None,
-                 time_zone=None,
-                 nickname='guest',
-                 about='',
                  mail=None):
-        self.own_tasks = []
-        self.projects = []
         self.uid = uid
         self.login = login
-        self.nickname = nickname
         self.password = password
-        self.time_zone = None
-        self.about = about
         self.mail = mail
 
     @classmethod
@@ -33,20 +25,13 @@ class User:
         - uid
         - login
         - password
-        - time_zone
-        - nickname
-        - about
         - mail
         :return: User
         """
-        logger.debug('convert storage to model user')
+        logger.debug('make user auth model')
 
         user = cls(uid=obj.uid,
-                   login=obj.login,
                    password=obj.password,
-                   nickname=obj.nickname,
-                   about=obj.about,
                    mail=obj.mail)
 
         return user
-

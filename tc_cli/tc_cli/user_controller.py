@@ -1,14 +1,14 @@
-from time_candle.module_app.user import User as UserInstance
-from time_candle.module_app.user_adapter import UserAdapter, UserFilter
-from time_candle.module_app.config_parser import run_config
-import time_candle.module_app.user_validation as v
+from .user import User as UserInstance
+from .user_adapter import UserAdapter
+from .config_parser import run_config
 import time_candle.exceptions.db_exceptions as db_e
-from time_candle.module_app import config_parser
-from time_candle.module_app import logger
+from . import user_validation as v
+from . import config_parser
+from . import logger
 from copy import copy
 
 
-class UserController:
+class UserAuthenticationController:
 
     def __init__(self, db_file=None, uid=None):
         self.user_adapter = UserAdapter(db_file)
@@ -24,13 +24,26 @@ class UserController:
         if uid is not None:
             self.uid = uid
         else:
-            self.uid = self.auth().uid
+            self.uid = self.load_user().uid
 
         self.user_adapter.uid = self.uid
 
     @staticmethod
-    def auth():
+    def load_user():
         return run_config()['user']
+
+    def add_user(self, login, password, mail=None):
+        """
+        This function adds user to auth database
+        :param mail: User's email
+        :param login: User's login
+        :param password: User's password
+        :return: None
+        """
+        v.check_login(login)
+        v.check_password(password)
+        user = UserInstance(login=login, password=password)
+        self.user_adapter.save(user)
 
     def log_in(self, login, password):
         """
@@ -43,7 +56,7 @@ class UserController:
         success = False
         try:
             UserInstance.make_user(
-                self.user_adapter.login_user(login, password))
+                self.user_adapter.authenticate(login, password))
 
             success = True
         except db_e.InvalidPasswordError:
@@ -57,62 +70,21 @@ class UserController:
         config_parser.write_user(login, password)
         return success
 
-    def add_user(self,
-                 login,
-                 password,
-                 mail=None,
-                 nickname=None,
-                 about=''):
+    def authenticate(self):
         """
-        This function adds user to the database, if there is no users with given
-        login
-        :type login: String
-        :type password: String
-        :type mail: String
-        :type nickname: String
-        :type about: String
+        This function authenticates current user
         :return: None
         """
-        if mail is not None:
-            v.check_mail(mail)
-
-        if nickname is None:
-            nickname = login
-
-        if not about:
-            about = 'Hello, it\'s me, ' + nickname
-
-        v.check_login(login)
-        v.check_name(nickname)
-        v.check_password(password)
-
-        # add user to the database
-        user = UserInstance(login=login,
-                            password=password,
-                            nickname=nickname,
-                            about=about,
-                            mail=mail)
-        self.user_adapter.save(user)
-
-    def get_users(self, substr):
-        """
-        This function returns found users.
-        :param substr: Filter for nickname search
-        :type substr: String
-        :return: list of UserInstance
-        """
-        # get users by passed substring
-        fil = UserFilter().nickname_substring(substr)
-        users = self.user_adapter.get_by_filter(fil)
-
-        return [UserInstance.make_user(user) for user in users]
+        user = self.load_user()
+        self.user_adapter.authenticate(user.login, user.password)
+        logger.info('Successfully authenticated!')
 
     def get_current_user(self):
         """
         This function returns current user.
         :return: UserInstance
         """
-        user = self.auth()
+        user = self.load_user()
         return copy(user)
 
     @staticmethod

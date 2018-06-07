@@ -1,8 +1,8 @@
 import configparser
 import time_candle.exceptions.model_exceptions as m_e
-from time_candle.module_app.user import User
-from time_candle.module_app.user_adapter import UserAdapter
-import time_candle.exceptions.db_exceptions as db_e
+from .user import User
+from .user_adapter import UserAdapter
+from . import exceptions as auth_e
 import os
 
 
@@ -31,17 +31,16 @@ def run_config():
         # Create user by it's name and password. If it exists, we will get it
         # from database
         user_field = type('user_field', (), {'uid': None,
-                                             'login': 'Guest',
-                                             'nickname': 'SansTheSkeleton',
-                                             'about': '',
-                                             'mail': None})
+                                             'login': 'Sans the Skeleton',
+                                             'mail': None,
+                                             'password': ''})
         try:
-            config_dict['user'] = UserAdapter.login_user(login, password)
+            config_dict['user'] = UserAdapter.authenticate(login, password)
 
-        except db_e.InvalidPasswordError:
+        except auth_e.InvalidPasswordError:
             config_dict['user'] = user_field()
 
-        except db_e.InvalidLoginError:
+        except auth_e.InvalidLoginError:
             config_dict['user'] = user_field()
         return config_dict
 

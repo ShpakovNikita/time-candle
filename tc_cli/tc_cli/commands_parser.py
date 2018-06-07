@@ -2,8 +2,8 @@ import argparse
 from collections import namedtuple
 from time_candle.controller.commands import Controller as AppController
 import time_candle.app_logger
-import time_candle.module_app.print_functions
-from time_candle.module_app.user_controller import UserController
+from . import print_functions
+from .user_controller import UserAuthenticationController as UserController
 from . import settings as config
 
 
@@ -265,8 +265,9 @@ def run(mode='dev'):
     """
     global app_controller, user_controller
     user_controller = UserController(db_file=config.USERS_DATABASE_PATH)
-    user = UserController.auth()
-    app_controller = AppController(mode, db_file=config.DATABASE_PATH, uid=user.uid)
+    user = UserController.load_user()
+    app_controller = AppController(mode, db_file=config.DATABASE_PATH,
+                                   uid=user.uid)
 
     parser = argparse.ArgumentParser(prog='time_candle')
 
@@ -351,7 +352,7 @@ def run(mode='dev'):
         _process_whoami()
 
     elif parsed.action == 'watch':
-        time_candle.module_app.print_functions.watch()
+        print_functions.watch()
 
 
 """
@@ -630,6 +631,7 @@ def _process_login(parsed_args):
 
 def _process_add_task(parsed_args):
     logger.debug('add_task')
+    user_controller.authenticate()
 
     app_controller.add_task(parsed_args.title,
                             parsed_args.priority[0],
@@ -645,6 +647,7 @@ def _process_add_task(parsed_args):
 
 def _process_change_task(parsed_args):
     logger.debug('change_task')
+    user_controller.authenticate()
 
     app_controller.change_task(parsed_args.id,
                                parsed_args.priority[0],
@@ -657,6 +660,7 @@ def _process_change_task(parsed_args):
 
 def _process_remove_task(parsed_args):
     logger.debug('remove_task')
+    user_controller.authenticate()
     app_controller.remove_task(parsed_args.id)
     print('task %s removed' % parsed_args.id)
 
@@ -674,9 +678,11 @@ def _process_add_user(parsed_args):
 
         user_controller.add_user(parsed_args.login,
                                  parsed_args.password,
-                                 parsed_args.mail[0],
-                                 parsed_args.nickname[0],
-                                 parsed_args.about[0])
+                                 parsed_args.mail[0])
+        app_controller.add_user(parsed_args.login,
+                                parsed_args.nickname[0],
+                                parsed_args.about[0])
+
         print('user %s added' % parsed_args.login)
 
     else:
@@ -688,6 +694,7 @@ def _process_add_user(parsed_args):
 
 def _process_add_project(parsed_args):
     logger.debug('add_project')
+    user_controller.authenticate()
     app_controller.add_project(parsed_args.title,
                                parsed_args.description[0],
                                parsed_args.members)
@@ -695,30 +702,35 @@ def _process_add_project(parsed_args):
 
 
 def _process_show_tasks(parsed_args):
+    user_controller.authenticate()
     tasks = app_controller.get_tasks(parsed_args.filter[0])
-    time_candle.module_app.print_functions.print_tasks(tasks)
+    print_functions.print_tasks(tasks)
 
 
 def _process_show_users(parsed_args):
     if parsed_args.project[0] is None:
-        users = user_controller.get_users(parsed_args.filter[0])
+        users = app_controller.get_users_by_nickname(parsed_args.filter[0])
     else:
-        app_controller.get_users(parsed_args.project[0])
+        user_controller.authenticate()
+        users = app_controller.get_users(parsed_args.project[0])
 
-    time_candle.module_app.print_functions.print_users(users)
+    print_functions.print_users(users)
 
 
 def _process_show_projects(parsed_args):
+    user_controller.authenticate()
     projects = app_controller.get_projects(parsed_args.filter[0])
-    time_candle.module_app.print_functions.print_projects(projects)
+    print_functions.print_projects(projects)
 
 
 def _process_whoami():
-    user = user_controller.get_current_user()
-    time_candle.module_app.print_functions.cow_print_user(user)
+    uid = user_controller.get_current_user().uid
+    user = app_controller.get_user(uid)
+    print_functions.cow_print_user(user)
 
 
 def _process_change_project(parsed_args):
+    user_controller.authenticate()
     app_controller.change_project(parsed_args.id,
                                   parsed_args.title[0],
                                   parsed_args.description[0])
@@ -726,6 +738,7 @@ def _process_change_project(parsed_args):
 
 
 def _process_remove_project(parsed_args):
+    user_controller.authenticate()
     app_controller.remove_project(parsed_args.id)
     print('project %s removed' % parsed_args.id)
 
