@@ -1,11 +1,11 @@
 from enum import Enum
+from . import AppException
 
 
 # Name related things
-class InvalidNameError(Exception):
+class InvalidNameError(AppException):
     def __init__(self, errors=None, message='The typed name is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 class NameMessages(Enum):
@@ -16,10 +16,9 @@ class NameMessages(Enum):
 
 
 # Mail related things
-class InvalidMailError(Exception):
+class InvalidMailError(AppException):
     def __init__(self, errors=None, message='The typed mail is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 class MailMessages(Enum):
@@ -29,10 +28,9 @@ class MailMessages(Enum):
 
 
 # Password related things
-class InvalidPasswordError(Exception):
+class InvalidPasswordError(AppException):
     def __init__(self, errors=None, message='The typed name is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 class PasswordMessages(Enum):
@@ -42,10 +40,9 @@ class PasswordMessages(Enum):
                        'eight characters, at least one letter and one number'
 
 
-class InvalidCommentError(Exception):
+class InvalidCommentError(AppException):
     def __init__(self, errors=None, message='The typed comment is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 class CommentMessages(Enum):
@@ -54,10 +51,9 @@ class CommentMessages(Enum):
     INVALID_COMMENT = 'Your comment is too long!'
 
 
-class InvalidTitleError(Exception):
+class InvalidTitleError(AppException):
     def __init__(self, errors=None, message='The typed title is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 class TitleMessages(Enum):
@@ -67,10 +63,9 @@ class TitleMessages(Enum):
 
 
 # Status related things
-class InvalidStatusError(Exception):
+class InvalidStatusError(AppException):
     def __init__(self, errors=None, message='The typed status is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 class StatusMessages(Enum):
@@ -80,11 +75,10 @@ class StatusMessages(Enum):
 
 
 # Priority related things
-class InvalidPriorityError(Exception):
+class InvalidPriorityError(AppException):
     def __init__(
             self, errors=None, message='The typed priority is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 class PriorityMessages(Enum):

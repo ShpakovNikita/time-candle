@@ -72,6 +72,19 @@ class BaseModel(Model):
         database = _db_proxy
 
 
+class User(BaseModel):
+    uid = PrimaryKeyField()
+
+    # user fields
+    # for UserModel's own_tasks we have a relation field in Task class from
+    # storage.task_adapter
+    login = CharField(unique=True)
+
+    # settings field
+    nickname = CharField(default='')
+    about = CharField(default='')
+
+
 class Project(BaseModel):
     pid = PrimaryKeyField()
 
@@ -149,6 +162,7 @@ class Adapter:
 
     @staticmethod
     def _create_database():
+        User.create_table()
         Project.create_table()
         UserProjectRelation.create_table()
         Task.create_table()

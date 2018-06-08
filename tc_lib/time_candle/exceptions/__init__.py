@@ -4,16 +4,19 @@ application uses this exceptions for more organized project structure.
 from enum import Enum
 
 
-def custom_excepthook(exc_type, exc_value, tb):
-    # Exception type and value
-    print(' %s: %s' % (exc_type.__name__, exc_value))
+class AppException(Exception):
+    def __init__(self,
+                 errors=None,
+                 message='Some error occured during the lib interraction! {}'):
+        super().__init__(message.format(errors))
+        self.errors = errors
+        self.message = message
 
 
 # Login related things
-class ConfigError(Exception):
+class ConfigError(AppException):
     def __init__(self, errors=None, message='The config is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 class ConfigMessages(Enum):

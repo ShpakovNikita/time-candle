@@ -1,24 +1,22 @@
 from enum import Enum
+from . import AppException
 
 
-class InvalidLoginException(Exception):
-    def __init__(self, error_arguments=None):
-        self.errorArguments = error_arguments
-        Exception.__init__(self, "The login is invalid!")
+class InvalidLoginException(AppException):
+    def __init__(self, errors=None, message='The login is invalid! {}'):
+        super().__init__(errors, message)
 
 
 # Validators exceptions
-class InvalidArgumentFormat(Exception):
+class InvalidArgumentFormat(AppException):
     def __init__(self, errors=None, message='The argument is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 # Password related things
-class InvalidTimeError(Exception):
+class InvalidTimeError(AppException):
     def __init__(self, errors=None, message='The time is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 class TimeMessages(Enum):
@@ -31,10 +29,9 @@ class TimeMessages(Enum):
 
 
 # Status related things
-class InvalidStatusError(Exception):
+class InvalidStatusError(AppException):
     def __init__(self, errors=None, message='The status is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 class StatusMessages(Enum):

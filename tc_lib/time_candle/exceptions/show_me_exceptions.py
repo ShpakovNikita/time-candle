@@ -1,18 +1,17 @@
 from enum import Enum
+from . import AppException
 
 
 # few elements in commend
-class FewElementsError(Exception):
+class FewElementsError(AppException):
     def __init__(self, errors=None, message='Too few elements in command! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 # invalid expression
-class InvalidExpressionError(Exception):
+class InvalidExpressionError(AppException):
     def __init__(self, errors=None, message='Too few elements in command! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 class ShowMeMessages(Enum):

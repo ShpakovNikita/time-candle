@@ -1,8 +1,22 @@
+import re
 import time_candle.exceptions.validation_exceptions as v_e
 """
 This module is module for most validations some inner values and conversions. 
 Also it has some other mini helper functions.
 """
+
+
+def check_name(name):
+    """
+    Validates typed login or nickname.
+    :param name: String
+    :return: None
+    """
+    raw_name_pattern = (r"^(?=.{4,15}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<!["
+                        r"_.])$")
+
+    if re.match(raw_name_pattern, name) is None:
+        raise v_e.InvalidNameError(v_e.NameMessages.INVALID_NICKNAME)
 
 
 def check_comment(comment):

@@ -17,6 +17,9 @@ class Logic:
         self.project_adapter = time_candle.storage.project_adapter. \
             ProjectAdapter(db_file)
 
+        self.user_adapter = time_candle.storage.user_adapter. \
+            UserAdapter(db_file)
+
         self._auth(uid)
 
     def _auth(self, uid=None):

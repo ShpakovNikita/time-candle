@@ -59,5 +59,5 @@ class ProjectLogic(Logic):
         return [ProjectInstance.make_project(project) for project in projects]
 
     def get_users(self, pid):
-        # get users id
+        # get users
         return self.project_adapter.get_users_by_project(pid)

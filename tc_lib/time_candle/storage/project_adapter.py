@@ -1,5 +1,5 @@
 from peewee import DoesNotExist, IntegrityError
-from time_candle.storage.adapter_classes import Project, UserProjectRelation, Task
+from time_candle.storage.adapter_classes import User, Project, UserProjectRelation, Task
 from time_candle.storage.adapter_classes import Filter as PrimaryFilter
 from time_candle.storage.adapter_classes import Adapter as PrimaryAdapter
 import time_candle.exceptions.db_exceptions as db_e
@@ -263,8 +263,11 @@ class ProjectAdapter(PrimaryAdapter):
 
         query = UserProjectRelation.select().\
             where(UserProjectRelation.project == pid)
+        query = [q.user for q in query]
 
-        return [q.user for q in query]
+        users = User.select().where(User.uid << query)
+
+        return [user for user in users]
 
     def remove_project_by_id(self, pid):
         """

@@ -1,11 +1,11 @@
 from enum import Enum
+from . import AppException
 
 
 # Login related things
-class InvalidLoginError(Exception):
+class InvalidLoginError(AppException):
     def __init__(self, errors=None, message='The login is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 class LoginMessages(Enum):
@@ -20,18 +20,15 @@ class LoginMessages(Enum):
 
 
 # Uid related things
-class InvalidUidError(Exception):
+class InvalidUidError(AppException):
     def __init__(self, errors=None, message='The uid is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 # Password related things
-class InvalidPasswordError(Exception):
+class InvalidPasswordError(AppException):
     def __init__(self, errors=None, message='The password is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
-
+        super().__init__(errors, message)
 
 class PasswordMessages(Enum):
     # This is pre defined messages that will be associated with password all
@@ -39,17 +36,15 @@ class PasswordMessages(Enum):
     PASSWORD_IS_NOT_MATCH = 'Typed password is wrong for selected user.'
 
 
-class InvalidMailError(Exception):
+class InvalidMailError(AppException):
     def __init__(self, errors=None, message='The mail is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 # Task related things
-class InvalidTidError(Exception):
+class InvalidTidError(AppException):
     def __init__(self, errors=None, message='The tid is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 class TaskMessages(Enum):
@@ -60,10 +55,9 @@ class TaskMessages(Enum):
 
 
 # Project related things
-class InvalidPidError(Exception):
+class InvalidPidError(AppException):
     def __init__(self, errors=None, message='The pid is invalid! {}'):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 class ProjectMessages(Enum):
@@ -75,18 +69,16 @@ class ProjectMessages(Enum):
 
 
 # Filters related things
-class InvalidFilterOperator(Exception):
+class InvalidFilterOperator(AppException):
     def __init__(self, errors=None, message='The filter operator is invalid! {}'
                  ):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
-class InvalidFilter(Exception):
+class InvalidFilter(AppException):
     def __init__(self, errors=None, message='The filter is invalid! {}'
                  ):
-        super().__init__(message.format(errors))
-        self.errors = errors
+        super().__init__(errors, message)
 
 
 class FilterMessages(Enum):

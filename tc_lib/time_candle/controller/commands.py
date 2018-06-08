@@ -1,5 +1,6 @@
 from time_candle.model.logic.project import ProjectLogic
 from time_candle.model.logic.task import TaskLogic
+from time_candle.model.logic.user import UserLogic
 import time_candle.controller.validators as v
 import time_candle.exceptions.validation_exceptions as v_e
 from time_candle.model import logger
@@ -16,29 +17,20 @@ Note, that we have to login anytime firstly before the actions from the user
 
 class Controller:
 
-    def __init__(self, mode='dev', db_file=None, uid=None):
-        import sys
-        from time_candle.exceptions import custom_excepthook
-
-        if mode == 'dev':
-            pass
-        elif mode == 'user':
-            sys.excepthook = custom_excepthook
-        else:
-            raise ValueError('mode option is wrong!')
-
+    def __init__(self, db_file=None, uid=None):
         self.task_logic = TaskLogic(db_file, uid)
         self.project_logic = ProjectLogic(db_file, uid)
+        self.user_logic = UserLogic(db_file, uid)
 
-    def add_user_to_project(self, login, pid):
+    def add_user_to_project(self, uid, pid):
         """
         This function adds user to the project, if our logged user is admin of the
         project
-        :param login: User's login
+        :param uid: User's id
         :param pid: Project's id
         :return: None
         """
-        self.project_logic.add_user_to_project(login, pid)
+        self.project_logic.add_user_to_project(uid, pid)
 
     def add_project(self, title, description='', members=[]):
         """
@@ -142,18 +134,24 @@ class Controller:
         """
         self.project_logic.remove_project(pid)
 
-    def remove_user_from_project(self, login, pid):
+    def remove_user_from_project(self, uid, pid):
         """
         This function removes selected user from the project or raises an exception
         if user does not exists or you simply don't have rights to do that. Note
         that you can delete yourself from the project
-        :param login: User's login
+        :param uid: User's id
         :param pid: Project's id
         :return: None
         """
-        self.project_logic.remove_user_from_project(login, pid)
+        self.project_logic.remove_user_from_project(uid, pid)
 
-    def change_task(self, tid, priority, status, time, comment, project):
+    def change_task(self,
+                    tid,
+                    priority=None,
+                    status=None,
+                    time=None,
+                    comment=None,
+                    project=None):
         """
         This function will change task in the database, with the creator and
         executor that named in the config.ini (i.e current logged user)
@@ -190,7 +188,7 @@ class Controller:
                                     comment,
                                     project)
 
-    def change_project(self, pid, title, description):
+    def change_project(self, pid, title=None, description=None):
         """
         This function will change task in the database, with the creator and
         executor that named in the config.ini (i.e current logged user)
@@ -199,10 +197,12 @@ class Controller:
         :param description: Project's short (or long) description
         :return: None
         """
-        v.check_title(title)
+        if title is not None:
+            v.check_title(title)
+
         self.project_logic.change_project(pid, title, description)
 
-    def get_projects(self, substr):
+    def get_projects(self, substr=''):
         """
         This function returns found projects for your user.
         :param substr: Filter for title search
@@ -216,11 +216,11 @@ class Controller:
         This function returns list of id of users in the chosen project
         :param pid: Project's id
         :type pid: Int
-        :return: List of integers
+        :return: List of users
         """
         return self.project_logic.get_users(pid)
 
-    def get_tasks(self, fil):
+    def get_tasks(self, fil=''):
         """
         This function returns specific tasks that was taken from the database
         from your available tasks by the filter.
@@ -229,3 +229,54 @@ class Controller:
         :return: list of TaskInstance
         """
         return self.task_logic.get_tasks(fil)
+
+    def get_users_by_nickname(self, substr=''):
+        """
+        This function returns found users.
+        :param substr: Filter for nickname search
+        :type substr: String
+        :return: list of UserInstance
+        """
+        return self.user_logic.get_users(substr)
+
+    def get_user(self, uid):
+        """
+        This function returns user by uid.
+        :param uid: User's id
+        :type uid: Int
+        :return: list of UserInstance
+        """
+        return self.user_logic.get_user(uid)
+
+    def add_user(self,
+                 login,
+                 nickname=None,
+                 about=''):
+        """
+        This function adds user to the database, if there is no users with given
+        login
+        :type login: String
+        :type nickname: String
+        :type about: String
+        :return: None
+        """
+        if nickname is None:
+            nickname = login
+
+        if not about:
+            about = 'Hello, it\'s me, ' + nickname
+
+        v.check_name(nickname)
+
+        self.user_logic.add_user(login,
+                                 nickname,
+                                 about)
+
+    def change_user(self, uid, nickname=None):
+        """
+        This function will change user in the database
+        :param uid: User's id (change target)
+        :param nickname: User's nickname
+        :return: None
+        """
+        self.user_logic.change_user(uid, nickname)
