@@ -1,10 +1,13 @@
 import argparse
 from collections import namedtuple
 from time_candle.controller.commands import Controller as AppController
+from time_candle.exceptions import AppException
+from .exceptions import AuthenticationError
 import time_candle.app_logger
-from . import print_functions
+from tc_cli import print_functions
 from .user_controller import UserAuthenticationController as UserController
-from . import settings as config
+from tc_cli import settings as config
+import traceback
 
 
 logger = time_candle.app_logger.custom_logger('console')
@@ -257,7 +260,7 @@ class _Args:
         return _Args._with_prefix
 
 
-def run(mode='dev'):
+def run():
     """
     This function runs parser module to parse command line arguments and form
     specific requests to our main model
@@ -266,7 +269,7 @@ def run(mode='dev'):
     global app_controller, user_controller
     user_controller = UserController(db_file=config.USERS_DATABASE_PATH)
     user = UserController.load_user()
-    app_controller = AppController(mode, db_file=config.DATABASE_PATH,
+    app_controller = AppController(db_file=config.DATABASE_PATH,
                                    uid=user.uid)
 
     parser = argparse.ArgumentParser(prog='time_candle')
@@ -304,55 +307,63 @@ def run(mode='dev'):
     parsed = parser.parse_args()
     logger.debug(parsed)
 
-    # try to process each command
-    if parsed.action == _Args.ADD_USER.long:
-        _process_add_user(parsed)
+    try:
+        # try to process each command
+        if parsed.action == _Args.ADD_USER.long:
+            _process_add_user(parsed)
 
-    elif parsed.action == _Args.REMOVE_USER.long:
-        _process_remove_user(parsed)
+        elif parsed.action == _Args.REMOVE_USER.long:
+            _process_remove_user(parsed)
 
-    elif parsed.action == _Args.LOGIN.long:
-        _process_login(parsed)
+        elif parsed.action == _Args.LOGIN.long:
+            _process_login(parsed)
 
-    elif parsed.action == _Args.ADD_TASK.long:
-        _process_add_task(parsed)
+        elif parsed.action == _Args.ADD_TASK.long:
+            _process_add_task(parsed)
 
-    elif parsed.action == _Args.CLEAR_LOG.long:
-        open(config.LOG_PATH, 'w').close()
-        logger.info('log has been cleared')
+        elif parsed.action == _Args.CLEAR_LOG.long:
+            open(config.LOG_PATH, 'w').close()
+            logger.info('log has been cleared')
 
-    elif parsed.action == _Args.LOGOUT.long:
-        _process_logout()
+        elif parsed.action == _Args.LOGOUT.long:
+            _process_logout()
 
-    elif parsed.action == _Args.ADD_PROJECT.long:
-        _process_add_project(parsed)
+        elif parsed.action == _Args.ADD_PROJECT.long:
+            _process_add_project(parsed)
 
-    elif parsed.action == _Args.REMOVE_PROJECT.long:
-        _process_remove_project(parsed)
+        elif parsed.action == _Args.REMOVE_PROJECT.long:
+            _process_remove_project(parsed)
 
-    elif parsed.action == _Args.CHANGE_PROJECT.long:
-        _process_change_project(parsed)
+        elif parsed.action == _Args.CHANGE_PROJECT.long:
+            _process_change_project(parsed)
 
-    elif parsed.action == _Args.CHANGE_TASK.long:
-        _process_change_task(parsed)
+        elif parsed.action == _Args.CHANGE_TASK.long:
+            _process_change_task(parsed)
 
-    elif parsed.action == _Args.REMOVE_TASK.long:
-        _process_remove_task(parsed)
+        elif parsed.action == _Args.REMOVE_TASK.long:
+            _process_remove_task(parsed)
 
-    elif parsed.action == _Args.SHOW_TASKS.long:
-        _process_show_tasks(parsed)
+        elif parsed.action == _Args.SHOW_TASKS.long:
+            _process_show_tasks(parsed)
 
-    elif parsed.action == _Args.SHOW_USERS.long:
-        _process_show_users(parsed)
+        elif parsed.action == _Args.SHOW_USERS.long:
+            _process_show_users(parsed)
 
-    elif parsed.action == _Args.SHOW_PROJECTS.long:
-        _process_show_projects(parsed)
+        elif parsed.action == _Args.SHOW_PROJECTS.long:
+            _process_show_projects(parsed)
 
-    elif parsed.action == _Args.WHO_AM_I.long:
-        _process_whoami()
+        elif parsed.action == _Args.WHO_AM_I.long:
+            _process_whoami()
 
-    elif parsed.action == 'watch':
-        print_functions.watch()
+        elif parsed.action == 'watch':
+            print_functions.watch()
+
+    except (AppException, AuthenticationError) as e:
+        if config.VERBOSE:
+            traceback.print_exc()
+            print('Message text: {}'.format(e.errors.value))
+        else:
+            print(e.message.format(e.errors.value))
 
 
 """

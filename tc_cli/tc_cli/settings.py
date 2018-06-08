@@ -10,7 +10,7 @@ else:
 
 # This is the mode for out session. It can be user or dev. Depends on library
 # stacktrace
-MODE = 'dev'
+VERBOSE = True
 
 # This is the log file name
 LOG_FILE = 'config.log'
@@ -19,7 +19,7 @@ LOG_CONF = 'logging.conf'
 LOG_CONF_PATH = os.path.join(BASE_DIR, LOG_CONF)
 
 # This is lib database file name
-DATABASE_FILE = 'datass.db'
+DATABASE_FILE = 'data.db'
 DATABASE_PATH = os.path.join(BASE_DIR, DATABASE_FILE)
 
 # This is the user (cli) database file name

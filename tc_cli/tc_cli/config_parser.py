@@ -1,8 +1,8 @@
 import configparser
 import time_candle.exceptions.model_exceptions as m_e
-from .user import User
-from .user_adapter import UserAdapter
-from . import exceptions as auth_e
+from tc_cli.user import User
+from tc_cli.user_adapter import UserAdapter
+from tc_cli import exceptions as auth_e
 import os
 
 

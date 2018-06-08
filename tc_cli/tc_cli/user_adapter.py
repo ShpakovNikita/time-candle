@@ -1,6 +1,6 @@
 from peewee import *
 import tc_cli.exceptions as auth_e
-from . import logger
+from tc_cli import logger
 import os
 
 db_filename = 'users.db'

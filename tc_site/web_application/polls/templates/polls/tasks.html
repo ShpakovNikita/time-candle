@@ -2,39 +2,49 @@
 {% block content %}
 {% if tasks_list %}
 <div class="row">
-{% for task in tasks_list %}
+    {% for task in tasks_list %}
 
-<!--Grid column-->
-<div class="col-lg-4 col-md-6 mb-4">
+    <!--Grid column-->
+    <div class="col-lg-4 col-md-6 mb-4">
 
-    <!--Card-->
-    <div class="card">
+        <!--Card-->
+        <div class="card">
 
-        <!--Card image-->
-        <div class="view overlay">
-            <img src="https://mdbootstrap.com/img/Photos/Horizontal/Nature/4-col/img%20(72).jpg"
-                 class="card-img-top" alt="">
-            <a href="#">
-                <div class="mask rgba-white-slight"></div>
-            </a>
+            <!--Card content-->
+            <div class="card-body">
+                <!--Title-->
+                <div class="row" style="margin-bottom: -20px">
+                    <div class="col-md-9">
+                <h4 class="card-title">{{ task.title }}<span class="grey-text">@{{ task.tid }}</span>
+                </h4></div>
+                    <div class="col-md-3"><a
+                            class="btn-floating btn-sm red" style="margin-top: -3px"><i
+                            class="fa fa-times"></i></a></div>
+                </div>
+                <hr>
+                <!--Text-->
+                <p class="card-text">{{ task.comment|default:"No comments provided"|truncatechars:40 }}</p>
+                <!--TODO: REAL url-->
+            </div>
+<!-- Card footer -->
+  <div class="rounded-bottom mdb-color darken-1 text-center pt-3">
+    <ul class="list-unstyled list-inline font-small">
+      <li class="list-inline-item pr-2">
+          {% if task.deadline %}
+          <a class="white-text"><i class="fa fa-clock-o pr-1"></i>{{task.deadline|date:"d M, H:i"}}</a>
+          {% else %}
+          <a class="white-text"><i class="fa fa-clock-o pr-1"></i>No deadline</a>
+          {% endif %}
+          </li>
+      <li class="list-inline-item pr-2"><a href="#" class="white-text"><i class="fa fa-deviantart pr-1"> </i>split</a></li>
+      <li class="list-inline-item pr-2"><a href="#" class="white-text"><i class="fa fa-arrow-right pr-1"></i>change</a></li>
+    </ul>
+  </div>
         </div>
-
-        <!--Card content-->
-        <div class="card-body">
-            <!--Title-->
-            <h4 class="card-title">{{ task.title }}<span class="grey-text">@{{ task.tid }}</span></h4>
-            <!--Text-->
-            <p class="card-text">{{ task.comment }}</p>
-            <!--TODO: REAL url-->
-            <a href="{% url 'polls:detail' task.tid %}"
-               class="btn btn-indigo">Click!</a>
-        </div>
+        <!--/.Card-->
 
     </div>
-    <!--/.Card-->
-
-</div>
-{% endfor %}
+    {% endfor %}
 </div>
 </ul>
 {% else %}

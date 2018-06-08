@@ -1,4 +1,4 @@
-from . import logger
+from tc_cli import logger
 
 
 class User:

@@ -5,6 +5,7 @@ from django.urls import reverse
 from time_candle.controller.commands import Controller
 from . import forms
 
+from time_candle.model.time_formatter import get_datetime
 from .models import Question, Choice, DoesNotExist
 
 
@@ -52,6 +53,12 @@ def tasks(request):
 
     tasks_list = Controller(uid=request.user.id, db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').get_tasks('')[:5]
 
+    # convert all milliseconds fields to normal datetime
+    for task in tasks_list:
+        if task.deadline is not None:
+            task.deadline = get_datetime(task.deadline)
+        else:
+            task.deadline = None
     context = {
         'tasks_list': tasks_list
     }

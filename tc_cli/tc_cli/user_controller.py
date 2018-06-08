@@ -1,10 +1,10 @@
-from .user import User as UserInstance
-from .user_adapter import UserAdapter
-from .config_parser import run_config
+from tc_cli.user import User as UserInstance
+from tc_cli.user_adapter import UserAdapter
+from tc_cli.config_parser import run_config
 import time_candle.exceptions.db_exceptions as db_e
-from . import user_validation as v
-from . import config_parser
-from . import logger
+from tc_cli import user_validation as v
+from tc_cli import config_parser
+from tc_cli import logger
 from copy import copy
 
 

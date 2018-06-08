@@ -7,7 +7,7 @@ PRIORITY_CHOICES = tuple(priority_dict.items())
 
 
 class AddTask(forms.Form):
-    title = forms.CharField(label='task\'s title', max_length=30, required=True)
+    title = forms.CharField(label='task\'s title', max_length=60, required=True)
     comment = forms.CharField(label='comment', max_length=155, required=False)
     deadline_time = forms.CharField(
         label='deadline', required=False,
@@ -24,4 +24,5 @@ class AddTask(forms.Form):
 class AddProject(forms.Form):
     title = forms.CharField(
         label='project\'s title', max_length=30, required=True)
-    description = forms.CharField(label='description', required=False)
+    description = forms.CharField(label='description', required=False,
+                                  widget=forms.Textarea)
