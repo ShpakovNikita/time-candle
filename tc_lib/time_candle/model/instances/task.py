@@ -1,6 +1,7 @@
 from time_candle.enums.priority import Priority
 from time_candle.enums.status import Status
 from time_candle.model import logger
+from time_candle.model.time_formatter import get_datetime
 
 
 class Task:
@@ -33,12 +34,9 @@ class Task:
         self.pid = pid
         self.title = title
         self.status = status
-        self.tags = []
-        self.childs = []
         self.priority = priority
         self.parent = parent
         self.period = period
-        # self._controller = controller
         self.deadline = deadline
         self.comment = comment
         self.realization_time = realization_time
