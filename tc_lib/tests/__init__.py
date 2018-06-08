@@ -1,8 +1,10 @@
 import unittest
-from time_candle.storage.adapter_classes import Task, Project, UserProjectRelation
+from time_candle.storage.adapter_classes import \
+    Task, Project, UserProjectRelation, User
 from time_candle.storage.adapter_classes import Filter as PrimaryFilter
 from time_candle.storage.project_adapter import ProjectAdapter, ProjectFilter
 from time_candle.storage.task_adapter import TaskAdapter, TaskFilter
+from time_candle.storage.user_adapter import UserAdapter, UserFilter
 from time_candle.enums.priority import Priority
 from time_candle.enums.status import Status
 import time_candle.exceptions.db_exceptions as db_e
@@ -12,12 +14,12 @@ from copy import copy
 db_file = ':memory:'
 
 
-__all__ = ['_init_project_table',
+__all__ = ['_init_project_table', '_init_user_table',
            '_init_task_table', '_init_project_tasks_table', '_USERS',
            '_TASKS', '_PROJECTS', '_PROJECT_TASKS', 'db_file',
-           'Task', 'Project', 'UserProjectRelation',
+           'Task', 'Project', 'UserProjectRelation', 'User',
            'ProjectAdapter', 'ProjectFilter', 'unittest',
-           'TaskAdapter', 'TaskFilter',
+           'TaskAdapter', 'TaskFilter', 'UserAdapter', 'UserFilter',
            'Priority', 'Status', 'db_e', 'copy', 'PrimaryFilter',
            'UserDummie', 'ProjectDummie', 'TaskDummie']
 
@@ -165,13 +167,12 @@ _PROJECT_TASKS = [TaskDummie(uid=2, creator_uid=1, tid=12, pid=1, deadline=None,
                   TaskDummie(uid=2, creator_uid=2, tid=25, pid=4, deadline=None,
                              title='test pr 14')]
 
-"""
+
 def _init_user_table():
     for user in _USERS:
         User.create(login=user.login,
                     nickname=user.nickname,
                     password=user.password)
-"""
 
 
 def _init_task_table():

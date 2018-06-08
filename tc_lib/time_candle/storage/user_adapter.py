@@ -67,33 +67,6 @@ class UserAdapter(PrimaryAdapter):
         return [user for user in query]
 
     @staticmethod
-    def login_user(login, password):
-        """
-        This function is like head function for all adapters. From this start
-        point we get real user from database by it's login and valid password
-        :param login: login of searching user
-        :param password: password of searching user
-        :type login: String
-        :type password: String
-        :return: User
-        """
-        query = User.select().where(User.login == login)
-
-        try:
-            # user instance
-            obj = query.get()
-
-        except DoesNotExist:
-            raise db_e.InvalidLoginError(
-                db_e.LoginMessages.USER_DOES_NOT_EXISTS)
-
-        if obj.password != password:
-            raise db_e.InvalidPasswordError(
-                db_e.PasswordMessages.PASSWORD_IS_NOT_MATCH)
-
-        return obj
-
-    @staticmethod
     def save(obj):
         """
         This function if checking is current user exists, and if so we are

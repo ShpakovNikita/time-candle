@@ -16,7 +16,7 @@ class TestTaskLogic(unittest.TestCase):
         self.controller.project_logic._auth(_USERS[uid - 1].uid)
 
     def setUp(self):
-        self.controller = Controller(mode='dev', db_file=db_file)
+        self.controller = Controller(db_file=db_file)
 
         _init_project_table()
 
