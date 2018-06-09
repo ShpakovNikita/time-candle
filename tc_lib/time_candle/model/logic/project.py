@@ -41,6 +41,16 @@ class ProjectLogic(Logic):
         # remove project from database if have rights
         self.project_adapter.remove_project_by_id(pid)
 
+    def get_project(self, pid):
+        # remove project from database if have rights
+        fil = ProjectFilter().pid(pid)
+        try:
+            return ProjectInstance.make_project(
+                self.project_adapter.get_by_filter(fil)[0])
+        except IndexError:
+            raise db_e.InvalidPidError(
+                db_e.ProjectMessages.PROJECT_DOES_NOT_EXISTS)
+
     def change_project(self, pid, title, description):
         # change project in the database
         project = ProjectInstance.make_project(

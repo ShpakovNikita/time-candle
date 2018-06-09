@@ -11,9 +11,12 @@ def signup(request):
         form = forms.SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            user.refresh_from_db()  # load the profile instance created by the signal
+
+            # load the profile instance created by the signal
+            user.refresh_from_db()
             user.profile.birth_date = form.cleaned_data.get('birth_date')
             user.save()
+
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)

@@ -128,6 +128,15 @@ class Controller:
         """
         self.project_logic.remove_project(pid)
 
+    def get_project(self, pid):
+        """
+        This function gets project by id or raises an exception if you don't
+        have rights for that
+        :param pid: Project's id
+        :return: None
+        """
+        return self.project_logic.get_project(pid)
+
     def remove_user_from_project(self, uid, pid):
         """
         This function removes selected user from the project or raises an exception

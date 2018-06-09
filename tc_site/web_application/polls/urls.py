@@ -1,5 +1,5 @@
 from django.urls import path
-
+from . import startup
 from . import views
 
 
@@ -26,3 +26,5 @@ urlpatterns = [
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns += staticfiles_urlpatterns()
+
+startup.startup()

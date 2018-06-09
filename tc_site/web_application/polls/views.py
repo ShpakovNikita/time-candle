@@ -8,6 +8,7 @@ from . import forms
 from time_candle.model.time_formatter import get_datetime
 from .models import Question, Choice, DoesNotExist
 from time_candle.enums.status import Status
+from . import config
 
 
 def err404(request, exception):
@@ -16,11 +17,10 @@ def err404(request, exception):
 
 
 def index(request):
-    latest_question_list = Controller(uid=request.user.id, db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').get_tasks('')[:5]
+    controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
+    latest_question_list = controller.get_tasks('')[:5]
     template = loader.get_template('polls/index.html')
-    Controller(uid=request.user.id,
-               db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').get_tasks(
-        'tids: 10')
+    controller.get_tasks('tids: 10')
 
     context = {
         'latest_question_list': latest_question_list
@@ -52,8 +52,7 @@ def tasks(request):
     if not request.user.is_authenticated:
         raise Http404
 
-    controller = Controller(uid=request.user.id, db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db')
-
+    controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
     if request.method == 'POST':
         if 'delete' in request.POST:
             try:
@@ -74,10 +73,19 @@ def tasks(request):
 
     # convert all milliseconds fields to normal datetime
     for task in tasks_list:
+        task.pid = 1
         if task.deadline is not None:
             task.deadline = get_datetime(task.deadline)
         else:
             task.deadline = None
+
+        if task.pid is not None:
+            task.project_name = controller.get_project(task.pid).title
+            if task.uid == request.user.id:
+                task.receiver_name = 'You'
+            else:
+                task.receiver_name = controller.get_user(task.uid).login
+
     context = {
         'tasks_list': tasks_list
     }
@@ -88,8 +96,8 @@ def tasks(request):
 def projects(request):
     if not request.user.is_authenticated:
         raise Http404
-
-    projects_list = Controller(uid=request.user.id, db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').get_projects('')[:5]
+    controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
+    projects_list = controller.get_projects('')[:5]
 
     context = {
         'projects_list': projects_list
@@ -112,20 +120,18 @@ def add_task(request):
             if not deadline_time:
                 deadline_time = None
 
-            print(priority, status
-                  )
+            controller = Controller(uid=request.user.id,
+                                    db_file=config.DATABASE_PATH)
 
-            Controller(uid=request.user.id,
-                       db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').\
-                add_task(title=title,
-                         time=deadline_time,
-                         priority=int(priority),
-                         status=int(status),
-                         period=period,
-                         parent_id=None,
-                         comment=comment,
-                         pid=None,
-                         receiver_uid=None)
+            controller.add_task(title=title,
+                                time=deadline_time,
+                                priority=int(priority),
+                                status=int(status),
+                                period=period,
+                                parent_id=None,
+                                comment=comment,
+                                pid=None,
+                                receiver_uid=None)
 
             return redirect('/polls/tasks')
     else:
@@ -142,11 +148,12 @@ def add_project(request):
             title = form.cleaned_data.get('title')
             description = form.cleaned_data.get('description')
 
-            Controller(uid=request.user.id,
-                       db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').\
-                add_project(title=title,
-                            description=description,
-                            members=[])
+            controller = Controller(uid=request.user.id,
+                                    db_file=config.DATABASE_PATH)
+
+            controller.add_project(title=title,
+                                   description=description,
+                                   members=[])
 
             return redirect('/polls/projects')
     else:
@@ -178,6 +185,5 @@ def vote(request, question_id):
         # user hits the Back button.
         return HttpResponseRedirect(
             reverse('polls:results', args=(question.id,)))
-
 
 # Create your views here.
