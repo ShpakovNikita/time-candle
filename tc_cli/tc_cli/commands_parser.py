@@ -100,7 +100,8 @@ class _Args:
     PRIORITY = Argument(long='priority',
                         short='r',
                         docstring="""task\'s priority, that can be changed 
-                        later. Can be: min, low, medium, high, max.""")
+                        later. Can be: 0 - min, 1 - low, 2 - medium, 3 - high, 4
+                         - max.""")
 
     # task time
     TIME = Argument(long='time',
@@ -113,7 +114,8 @@ class _Args:
     STATUS = Argument(long='status',
                       short='s',
                       docstring="""task\'s status, that can be changed later.
-                      Can be: expired, cancelled, in_progress, done.""")
+                      Can be: 0 - expired, 1 - cancelled, 2 - in_progress, 3 - 
+                      done.""")
 
     # task comment
     COMMENT = Argument(long='comment',
@@ -433,12 +435,14 @@ def _init_add_task_parser(root_args):
                       _Args.prefix().PRIORITY.short,
                       help=_Args.PRIORITY.docstring,
                       nargs=1,
+                      type=int,
                       default=[None])
 
     task.add_argument(_Args.prefix().STATUS.long,
                       _Args.prefix().STATUS.short,
                       help=_Args.STATUS.docstring,
                       nargs=1,
+                      type=int,
                       default=[None])
 
     task.add_argument(_Args.prefix().TIME.long,
@@ -499,12 +503,14 @@ def _init_change_task_parser(root_args):
                       _Args.prefix().PRIORITY.short,
                       help=_Args.PRIORITY.docstring,
                       nargs=1,
+                      type=int,
                       default=[None])
 
     task.add_argument(_Args.prefix().STATUS.long,
                       _Args.prefix().STATUS.short,
                       help=_Args.STATUS.docstring,
                       nargs=1,
+                      type=int,
                       default=[None])
 
     task.add_argument(_Args.prefix().TIME.long,

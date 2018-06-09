@@ -18,6 +18,10 @@ LOG_PATH = os.path.join(BASE_DIR, LOG_FILE)
 LOG_CONF = 'logging.conf'
 LOG_CONF_PATH = os.path.join(BASE_DIR, LOG_CONF)
 
+# This is file where logged user data will be stored
+LOGGED_USER_FILE = 'user.ini'
+LOGGED_USER_PATH = os.path.join(BASE_DIR, LOGGED_USER_FILE)
+
 # This is lib database file name
 DATABASE_FILE = 'data.db'
 DATABASE_PATH = os.path.join(BASE_DIR, DATABASE_FILE)

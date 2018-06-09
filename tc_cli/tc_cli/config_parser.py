@@ -3,10 +3,8 @@ import time_candle.exceptions.model_exceptions as m_e
 from tc_cli.user import User
 from tc_cli.user_adapter import UserAdapter
 from tc_cli import exceptions as auth_e
+from tc_cli import settings
 import os
-
-
-CONFIG_NAME = 'config.ini'
 
 
 def run_config():
@@ -19,7 +17,7 @@ def run_config():
     }
     """
     config = configparser.ConfigParser()
-    config.read(CONFIG_NAME)
+    config.read(settings.LOGGED_USER_PATH)
 
     # config_dict contains parsed dictionary from config file, but with
     # initialized instances
@@ -62,16 +60,16 @@ def write_config(user):
 def write_user(login, password, new=False):
     config = configparser.ConfigParser()
     if not new:
-        config.read(CONFIG_NAME)
+        config.read(settings.LOGGED_USER_PATH)
     else:
         config['user'] = {'name': '', 'password': ''}
 
     config['user']['name'] = login
     config['user']['password'] = password
 
-    with open(CONFIG_NAME, 'w') as configfile:
+    with open(settings.LOGGED_USER_PATH, 'w') as configfile:
         config.write(configfile)
 
 
-if not os.path.exists(CONFIG_NAME):
+if not os.path.exists(settings.LOGGED_USER_PATH):
     write_user('', '', True)

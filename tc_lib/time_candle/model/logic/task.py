@@ -98,6 +98,15 @@ class TaskLogic(Logic):
         # change task in the database
         task = TaskInstance.make_task(
             self.task_adapter.get_task_by_id(tid, pid))
+        if task.parent is not None:
+            parent_task = TaskInstance.make_task(
+                self.task_adapter.get_task_by_id(task.parent_id, pid))
+            if status is not None:
+                status = max(status, parent_task.status)
+
+            if priority is not None:
+                priority = max(priority, parent_task.priority)
+
         if priority is not None:
             task.priority = priority
         if status is not None:

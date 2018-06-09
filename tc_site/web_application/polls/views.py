@@ -7,8 +7,7 @@ from time_candle.exceptions import AppException
 from . import forms
 from time_candle.model.time_formatter import get_datetime
 from .models import Question, Choice, DoesNotExist
-from time_candle.enums.status import status_dict, Status
-from time_candle.enums.priority import priority_dict, Priority
+from time_candle.enums.status import Status
 
 
 def err404(request, exception):
@@ -59,13 +58,15 @@ def tasks(request):
         if 'delete' in request.POST:
             try:
                 controller.remove_task(request.POST['delete'])
+                return redirect('/polls/tasks')
             except AppException:
                 pass
 
         elif 'check' in request.POST:
             try:
                 controller.change_task(
-                    request.POST['check'], status='done')
+                    request.POST['check'], status=Status.DONE)
+                return redirect('/polls/tasks')
             except AppException as e:
                 print(e.errors)
 
@@ -111,12 +112,15 @@ def add_task(request):
             if not deadline_time:
                 deadline_time = None
 
+            print(priority, status
+                  )
+
             Controller(uid=request.user.id,
                        db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').\
                 add_task(title=title,
                          time=deadline_time,
-                         priority=priority_dict[int(priority)],
-                         status=status_dict[int(status)],
+                         priority=int(priority),
+                         status=int(status),
                          period=period,
                          parent_id=None,
                          comment=comment,

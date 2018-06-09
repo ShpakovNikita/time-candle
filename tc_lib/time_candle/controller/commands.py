@@ -4,8 +4,8 @@ from time_candle.model.logic.user import UserLogic
 import time_candle.controller.validators as v
 import time_candle.exceptions.validation_exceptions as v_e
 from time_candle.model import logger
-from time_candle.enums.status import key_status_dict
-from time_candle.enums.priority import key_priority_dict
+from time_candle.enums.status import key_status_dict, Status
+from time_candle.enums.priority import key_priority_dict, Priority
 import time_candle.model.time_formatter
 """
 This is commands module. Commands from argparse and django will go to this 
@@ -78,22 +78,16 @@ class Controller:
         """
         if priority is None:
             logger.debug('Default priority has been set')
-            priority = key_priority_dict['medium']
-        else:
-            try:
-                priority = key_priority_dict[priority]
-            except KeyError:
-                raise v_e.InvalidPriorityError(
-                    v_e.PriorityMessages.INVALID_PRIORITY)
+            priority = Priority.MEDIUM
+        elif priority < Priority.MIN or priority > Priority.MAX:
+            raise v_e.InvalidPriorityError(
+                v_e.PriorityMessages.INVALID_PRIORITY)
 
         if status is None:
             logger.debug('Default status has been set')
-            status = key_status_dict['in_progress']
-        else:
-            try:
-                status = key_status_dict[status]
-            except KeyError:
-                raise v_e.InvalidStatusError(v_e.StatusMessages.INVALID_STATUS)
+            status = Status.IN_PROGRESS
+        elif status < Status.EXPIRED or status > Status.DONE:
+            raise v_e.InvalidStatusError(v_e.StatusMessages.INVALID_STATUS)
 
         if time is not None:
             time = time_candle.model.time_formatter.get_milliseconds(time)
@@ -164,16 +158,12 @@ class Controller:
         :return: None
         """
         if priority is not None:
-            try:
-                priority = key_priority_dict[priority]
-            except KeyError:
+            if priority < Priority.MIN or priority > Priority.MAX:
                 raise v_e.InvalidPriorityError(
                     v_e.PriorityMessages.INVALID_PRIORITY)
 
         if status is not None:
-            try:
-                status = key_status_dict[status]
-            except KeyError:
+            if status < Status.EXPIRED or status > Status.DONE:
                 raise v_e.InvalidStatusError(v_e.StatusMessages.INVALID_STATUS)
 
         if time is not None:

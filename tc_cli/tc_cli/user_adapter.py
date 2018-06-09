@@ -74,8 +74,7 @@ class UserAdapter:
 
         except DoesNotExist:
             raise auth_e.InvalidLoginError(
-                str(auth_e.LoginMessages.USER_DOES_NOT_EXISTS) +
-                ', try to login again')
+                auth_e.LoginMessages.USER_DOES_NOT_EXISTS)
 
         if obj.password != password:
             raise auth_e.InvalidPasswordError(
