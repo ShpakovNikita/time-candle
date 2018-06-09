@@ -33,7 +33,7 @@
                         <p class="card-text">{{ task.comment|default:"No comments provided"|truncatechars:38 }}</p>
                     </div>
                     {% if task.status == 3 %}
-                        <div class="col-md-3"><i class="fa fa-check pr-1"></i></div>
+                        <div class="col-sm-3 text-center"><i class="fa fa-check pr-1"></i></div>
                     {% elif task.status == 0 %}
                         <div class="col-md-3">
                             <form id="check" method="post">
@@ -84,7 +84,13 @@
 </div>
 </ul>
 {% else %}
-<p>No tasks are available.</p>
+ <div class="card">
+
+     <!--Card content-->
+     <div class="card-body">
+         <div class="card-title text-center">No tasks available</div>
+     </div>
+ </div>
 {% endif %}
 <!--Grid column-->
 {% endblock %}
