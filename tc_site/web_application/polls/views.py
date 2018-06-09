@@ -3,10 +3,12 @@ from django.template import loader
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from time_candle.controller.commands import Controller
+from time_candle.exceptions import AppException
 from . import forms
-
 from time_candle.model.time_formatter import get_datetime
 from .models import Question, Choice, DoesNotExist
+from time_candle.enums.status import status_dict, Status
+from time_candle.enums.priority import priority_dict, Priority
 
 
 def err404(request, exception):
@@ -51,7 +53,23 @@ def tasks(request):
     if not request.user.is_authenticated:
         raise Http404
 
-    tasks_list = Controller(uid=request.user.id, db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db').get_tasks('')[:5]
+    controller = Controller(uid=request.user.id, db_file='/home/shaft/repos/time-candle/time_candle/tc_site/web_application/data.db')
+
+    if request.method == 'POST':
+        if 'delete' in request.POST:
+            try:
+                controller.remove_task(request.POST['delete'])
+            except AppException:
+                pass
+
+        elif 'check' in request.POST:
+            try:
+                controller.change_task(
+                    request.POST['check'], status='done')
+            except AppException as e:
+                print(e.errors)
+
+    tasks_list = controller.get_tasks('')[:5]
 
     # convert all milliseconds fields to normal datetime
     for task in tasks_list:
@@ -77,10 +95,6 @@ def projects(request):
     }
 
     return render(request, 'polls/projects.html', context)
-
-
-from time_candle.enums.status import status_dict
-from time_candle.enums.priority import priority_dict
 
 
 def add_task(request):

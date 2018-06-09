@@ -179,7 +179,8 @@ class Controller:
         if time is not None:
             time = time_candle.model.time_formatter.get_milliseconds(time)
 
-        v.check_comment(comment)
+        if comment is not None:
+            v.check_comment(comment)
 
         self.task_logic.change_task(tid,
                                     priority,

@@ -19,6 +19,10 @@ After installing the main time candle lib you may use it from command line, if y
 $ cd tc_cli
 $ python3 setup.py install
 ```
+Also be sure, that you have installed xcowsay to print whoami if you are on linux:
+```bash
+$ sudo apt install xcowsay
+```
 
 ## How to use? ##
 ```bash
