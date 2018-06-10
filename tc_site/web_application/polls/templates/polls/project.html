@@ -1,5 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
+{% if project %}
+<div class="row">
+    <div class="col-md-12">
+     <div class="card">
+     <!--Card content-->
+     <div class="card-body">
+         <div class="card-title text-center">{{ project.title }}</div>
+     </div>
+         <div class="card-text">{{ project.description }}</div>
+     </div>
+    </div>
+ </div>
+{% endif %}
 {% if tasks_list %}
 <div class="row">
     {% for task in tasks_list %}
@@ -25,4 +38,19 @@
         <i class="fa fa-plus"></i>
     </a>
 </div>
+{% endblock %}
+
+{% block errors %}
+{% if not project %}
+<div class="row">
+    <div class="col-md-12">
+     <div class="card">
+     <!--Card content-->
+     <div class="card-body">
+         <div class="card-title text-center red-text">You don't have rights for this project</div>
+     </div>
+     </div>
+    </div>
+ </div>
+{% endif %}
 {% endblock %}

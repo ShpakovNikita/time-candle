@@ -163,6 +163,44 @@ def add_project(request):
     return render(request, 'polls/add_project.html', {'form': form})
 
 
+def add_project_task(request, project_id):
+    if request.method == 'POST':
+        print(request.POST)
+        form = forms.AddTask(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data.get('title')
+            comment = form.cleaned_data.get('comment')
+            deadline_time = form.cleaned_data.get('deadline_time')
+            priority = form.cleaned_data.get('priority')
+            status = form.cleaned_data.get('status')
+            period = form.cleaned_data.get('period')
+            if not deadline_time:
+                deadline_time = None
+
+            controller = Controller(uid=request.user.id,
+                                    db_file=config.DATABASE_PATH)
+
+            controller.add_task(title=title,
+                                time=deadline_time,
+                                priority=int(priority),
+                                status=int(status),
+                                period=period,
+                                parent_id=None,
+                                comment=comment,
+                                pid=None,
+                                receiver_uid=None)
+
+            return redirect(reverse('polls:tasks'))
+    else:
+        form = forms.AddTask()
+
+    return render(request, reverse('polls:add_task'), {'form': form})
+
+
+def profile(request, user_id):
+    return render(request, 'polls/profile.html', {'screen_user':user_id})
+
+
 def vote(request, question_id):
     try:
         question = Question.get(Question.id == question_id)
