@@ -1,10 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block content %}
+{% if tasks_list %}
+<div class="row">
+    {% for task in tasks_list %}
+        {% include 'polls/task.html' with task=task %}
+    {% endfor %}
+</div>
+</ul>
+{% else %}
+ <div class="card">
 
-</body>
-</html>
+     <!--Card content-->
+     <div class="card-body">
+         <div class="card-title text-center">No tasks available</div>
+     </div>
+ </div>
+{% endif %}
+<!--Grid column-->
+{% endblock %}
+
+{% block add_buttons %}
+<div class="fixed-action-btn" style="bottom: 45px; right: 24px; z-index: 10000">
+    <a class="btn-floating btn-lg red" href="{% url 'polls:add_task' %}">
+        <i class="fa fa-plus"></i>
+    </a>
+</div>
+{% endblock %}

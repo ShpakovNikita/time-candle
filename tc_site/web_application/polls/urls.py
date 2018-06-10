@@ -22,6 +22,8 @@ urlpatterns = [
     path('<int:question_id>/results/', views.results, name='results'),
     # ex: /polls/5/vote/
     path('<int:question_id>/vote/', views.vote, name='vote'),
+
+    path('project/<int:project_id>', views.project, name='project'),
 ]
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns

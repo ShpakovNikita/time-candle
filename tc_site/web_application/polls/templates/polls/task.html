@@ -57,7 +57,7 @@
                 {% if task.pid %}
                     <div class="row mt-2">
                         <div class="col-md-6">
-                            <div disabled="disabled" class="btn btn-sm btn-red" style="margin-bottom: -10px; width: 110%">Proj:{{ task.project_name|truncatechars:20 }}</div>
+                            <a href="{% url 'polls:project' task.pid %}" class="btn btn-sm btn-red" style="margin-bottom: -10px; width: 110%">Proj:{{ task.project_name|truncatechars:20 }}</a>
                         </div>
                         <div class="col-md-6">
                             <div disabled="disabled" class="btn btn-sm btn-unique" style=" margin-bottom: -10px; width: 100%">Exec:{{ task.receiver_name|truncatechars:20 }}</div>

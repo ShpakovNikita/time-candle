@@ -9,6 +9,7 @@ from time_candle.model.time_formatter import get_datetime
 from .models import Question, Choice, DoesNotExist
 from time_candle.enums.status import Status
 from . import config
+from .tasks import shortcuts
 
 
 def err404(request, exception):
@@ -48,43 +49,43 @@ def results(request, question_id):
     return render(request, 'polls/results.html', {'question': question})
 
 
+def project(request, project_id):
+    if not request.user.is_authenticated:
+        raise Http404
+
+    controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
+    shortcuts.task_card_post_form(request,
+                                  controller,
+                                  reverse('polls:project', args=(project_id, )))
+
+    tasks_list = controller.get_tasks('projects: ' + str(project_id))
+
+    try:
+        project = controller.get_project(project_id)
+    except AppException:
+        pass
+
+    # convert all milliseconds fields to normal datetime
+    shortcuts.init_tasks(request, controller, tasks_list)
+
+    context = {
+        'tasks_list': tasks_list
+    }
+
+    return render(request, 'polls/project.html', context)
+
+
 def tasks(request):
     if not request.user.is_authenticated:
         raise Http404
 
     controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
-    if request.method == 'POST':
-        if 'delete' in request.POST:
-            try:
-                controller.remove_task(request.POST['delete'])
-                return redirect('/polls/tasks')
-            except AppException:
-                pass
-
-        elif 'check' in request.POST:
-            try:
-                controller.change_task(
-                    request.POST['check'], status=Status.DONE)
-                return redirect('/polls/tasks')
-            except AppException as e:
-                print(e.errors)
+    shortcuts.task_card_post_form(request, controller, reverse('polls:tasks'))
 
     tasks_list = controller.get_tasks('')[:5]
 
     # convert all milliseconds fields to normal datetime
-    for task in tasks_list:
-        task.pid = 1
-        if task.deadline is not None:
-            task.deadline = get_datetime(task.deadline)
-        else:
-            task.deadline = None
-
-        if task.pid is not None:
-            task.project_name = controller.get_project(task.pid).title
-            if task.uid == request.user.id:
-                task.receiver_name = 'You'
-            else:
-                task.receiver_name = controller.get_user(task.uid).login
+    shortcuts.init_tasks(request, controller, tasks_list)
 
     context = {
         'tasks_list': tasks_list
