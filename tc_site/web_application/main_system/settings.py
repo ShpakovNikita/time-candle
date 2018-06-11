@@ -29,13 +29,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-LOGIN_REDIRECT_URL = '/polls/'
+LOGIN_REDIRECT_URL = '/tc_web/'
 
 # Application definition
 
 INSTALLED_APPS = [
     'main_system.apps.AuthConfig',
-    'polls.apps.PollsConfig',
+    'tc_web.apps.TCWebConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

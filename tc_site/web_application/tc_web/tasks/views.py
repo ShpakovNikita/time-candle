@@ -36,11 +36,11 @@ def add_task(request):
                                 pid=None,
                                 receiver_uid=None)
 
-            return redirect('/polls/tasks')
+            return redirect(reverse('tc_web:tasks'))
     else:
         form = forms.AddTask()
 
-    return render(request, 'polls/tasks/add_task.html', {'form': form})
+    return render(request, 'tc_web/tasks/add_task.html', {'form': form})
 
 
 def add_project_task(request, project_id):
@@ -70,11 +70,11 @@ def add_project_task(request, project_id):
                                 pid=None,
                                 receiver_uid=None)
 
-            return redirect(reverse('polls:tasks'))
+            return redirect(reverse('tc_web:tasks'))
     else:
         form = forms.AddTask()
 
-    return render(request, reverse('polls:add_task'), {'form': form})
+    return render(request, reverse('tc_web:add_task'), {'form': form})
 
 
 def project(request, project_id):
@@ -94,7 +94,7 @@ def project(request, project_id):
 
         redirect_view = shortcuts.task_card_post_form(request,
                                                       controller,
-                                                      reverse('polls:project',
+                                                      reverse('tc_web:project',
                                                               args=(project_id,)
                                                               ))
         if redirect_view:
@@ -106,7 +106,7 @@ def project(request, project_id):
     except AppException as e:
         context['errors'] = e.errors.value
 
-    return render(request, 'polls/tasks/project.html', context)
+    return render(request, 'tc_web/tasks/project.html', context)
 
 
 def tasks(request):
@@ -122,7 +122,7 @@ def tasks(request):
 
     try:
         redirect_view = shortcuts.task_card_post_form(request, controller,
-                                                      reverse('polls:tasks'))
+                                                      reverse('tc_web:tasks'))
         if redirect_view:
             return redirect_view
 
@@ -132,4 +132,4 @@ def tasks(request):
     except AppException as e:
         context['errors'] = e.errors.value
 
-    return render(request, 'polls/tasks/tasks.html', context)
+    return render(request, 'tc_web/tasks/tasks.html', context)

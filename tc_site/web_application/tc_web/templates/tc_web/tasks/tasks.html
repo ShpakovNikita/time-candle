@@ -3,10 +3,9 @@
 {% if tasks_list %}
 <div class="row">
     {% for task in tasks_list %}
-        {% include 'polls/tasks/task_card.html' with task=task %}
+        {% include 'tc_web/tasks/task_card.html' with task=task %}
     {% endfor %}
 </div>
-</ul>
 {% else %}
  <div class="card">
 
@@ -21,7 +20,7 @@
 
 {% block add_buttons %}
 <div class="fixed-action-btn" style="bottom: 45px; right: 24px; z-index: 10000">
-    <a class="btn-floating btn-lg red" href="{% url 'polls:add_task' %}">
+    <a class="btn-floating btn-lg red" href="{% url 'tc_web:add_task' %}">
         <i class="fa fa-plus"></i>
     </a>
 </div>

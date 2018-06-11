@@ -5,7 +5,7 @@ from .tasks import views as task_views
 from .projects import views as project_views
 
 
-app_name = 'polls'
+app_name = 'tc_web'
 
 
 urlpatterns = [

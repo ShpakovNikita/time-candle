@@ -14,13 +14,13 @@ from .tasks import shortcuts
 
 def err404(request, exception):
     return render(
-        request, 'polls/404.html', status=404)
+        request, 'tc_web/404.html', status=404)
 
 
 def index(request):
     controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
     latest_question_list = controller.get_tasks('')[:5]
-    template = loader.get_template('polls/index.html')
+    template = loader.get_template('tc_web/index.html')
     controller.get_tasks('tids: 10')
 
     context = {
@@ -30,7 +30,7 @@ def index(request):
 
 
 def profile(request, user_id):
-    return render(request, 'polls/profile.html', {'screen_user': user_id})
+    return render(request, 'tc_web/profile.html', {'screen_user': user_id})
 
 
 def vote(request, question_id):
@@ -44,7 +44,7 @@ def vote(request, question_id):
             Choice.id == int(request.POST['choice'])).get()
     except (KeyError, DoesNotExist):
         # Redisplay the question voting form.
-        return render(request, 'polls/detail.html', {
+        return render(request, 'tc_web/detail.html', {
             'question': question,
             'error_message': "You didn't select a choice.",
         })
@@ -55,6 +55,6 @@ def vote(request, question_id):
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
         return HttpResponseRedirect(
-            reverse('polls:results', args=(question.id,)))
+            reverse('tc_web:results', args=(question.id,)))
 
 # Create your views here.

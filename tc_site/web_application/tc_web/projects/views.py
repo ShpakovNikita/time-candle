@@ -18,8 +18,19 @@ def projects(request):
     context = {
         'projects_list': projects_list
     }
+    try:
+        redirect_view = shortcuts.project_card_post_form(
+            request, controller, reverse('tc_web:projects'))
+        if redirect_view:
+            return redirect_view
 
-    return render(request, 'polls/projects/projects.html', context)
+        # convert all milliseconds fields to normal datetime.
+        shortcuts.init_projects(request, controller, projects_list)
+
+    except AppException as e:
+        context['errors'] = e.errors.value
+
+    return render(request, 'tc_web/projects/projects.html', context)
 
 
 def add_project(request):
@@ -37,9 +48,9 @@ def add_project(request):
                                    description=description,
                                    members=[])
 
-            return redirect('/polls/projects/projects')
+            return redirect(reverse('tc_web:projects'))
     else:
         form = forms.AddProject()
 
-    return render(request, 'polls/projects/add_project.html', {'form': form})
+    return render(request, 'tc_web/projects/add_project.html', {'form': form})
 

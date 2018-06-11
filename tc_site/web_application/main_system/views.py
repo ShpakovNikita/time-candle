@@ -10,18 +10,12 @@ def signup(request):
         print(request.POST)
         form = forms.SignUpForm(request.POST)
         if form.is_valid():
-            user = form.save()
-
-            # load the profile instance created by the signal
-            user.refresh_from_db()
-            user.profile.birth_date = form.cleaned_data.get('birth_date')
-            user.save()
-
+            form.save()
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            return redirect('/polls/')
+            return redirect('/tc_web/')
     else:
         form = forms.SignUpForm()
     return render(request, 'registration/signup.html', {'form': form})

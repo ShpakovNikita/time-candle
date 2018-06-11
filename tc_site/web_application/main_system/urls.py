@@ -19,7 +19,7 @@ from django.conf.urls import url
 from django.contrib.auth import views as auth_views
 from . import views
 
-handler404 = 'polls.views.err404'
+handler404 = 'tc_web.views.err404'
 
 urlpatterns = [
     url(r'^login/$', auth_views.login, name='login'),
@@ -35,6 +35,6 @@ urlpatterns = [
         auth_views.password_reset_confirm, name='password_reset_confirm'),
     url(r'^reset/done/$', auth_views.password_reset_complete,
         name='password_reset_complete'),
-    path('polls/', include('polls.urls')),
+    path('tc_web/', include('tc_web.urls')),
     path('admin/', admin.site.urls),
 ]
