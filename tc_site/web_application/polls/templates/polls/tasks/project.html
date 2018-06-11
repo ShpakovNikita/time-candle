@@ -2,13 +2,13 @@
 {% block content %}
 {% if project %}
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-12 mb-2">
      <div class="card">
      <!--Card content-->
      <div class="card-body">
-         <div class="card-title text-center">{{ project.title }}</div>
+         <h4 class="card-title text-center">{{ project.title }}</h4>
+         <p class="card-text">{{ project.description|default:'No description provided' }}</p>
      </div>
-         <div class="card-text">{{ project.description }}</div>
      </div>
     </div>
  </div>
@@ -16,38 +16,41 @@
 {% if tasks_list %}
 <div class="row">
     {% for task in tasks_list %}
-        {% include 'polls/task.html' with task=task %}
+        {% include 'polls/tasks/task_card.html' with task=task %}
     {% endfor %}
 </div>
 </ul>
 {% else %}
  <div class="card">
-
+     {% if project %}
      <!--Card content-->
      <div class="card-body">
-         <div class="card-title text-center">No tasks available</div>
+         <h4 class="card-title text-center">No tasks available</h4>
      </div>
+     {% endif %}
  </div>
 {% endif %}
 <!--Grid column-->
 {% endblock %}
 
 {% block add_buttons %}
+{% if project %}
 <div class="fixed-action-btn" style="bottom: 45px; right: 24px; z-index: 10000">
     <a class="btn-floating btn-lg red" href="{% url 'polls:add_task' %}">
         <i class="fa fa-plus"></i>
     </a>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block errors %}
-{% if not project %}
+{% if errors %}
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-12 mb-2">
      <div class="card">
      <!--Card content-->
      <div class="card-body">
-         <div class="card-title text-center red-text">You don't have rights for this project</div>
+         <h4 class="card-title text-center red-text">{{ errors }}</h4>
      </div>
      </div>
     </div>

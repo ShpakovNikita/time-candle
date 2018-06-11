@@ -3,7 +3,7 @@
 {% if tasks_list %}
 <div class="row">
     {% for task in tasks_list %}
-        {% include 'polls/task.html' with task=task %}
+        {% include 'polls/tasks/task_card.html' with task=task %}
     {% endfor %}
 </div>
 </ul>
@@ -12,7 +12,7 @@
 
      <!--Card content-->
      <div class="card-body">
-         <div class="card-title text-center">No tasks available</div>
+         <h4 class="card-title text-center">No tasks available</h4>
      </div>
  </div>
 {% endif %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if projects_list %}
+<div class="row">
+{% for project in projects_list %}
+    {% include 'polls/projects/project_card.html' with project=project %}
+{% endfor %}
+</div>
+</ul>
+{% else %}
+ <div class="card">
+
+     <!--Card content-->
+     <div class="card-body">
+         <h4 class="card-title text-center">No projects available</h4>
+     </div>
+ </div>
+{% endif %}
+<!--Grid column-->
+{% endblock %}
+
+{% block add_buttons %}
+<div class="fixed-action-btn" style="bottom: 45px; right: 24px; z-index: 10000">
+    <a class="btn-floating btn-lg red" href="{% url 'polls:add_project' %}">
+        <i class="fa fa-plus"></i>
+    </a>
+</div>
+{% endblock %}
+{% block errors %}
+{% if errors %}
+<div class="row">
+    <div class="col-md-12 mb-2">
+     <div class="card">
+     <!--Card content-->
+     <div class="card-body">
+         <h4 class="card-title text-center red-text">{{ errors }}</h4>
+     </div>
+     </div>
+    </div>
+ </div>
+{% endif %}
+{% endblock %}

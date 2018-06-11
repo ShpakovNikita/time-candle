@@ -1,5 +1,4 @@
 from django.shortcuts import redirect
-from time_candle.exceptions import AppException
 from time_candle.enums.status import Status
 from time_candle.model.time_formatter import get_datetime
 
@@ -7,24 +6,17 @@ from time_candle.model.time_formatter import get_datetime
 def task_card_post_form(request, controller, redirect_link):
     if request.method == 'POST':
         if 'delete' in request.POST:
-            try:
-                controller.remove_task(request.POST['delete'])
-                return redirect(redirect_link)
-            except AppException:
-                pass
+            controller.remove_task(request.POST['delete'])
+            return redirect(redirect_link)
 
         elif 'check' in request.POST:
-            try:
-                controller.change_task(
-                    request.POST['check'], status=Status.DONE)
-                return redirect(redirect_link)
-            except AppException as e:
-                print(e.errors)
+            controller.change_task(
+                request.POST['check'], status=Status.DONE)
+            return redirect(redirect_link)
 
 
 def init_tasks(request, controller, tasks_list):
     for task in tasks_list:
-        task.pid = 1
         if task.deadline is not None:
             task.deadline = get_datetime(task.deadline)
         else:

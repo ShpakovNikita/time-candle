@@ -270,6 +270,14 @@ class TestProjectAdapter(unittest.TestCase):
         for project in projects:
             self.assertIn(project.pid, [1, 2])
 
+        # let's check if we are getting right values from pid filter param
+        self.assertEqual(
+            len(self.adapter.get_by_filter(ProjectFilter().pid(1))), 1)
+        self.assertEqual(
+            len(self.adapter.get_by_filter(ProjectFilter().pid(3))), 1)
+        self.assertEqual(
+            len(self.adapter.get_by_filter(ProjectFilter().pid(4))), 0)
+
     def test_in_remove_from_project(self):
         _init_project_table()
 

@@ -19,7 +19,7 @@ class ProjectFilter(PrimaryFilter):
         if self.result:
             self.ops.append(op)
 
-        self.result.append(Project.admin == pid)
+        self.result.append(Project.pid == pid)
         return self
 
     def admin(self, uid, op=PrimaryFilter.OP_AND):

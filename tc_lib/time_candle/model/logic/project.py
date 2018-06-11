@@ -42,7 +42,6 @@ class ProjectLogic(Logic):
         self.project_adapter.remove_project_by_id(pid)
 
     def get_project(self, pid):
-        # remove project from database if have rights
         fil = ProjectFilter().pid(pid)
         try:
             return ProjectInstance.make_project(
