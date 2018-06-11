@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^login/$', auth_views.login, name='login'),
     url(r'^logout/$',
         auth_views.logout,
+        {'next_page': '/'},
         name='logout'),
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^password_reset/$', auth_views.password_reset, name='password_reset'),
@@ -37,4 +38,5 @@ urlpatterns = [
         name='password_reset_complete'),
     path('tc_web/', include('tc_web.urls')),
     path('admin/', admin.site.urls),
+    path('', views.index)
 ]

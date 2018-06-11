@@ -1,6 +1,6 @@
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from . import models
 from . import forms
 
@@ -19,3 +19,7 @@ def signup(request):
     else:
         form = forms.SignUpForm()
     return render(request, 'registration/signup.html', {'form': form})
+
+
+def index(request):
+    return redirect(reverse('tc_web:index'))

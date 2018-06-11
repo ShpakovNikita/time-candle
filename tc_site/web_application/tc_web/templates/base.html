@@ -24,11 +24,11 @@
 <!--Main Navigation-->
 <header>
     <!--Navbar-->
-    <nav class="navbar navbar-expand-lg navbar-dark mdb-color">
+    <nav class="navbar navbar-expand-lg navbar-dark mdb-color sticky-top">
         <div class="container">
 
             <!-- Navbar brand -->
-            <a class="navbar-brand" href="#">Time Candle</a>
+            <a class="navbar-brand text-white">Time Candle</a>
 
             <!-- Collapse button -->
             <button class="navbar-toggler" type="button" data-toggle="collapse"
@@ -59,6 +59,31 @@
                     {% endif %}
                     {% block navbar %}
                     {% endblock %}
+
+                </ul>
+                <!-- Links -->
+                <!-- Links -->
+                <ul class="navbar-nav ml-auto">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Log out</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-user"></i> Profile </a>
+                        <div class="dropdown-menu dropdown-menu-right dropdown-info" aria-labelledby="navbarDropdownMenuLink-4">
+                            <a class="dropdown-item" href="#">Settings</a>
+                            <a class="dropdown-item" href="#">Check</a>
+                        </div>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Log in</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'signup' %}">Sign up</a>
+                    </li>
+                    {% endif %}
 
                 </ul>
                 <!-- Links -->
@@ -149,7 +174,7 @@
 <!-- SCRIPTS -->
 <!-- JQuery -->
 <script type="text/javascript"
-        src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+        src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
 <!-- Bootstrap tooltips -->
 <script type="text/javascript" src="{% static 'js/popper.min.js' %}"></script>
 <!-- Bootstrap core JavaScript -->
