@@ -33,9 +33,12 @@ class UserLogic(Logic):
     def get_user(self, uid):
         return UserInstance.make_user(self.user_adapter.get_user_by_id(uid))
 
-    def change_user(self, uid, nickname):
+    def change_user(self, uid, nickname, about):
         user = self.user_adapter.get_user_by_id(uid)
         if nickname is not None:
             user.nickname = nickname
+
+        if about is not None:
+            user.about = about
 
         self.user_adapter.save(user)

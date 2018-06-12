@@ -153,8 +153,7 @@ class Controller:
                     priority=None,
                     status=None,
                     time=None,
-                    comment=None,
-                    project=None):
+                    comment=None):
         """
         This function will change task in the database, with the creator and
         executor that named in the config.ini (i.e current logged user)
@@ -185,8 +184,7 @@ class Controller:
                                     priority,
                                     status,
                                     time,
-                                    comment,
-                                    project)
+                                    comment)
 
     def change_project(self, pid, title=None, description=None):
         """
@@ -272,11 +270,12 @@ class Controller:
                                  nickname,
                                  about)
 
-    def change_user(self, uid, nickname=None):
+    def change_user(self, uid, nickname=None, about=''):
         """
         This function will change user in the database
         :param uid: User's id (change target)
         :param nickname: User's nickname
+        :param about: User's additional info
         :return: None
         """
-        self.user_logic.change_user(uid, nickname)
+        self.user_logic.change_user(uid, nickname, about)

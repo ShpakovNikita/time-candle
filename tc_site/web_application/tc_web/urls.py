@@ -16,9 +16,16 @@ urlpatterns = [
     path('projects/', project_views.projects, name='projects'),
 
     path('tasks/add_task/', task_views.add_task, name='add_task'),
-    path('tasks/add_task/<int:project_id>/',
-         task_views.add_project_task,
+    path('tasks/<int:project_id>/add_task/',
+         task_views.add_task,
          name='add_project_task'),
+    path('tasks/<int:project_id>/add_task/<int:task_id>',
+         task_views.add_task,
+         name='add_child_project_task'),
+    path('tasks/add_task/<int:task_id>/',
+         task_views.add_task,
+         name='add_child_task'),
+
     path('projects/add_project/',
          project_views.add_project,
          name='add_project'),
@@ -28,6 +35,9 @@ urlpatterns = [
 
     path('project/<int:project_id>', task_views.project, name='project'),
     path('profile/<int:user_id>', views.profile, name='profile'),
+    path('profile/change_profile/<int:user_id>',
+         views.change_profile,
+         name='change_profile'),
 ]
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns

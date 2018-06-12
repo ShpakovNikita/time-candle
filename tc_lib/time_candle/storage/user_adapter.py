@@ -80,8 +80,6 @@ class UserAdapter(PrimaryAdapter):
          - about
         :return: None
         """
-        if User.select().where(User.login == obj.login).exists():
-            raise db_e.InvalidLoginError(db_e.LoginMessages.USER_EXISTS)
 
         try:
             user = User.select().where(User.uid == obj.uid).get()
@@ -101,6 +99,7 @@ class UserAdapter(PrimaryAdapter):
     @staticmethod
     def _update(user, obj):
         user.nickname = obj.nickname
+        user.about = obj.about
         user.save()
 
     @staticmethod

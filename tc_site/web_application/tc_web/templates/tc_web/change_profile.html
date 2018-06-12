@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-md-center">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <p class="h4 text-center mb-4">Change profile</p>
+                <br>
+                <form method="post" class="text-center">
+                    {% csrf_token %}
+
+                    <div class="md-form">
+                        {{ form.nickname.errors }}
+                        <i class="fa fa-group prefix grey-text"></i>
+                        <label for="{{ form.nickname.id_for_label }}">{{ form.nickname.label_tag }}</label>
+                        {{ form.nickname }}
+                    </div>
+
+                    <div class="md-form">
+                        {{ form.about.errors }}
+                        <i class="fa fa-comment prefix grey-text"></i>
+                        <label for="{{ form.about.id_for_label }}">{{ form.about.label_tag }}</label>
+                        {{ form.about }}
+                    </div>
+                    <button type="submit" class="btn btn-unique">Commit
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

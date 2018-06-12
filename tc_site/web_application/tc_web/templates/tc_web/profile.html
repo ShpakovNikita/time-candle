@@ -1,5 +1,33 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{{ screen_user }}</h1>
+<!-- Card -->
+<div class="card">
+
+    <!-- Card body -->
+    <div class="card-body">
+
+        <!-- Material form register -->
+
+        <p class="h4 text-center py-4">Profile</p>
+
+        <h3><i class="fa fa-user prefix grey-text"> User id: </i> {{ screen_user.id }}</h3>
+        <h3><i class="fa fa-hand-peace-o prefix grey-text"> Login: </i> {{ screen_user.login }}</h3>
+        <h3><i class="fa fa-group prefix grey-text"> Nickname: </i> {{ screen_user.nickname }}</h3>
+        <h3><i class="fa fa-envelope prefix grey-text"> Email: </i> {{ screen_user.email }}</h3>
+        <h3><i class="fa fa-comment prefix grey-text"> About: </i> {{ screen_user.about }}</h3>
+
+        {% if user.is_authenticated and user.id == screen_user.id %}
+        <div class="text-center py-4 mt-3">
+            <a class="btn btn-unique" href="{% url 'tc_web:change_profile' user.id %}">Change</a>
+        </div>
+        {% endif %}
+
+        <!-- Material form register -->
+
+    </div>
+    <!-- Card body -->
+
+</div>
+<!-- Card -->
 {% endblock %}

@@ -6,15 +6,16 @@ from time_candle.controller.commands import Controller
 from time_candle.exceptions import AppException
 from . import forms
 from time_candle.model.time_formatter import get_datetime
-from .models import Question, Choice, DoesNotExist
+from .models import Question, Choice
 from time_candle.enums.status import Status
 from . import config
-from .tasks import shortcuts
+from . import shortcuts
+from django.contrib.auth.models import User
 
 
 def err404(request, exception):
     return render(
-        request, 'tc_web/404.html', status=404)
+        request, 'polls/404.html', status=404)
 
 
 def index(request):
@@ -30,7 +31,44 @@ def index(request):
 
 
 def profile(request, user_id):
-    return render(request, 'tc_web/profile.html', {'screen_user': user_id})
+    controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
+
+    try:
+        django_user = User.objects.get(id=user_id)
+        lib_user = controller.get_user(user_id)
+    except (User.DoesNotExist, AppException):
+        raise Http404
+
+    screen_user = shortcuts.merge_instances(django_user, lib_user)
+
+    return render(request, 'tc_web/profile.html', {'screen_user': screen_user})
+
+
+def change_profile(request, user_id):
+    if request.user.id != user_id:
+        raise Http404
+
+    controller = Controller(uid=request.user.id,
+                            db_file=config.DATABASE_PATH)
+
+    if request.method == 'POST':
+        print(request.POST)
+        form = forms.ChangeProfileForm(request.POST)
+        if form.is_valid():
+            about = form.cleaned_data.get('about')
+            nickname = form.cleaned_data.get('nickname')
+            controller.change_user(user_id, nickname, about)
+
+            return redirect(reverse('tc_web:profile', args=(user_id,)))
+
+    else:
+        form = forms.ChangeProfileForm()
+        print(form.__dict__)
+        user = controller.get_user(user_id)
+        form.fields['nickname'].widget.attrs.update({'value': user.nickname})
+        form.fields['about'].widget.attrs.update({'value': user.about})
+
+    return render(request, 'tc_web/change_profile.html', {'form': form})
 
 
 def vote(request, question_id):

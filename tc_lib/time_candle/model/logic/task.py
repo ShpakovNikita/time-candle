@@ -94,13 +94,13 @@ class TaskLogic(Logic):
         # remove task from database
         self.task_adapter.remove_task_by_id(tid)
 
-    def change_task(self, tid, priority, status, time, comment, pid):
+    def change_task(self, tid, priority, status, time, comment):
         # change task in the database
         task = TaskInstance.make_task(
-            self.task_adapter.get_task_by_id(tid, pid))
+            self.task_adapter.get_task_by_id(tid))
         if task.parent is not None:
             parent_task = TaskInstance.make_task(
-                self.task_adapter.get_task_by_id(task.parent_id, pid))
+                self.task_adapter.get_task_by_id(task.parent))
             if status is not None:
                 status = max(status, parent_task.status)
 

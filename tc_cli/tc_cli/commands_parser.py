@@ -519,12 +519,6 @@ def _init_change_task_parser(root_args):
                       nargs=1,
                       default=[None])
 
-    task.add_argument(_Args.prefix().PROJECT.long,
-                      _Args.prefix().PROJECT.short,
-                      help=_Args.PROJECT.docstring,
-                      nargs=1,
-                      default=[None])
-
     task.add_argument(_Args.prefix().COMMENT.long,
                       _Args.prefix().COMMENT.short,
                       help=_Args.COMMENT.docstring,
@@ -670,8 +664,7 @@ def _process_change_task(parsed_args):
                                parsed_args.priority[0],
                                parsed_args.status[0],
                                parsed_args.time[0],
-                               parsed_args.comment[0],
-                               parsed_args.project[0])
+                               parsed_args.comment[0])
     print('task %s changed' % parsed_args.id)
 
 

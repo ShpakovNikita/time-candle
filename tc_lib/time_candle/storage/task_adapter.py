@@ -319,20 +319,17 @@ class TaskAdapter(PrimaryAdapter):
 
         logger.debug('task saved to database')
 
-    def get_task_by_id(self, tid, pid=None):
+    def get_task_by_id(self, tid):
         """
         This function finds task by id and current user in database and returns
         it, or raise error due to incorrect request
-        :param pid: Project's id to get task from it
         :param tid: Task id to find
-        :type pid: Int
         :type tid: Int
         :return: Task
         """
         task = Task.select().where((Task.tid == tid) &
                                    ((Task.creator == self.uid) |
-                                    (Task.receiver == self.uid)) &
-                                   (Task.project == pid))
+                                    (Task.receiver == self.uid)))
         try:
             return task.get()
 

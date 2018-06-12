@@ -9,7 +9,7 @@ from .. import config
 from . import shortcuts
 
 
-def add_task(request):
+def add_task(request, project_id=None, task_id=None):
     if request.method == 'POST':
         print(request.POST)
         form = forms.AddTask(request.POST)
@@ -31,12 +31,14 @@ def add_task(request):
                                 priority=int(priority),
                                 status=int(status),
                                 period=period,
-                                parent_id=None,
+                                parent_id=task_id,
                                 comment=comment,
-                                pid=None,
+                                pid=project_id,
                                 receiver_uid=None)
-
-            return redirect(reverse('tc_web:tasks'))
+            if project_id is not None:
+                return redirect(reverse('tc_web:project', args=(project_id,)))
+            else:
+                return redirect(reverse('tc_web:tasks'))
     else:
         form = forms.AddTask()
 

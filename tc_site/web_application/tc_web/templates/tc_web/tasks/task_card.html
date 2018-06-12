@@ -60,28 +60,32 @@
                             <a href="{% url 'tc_web:project' task.pid %}" class="btn btn-sm btn-red" style="margin-bottom: -10px; width: 110%">Proj:{{ task.project_name|truncatechars:20 }}</a>
                         </div>
                         <div class="col-md-6">
-                            <div disabled="disabled" class="btn btn-sm btn-unique" style=" margin-bottom: -10px; width: 100%">Exec:{{ task.receiver_name|truncatechars:20 }}</div>
+                            <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-unique" style=" margin-bottom: -10px; width: 100%">Exec:{{ task.receiver_name|truncatechars:20 }}</a>
                         </div>
                     </div>
                 {% else %}
-                    <div class="btn btn-sm btn-pink" style="width: 95%; margin-bottom: -10px">Personal task</div>
+                    <div class="btn btn-sm btn-pink mt-2" style="width: 95%; margin-bottom: -10px">Personal task</div>
                 {% endif %}
                 <!--TODO: REAL url-->
             </div>
-<!-- Card footer -->
-  <div class="rounded-bottom mdb-color darken-1 text-center pt-3">
-    <ul class="list-unstyled list-inline font-small">
-      <li class="list-inline-item pr-2">
-          {% if task.deadline %}
-          <a class="white-text"><i class="fa fa-clock-o pr-1"></i>{{task.deadline|date:"d M, H:i"}}</a>
-          {% else %}
-          <a class="white-text"><i class="fa fa-clock-o pr-1"></i>No deadline</a>
-          {% endif %}
-          </li>
-      <li class="list-inline-item pr-2"><a href="#" class="white-text"><i class="fa fa-deviantart pr-1"> </i>add child</a></li>
-      <li class="list-inline-item pr-2"><a href="#" class="white-text"><i class="fa fa-arrow-right pr-1"></i>change</a></li>
-    </ul>
-  </div>
+        <!-- Card footer -->
+          <div class="rounded-bottom mdb-color darken-1 text-center pt-3">
+            <ul class="list-unstyled list-inline font-small">
+              <li class="list-inline-item pr-2">
+                  {% if task.deadline %}
+                  <a class="white-text"><i class="fa fa-clock-o pr-1"></i>{{task.deadline|date:"d M, H:i"}}</a>
+                  {% else %}
+                  <a class="white-text"><i class="fa fa-clock-o pr-1"></i>No deadline</a>
+                  {% endif %}
+                  </li>
+                {% if task.pid %}
+                    <li class="list-inline-item pr-2"><a href="{% url 'tc_web:add_child_project_task' project_id=task.pid task_id=task.tid  %}" class="white-text"><i class="fa fa-deviantart pr-1"> </i>add child</a></li>
+                {% else %}
+                    <li class="list-inline-item pr-2"><a href="{% url 'tc_web:add_child_task' task_id=task.tid  %}" class="white-text"><i class="fa fa-deviantart pr-1"> </i>add child</a></li>
+                {% endif %}
+              <li class="list-inline-item pr-2"><a href="#" class="white-text"><i class="fa fa-arrow-right pr-1"></i>change</a></li>
+            </ul>
+          </div>
         </div>
         <!--/.Card-->
 
