@@ -93,7 +93,10 @@ def change_task(request, task_id):
     context['form'] = form
     try:
         task = controller.get_tasks('tids: ' + str(task_id))[0]
-        context['task_title'] = task.title
+        shortcuts.init_tasks(request, controller, [task])
+        context['task'] = task
+        form.fields['comment'].widget.attrs.update({'value': task.comment})
+        form.fields['deadline_time'].widget.attrs.update({'value': task.deadline})
 
     except (AppException, IndexError):
         raise Http404

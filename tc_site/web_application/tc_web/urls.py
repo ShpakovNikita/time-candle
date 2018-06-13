@@ -13,6 +13,7 @@ urlpatterns = [
     path('', views.index, name='index'),
 
     path('tasks/', task_views.tasks, name='tasks'),
+    path('tasks/?hahs<int:project_id>/', task_views.project, name='projects_ts'),
     path('projects/', project_views.projects, name='projects'),
 
     path('tasks/add_task/', task_views.add_task, name='add_task'),

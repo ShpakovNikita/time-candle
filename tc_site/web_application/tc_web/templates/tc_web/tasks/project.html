@@ -44,3 +44,7 @@
 {% endblock %}
 
 {% include 'tc_web/error.html' with errors=errors %}
+
+{% block navbar %}
+    {% include 'tc_web/tasks/query_bar.html' %}
+{% endblock %}

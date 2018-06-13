@@ -1,6 +1,7 @@
 from django.shortcuts import redirect
 from time_candle.enums.status import Status
 from time_candle.model.time_formatter import get_datetime
+from django.contrib.auth.models import User
 
 
 def task_card_post_form(request, controller, redirect_link):
@@ -20,11 +21,29 @@ def init_tasks(request, controller, tasks_list):
         if task.deadline is not None:
             task.deadline = get_datetime(task.deadline)
         else:
-            task.deadline = None
+            task.deadline = ''
+
+        if task.realization_time is not None:
+            task.realization_time = get_datetime(task.realization_time)
+        else:
+            task.realization_time = ''
+
+        task.creation_time = get_datetime(task.creation_time)
 
         if task.pid is not None:
             task.project_name = controller.get_project(task.pid).title
+            user = None
             if task.uid == request.user.id:
                 task.receiver_name = 'You'
             else:
-                task.receiver_name = controller.get_user(task.uid).login
+                user = controller.get_user(task.uid)
+                task.receiver_name = user.login
+
+            if task.creator_uid == request.user.id:
+                task.creator_name = 'You'
+            else:
+                if not User:
+                    task.creator_name = controller.get_user(
+                        task.creator_uid).login
+                else:
+                    task.creator_name = user.login

@@ -57,11 +57,13 @@
                         <a class="nav-link" href="{% url 'tc_web:projects' %}">Projects</a>
                     </li>
                     {% endif %}
-                    {% block navbar %}
-                    {% endblock %}
 
                 </ul>
                 <!-- Links -->
+
+                {% block navbar %}
+                {% endblock %}
+
                 <!-- Links -->
                 <ul class="navbar-nav ml-auto">
                     {% if user.is_authenticated %}
@@ -89,8 +91,9 @@
                 <!-- Links -->
 
                 <form class="form-inline">
-                    <div class="md-form mt-0">
+                    <div class="md-form">
                         <input class="form-control mr-sm-2" type="text"
+
                                placeholder="Search users" aria-label="Search">
                     </div>
                 </form>

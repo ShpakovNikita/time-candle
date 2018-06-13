@@ -2,11 +2,26 @@
 
 {% block content %}
 <div class="row justify-content-md-center">
-    <div class="col-md-4">
+    <div class="col-md-5">
         <div class="card">
             <div class="card-body">
-                <p class="h4 text-center mb-4">Change task: {{ task_title }}</p>
-                <br>
+                <p class="h4 text-center mb-4">Change task: {{ task.title }}<span class="grey-text">@{{ task.tid }}</span></p>
+                <p class="h4 text-center mb-4">Created: {{ task.creation_time|date:"d M Y, H:i" }}</p>
+                {% if task.pid %}
+                    <p class="h4 text-center mb-4">Project: <a href="{% url 'tc_web:project' task.pid %}" class="btn btn-sm btn-unique">{{ task.project_name|truncatechars:20 }}</a></p>
+                {% endif %}
+                {% if task.parent %}
+                    <p class="h4 text-center mb-4">Parent task: {{ task.parent_task.title }}<span class="grey-text">@{{ task.parent_task.tid }}</span></p>
+                {% endif %}
+                <p class="h4 text-center mb-4">Creator: <a href="{% url 'tc_web:profile' user_id=task.creator_uid %}" class="btn btn-sm btn-unique">{{ task.creator_name|truncatechars:20 }}</a></p>
+                <p class="h4 text-center mb-4">Executor: <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-unique">{{ task.receiver_name|truncatechars:20 }}</a></p>
+                {% if task.period %}
+                    <p class="h4 text-center mb-4">Period: {{ task.period }} days</p>
+                {% endif %}
+                {% if task.realization_time %}
+                    <p class="h4 text-center mb-4">Checked: {{ task.realization_time|date:"d M Y, H:i" }}</p>
+                {% endif %}
+
                 <form method="post" class="text-center">
                     {% csrf_token %}
 
@@ -25,13 +40,16 @@
                             {{ form.deadline_time }}
                         </div>
                     </div>
-
                     <div class="fieldWrapper">
                         {{ form.priority.errors }}
                         <label class="grey-text h5" for="{{ form.priority.id_for_label }}">{{ form.priority.label_tag }}</label>
                         <div class="container bm-2">
                             {% for value, text in form.priority.field.choices %}
-                            <input type="radio" name="priority" id="priority_{{ forloop.counter }}" value="{{ value }}"></input>
+                            {% if value == task.priority %}
+                                <input type="radio" name="priority" id="priority_{{ forloop.counter }}" checked="checked" value="{{ value }}"></input>
+                            {% else %}
+                                <input type="radio" name="priority" id="priority_{{ forloop.counter }}" value="{{ value }}"></input>
+                            {% endif %}
                             <label for="priority_{{ forloop.counter }}">{{ text }}</label>
                             {% endfor %}
                         </div>
@@ -42,7 +60,11 @@
                         <label class="grey-text h5" for="{{ form.status.id_for_label }}">{{ form.status.label_tag }}</label>
                         <div class="container bm-2">
                             {% for value, text in form.status.field.choices %}
-                            <input type="radio" name="status" id="status_{{ forloop.counter }}" value="{{ value }}"></input>
+                            {% if value == task.status %}
+                                <input type="radio" name="status" id="status_{{ forloop.counter }}" checked="checked" value="{{ value }}"></input>
+                            {% else %}
+                                <input type="radio" name="status" id="status_{{ forloop.counter }}" value="{{ value }}"></input>
+                            {% endif %}
                             <label for="status_{{ forloop.counter }}">{{ text }}</label>
                             {% endfor %}
                         </div>
