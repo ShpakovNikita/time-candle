@@ -15,8 +15,18 @@ class AddTask(forms.Form):
         help_text='Optional. Format: YYYY-MM-DD hh:mm:ss')
     priority = forms.ChoiceField(
         label='priority', choices=PRIORITY_CHOICES, initial=Priority.MEDIUM,
-        required=False)
+        required=False, widget=forms.Select())
     status = forms.ChoiceField(
         label='status', choices=STATUS_CHOICES, initial=Status.IN_PROGRESS,
         required=False)
     period = forms.IntegerField(label='period in days', required=False)
+
+
+class ChangeTask(forms.Form):
+    comment = forms.CharField(label='comment', max_length=155, required=False)
+    deadline_time = forms.CharField(label='deadline', required=False,
+                                    help_text='Format: YYYY-MM-DD hh:mm:ss')
+    priority = forms.ChoiceField(label='priority', choices=PRIORITY_CHOICES,
+                                 required=False, widget=forms.Select())
+    status = forms.ChoiceField(
+        label='status', choices=STATUS_CHOICES, required=False)

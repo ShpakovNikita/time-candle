@@ -22,7 +22,7 @@ class TaskLogic(Logic):
 
         if parent_id is not None:
             parent_task = TaskInstance.make_task(
-                self.task_adapter.get_task_by_id(parent_id, pid))
+                self.task_adapter.get_task_by_id(parent_id))
             status = max(status, parent_task.status)
             priority = max(priority, parent_task.priority)
 
@@ -60,6 +60,9 @@ class TaskLogic(Logic):
 
         # also we must specify deadline if there is a period
         if period is not None and deadline_time is None:
+            raise m_e.InvalidTimeError(m_e.TimeMessages.NO_DEADLINE)
+
+        if status == Status.EXPIRED and deadline_time is None:
             raise m_e.InvalidTimeError(m_e.TimeMessages.NO_DEADLINE)
 
         if status == Status.DONE:
@@ -113,6 +116,9 @@ class TaskLogic(Logic):
             # if status is not done, then realization time is None
             if status != Status.DONE:
                 task.realization_time = None
+
+            if status == Status.EXPIRED and time is None:
+                raise m_e.InvalidTimeError(m_e.TimeMessages.NO_DEADLINE)
 
             # we cannot change done task to the expired. Note, that we can make
             # done task as some other task and then we may change it to expired

@@ -63,7 +63,6 @@ def change_profile(request, user_id):
 
     else:
         form = forms.ChangeProfileForm()
-        print(form.__dict__)
         user = controller.get_user(user_id)
         form.fields['nickname'].widget.attrs.update({'value': user.nickname})
         form.fields['about'].widget.attrs.update({'value': user.about})

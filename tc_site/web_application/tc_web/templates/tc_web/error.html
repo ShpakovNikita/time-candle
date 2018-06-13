@@ -1,0 +1,14 @@
+{% block errors %}
+{% if errors %}
+<div class="row">
+    <div class="col-md-12 mb-2">
+     <div class="card">
+     <!--Card content-->
+     <div class="card-body">
+         <h4 class="card-title text-center red-text">{{ errors }}</h4>
+     </div>
+     </div>
+    </div>
+ </div>
+{% endif %}
+{% endblock %}

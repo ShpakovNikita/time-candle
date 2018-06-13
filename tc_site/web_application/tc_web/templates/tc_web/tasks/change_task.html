@@ -1,10 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block content %}
+<div class="row justify-content-md-center">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <p class="h4 text-center mb-4">Change task: {{ task_title }}</p>
+                <br>
+                <form method="post" class="text-center">
+                    {% csrf_token %}
+
+                    <div class="fieldWrapper">
+                        {{ form.comment.errors }}
+                        <label class="grey-text h5" for="{{ form.comment.id_for_label }}">{{ form.comment.label_tag }}</label>
+                        <div class="container bm-2">
+                            {{ form.comment }}
+                        </div>
+                    </div>
+
+                    <div class="fieldWrapper">
+                        {{ form.deadline_time.errors }}
+                        <label class="grey-text h5" for="{{ form.deadline_time.id_for_label }}">{{ form.deadline_time.label_tag }}</label>
+                        <div class="container bm-2">
+                            {{ form.deadline_time }}
+                        </div>
+                    </div>
+
+                    <div class="fieldWrapper">
+                        {{ form.priority.errors }}
+                        <label class="grey-text h5" for="{{ form.priority.id_for_label }}">{{ form.priority.label_tag }}</label>
+                        <div class="container bm-2">
+                            {% for value, text in form.priority.field.choices %}
+                            <input type="radio" name="priority" id="priority_{{ forloop.counter }}" value="{{ value }}"></input>
+                            <label for="priority_{{ forloop.counter }}">{{ text }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="fieldWrapper">
+                        {{ form.status.errors }}
+                        <label class="grey-text h5" for="{{ form.status.id_for_label }}">{{ form.status.label_tag }}</label>
+                        <div class="container bm-2">
+                            {% for value, text in form.status.field.choices %}
+                            <input type="radio" name="status" id="status_{{ forloop.counter }}" value="{{ value }}"></input>
+                            <label for="status_{{ forloop.counter }}">{{ text }}</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-unique">Add
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% include 'tc_web/error.html' with errors=errors %}

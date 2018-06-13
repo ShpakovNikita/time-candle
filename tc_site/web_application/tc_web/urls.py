@@ -25,6 +25,9 @@ urlpatterns = [
     path('tasks/add_task/<int:task_id>/',
          task_views.add_task,
          name='add_child_task'),
+    path('tasks/change_task/<int:task_id>/',
+         task_views.change_task,
+         name='change_task'),
 
     path('projects/add_project/',
          project_views.add_project,

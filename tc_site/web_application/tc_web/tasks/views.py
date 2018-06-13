@@ -41,42 +41,64 @@ def add_task(request, project_id=None, task_id=None):
                 return redirect(reverse('tc_web:tasks'))
     else:
         form = forms.AddTask()
+        form.fields['title'].widget.attrs.update({'value': 'New Task'})
 
     return render(request, 'tc_web/tasks/add_task.html', {'form': form})
 
 
-def add_project_task(request, project_id):
+def change_task(request, task_id):
+    controller = Controller(uid=request.user.id,
+                            db_file=config.DATABASE_PATH)
+
+    context = {}
+
     if request.method == 'POST':
         print(request.POST)
-        form = forms.AddTask(request.POST)
+        form = forms.ChangeTask(request.POST)
         if form.is_valid():
-            title = form.cleaned_data.get('title')
             comment = form.cleaned_data.get('comment')
             deadline_time = form.cleaned_data.get('deadline_time')
             priority = form.cleaned_data.get('priority')
             status = form.cleaned_data.get('status')
-            period = form.cleaned_data.get('period')
             if not deadline_time:
                 deadline_time = None
 
-            controller = Controller(uid=request.user.id,
-                                    db_file=config.DATABASE_PATH)
+            if not comment:
+                comment = None
 
-            controller.add_task(title=title,
-                                time=deadline_time,
-                                priority=int(priority),
-                                status=int(status),
-                                period=period,
-                                parent_id=None,
-                                comment=comment,
-                                pid=None,
-                                receiver_uid=None)
+            if not status:
+                status = None
+            else:
+                status = int(status)
 
-            return redirect(reverse('tc_web:tasks'))
+            if not priority:
+                priority = None
+            else:
+                priority = int(priority)
+
+            try:
+                controller.change_task(tid=task_id,
+                                       priority=priority,
+                                       status=status,
+                                       time=deadline_time,
+                                       comment=comment)
+                return redirect(reverse('tc_web:tasks'))
+
+            except AppException as e:
+                context['errors'] = e.errors.value
+
     else:
-        form = forms.AddTask()
+        form = forms.ChangeTask()
 
-    return render(request, reverse('tc_web:add_task'), {'form': form})
+    context['form'] = form
+    try:
+        task = controller.get_tasks('tids: ' + str(task_id))[0]
+        context['task_title'] = task.title
+
+    except (AppException, IndexError):
+        raise Http404
+
+    return render(request, 'tc_web/tasks/change_task.html', context)
 
 
 def project(request, project_id):
