@@ -11,10 +11,12 @@
                     <p class="h4 text-center mb-4">Project: <a href="{% url 'tc_web:project' task.pid %}" class="btn btn-sm btn-unique">{{ task.project_name|truncatechars:20 }}</a></p>
                 {% endif %}
                 {% if task.parent %}
-                    <p class="h4 text-center mb-4">Parent task: {{ task.parent_task.title }}<span class="grey-text">@{{ task.parent_task.tid }}</span></p>
+                    <p class="h4 text-center mb-4">Parent task: {{ task.parent_task.title }}<a href="{% url 'tc_web:change_task' task.parent %}" class="grey-text">@{{ task.parent_task.tid }}</a></p>
                 {% endif %}
+                {% if task.pid %}
                 <p class="h4 text-center mb-4">Creator: <a href="{% url 'tc_web:profile' user_id=task.creator_uid %}" class="btn btn-sm btn-unique">{{ task.creator_name|truncatechars:20 }}</a></p>
                 <p class="h4 text-center mb-4">Executor: <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-unique">{{ task.receiver_name|truncatechars:20 }}</a></p>
+                {% endif %}
                 {% if task.period %}
                     <p class="h4 text-center mb-4">Period: {{ task.period }} days</p>
                 {% endif %}

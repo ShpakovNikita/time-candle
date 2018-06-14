@@ -13,14 +13,13 @@ urlpatterns = [
     path('', views.index, name='index'),
 
     path('tasks/', task_views.tasks, name='tasks'),
-    path('tasks/?hahs<int:project_id>/', task_views.project, name='projects_ts'),
     path('projects/', project_views.projects, name='projects'),
 
     path('tasks/add_task/', task_views.add_task, name='add_task'),
     path('tasks/<int:project_id>/add_task/',
          task_views.add_task,
          name='add_project_task'),
-    path('tasks/<int:project_id>/add_task/<int:task_id>',
+    path('tasks/<int:project_id>/add_task/<int:task_id>/',
          task_views.add_task,
          name='add_child_project_task'),
     path('tasks/add_task/<int:task_id>/',
@@ -37,11 +36,12 @@ urlpatterns = [
     # ex: /polls/5/vote/
     path('<int:question_id>/vote/', views.vote, name='vote'),
 
-    path('project/<int:project_id>', task_views.project, name='project'),
-    path('profile/<int:user_id>', views.profile, name='profile'),
-    path('profile/change_profile/<int:user_id>',
+    path('project/<int:project_id>/', task_views.project, name='project'),
+    path('profile/<int:user_id>/', views.profile, name='profile'),
+    path('profile/change_profile/<int:user_id>/',
          views.change_profile,
          name='change_profile'),
+
 ]
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns

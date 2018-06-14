@@ -16,6 +16,29 @@ def task_card_post_form(request, controller, redirect_link):
             return redirect(redirect_link)
 
 
+def tasks_query_get_form(request, controller, default_query=''):
+    if request.method == "GET":
+        if 'show_me' in request.GET:
+            if not default_query:
+                query_form = request.GET.get('show_me')
+            elif request.GET.get('show_me'):
+                query_form = default_query + \
+                             ' AND ( ' + request.GET.get('show_me') + ' ) '
+            else:
+                query_form = default_query
+
+            print(query_form)
+            tasks_list = controller.get_tasks(query_form)
+
+        else:
+            tasks_list = controller.get_tasks(default_query)
+
+        return tasks_list
+
+    else:
+        return None
+
+
 def init_tasks(request, controller, tasks_list):
     for task in tasks_list:
         if task.deadline is not None:
@@ -47,3 +70,6 @@ def init_tasks(request, controller, tasks_list):
                         task.creator_uid).login
                 else:
                     task.creator_name = user.login
+
+        if task.parent:
+            task.parent_task = controller.get_tasks('tids: ' + str(task.parent))[0]

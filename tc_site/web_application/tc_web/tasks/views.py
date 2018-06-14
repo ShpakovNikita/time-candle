@@ -108,14 +108,15 @@ def project(request, project_id):
     if not request.user.is_authenticated:
         raise Http404
 
+    context = {}
+
     controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
 
-    tasks_list = controller.get_tasks('projects: ' + str(project_id))
-    context = {
-        'tasks_list': tasks_list
-    }
-
     try:
+        tasks_list = shortcuts.tasks_query_get_form(
+            request, controller, 'projects: ' + str(project_id))
+        context['tasks_list'] = tasks_list
+
         selected_project = controller.get_project(project_id)
         context['project'] = selected_project
 
@@ -140,14 +141,14 @@ def tasks(request):
     if not request.user.is_authenticated:
         raise Http404
 
+    context = {}
+
     controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
 
-    tasks_list = controller.get_tasks('')[:5]
-    context = {
-        'tasks_list': tasks_list
-    }
-
     try:
+        tasks_list = shortcuts.tasks_query_get_form(request, controller, '')[:10]
+        context['tasks_list'] = tasks_list
+
         redirect_view = shortcuts.task_card_post_form(request, controller,
                                                       reverse('tc_web:tasks'))
         if redirect_view:
