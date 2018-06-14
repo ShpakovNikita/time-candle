@@ -1,7 +1,8 @@
 from time_candle.model.instances.project import Project as ProjectInstance
 import time_candle.exceptions.db_exceptions as db_e
 from time_candle.storage.project_adapter import ProjectFilter
-from . import Logic
+from time_candle.model.logic import Logic
+from time_candle.model.instances.user import User
 
 
 class ProjectLogic(Logic):
@@ -69,4 +70,5 @@ class ProjectLogic(Logic):
 
     def get_users(self, pid):
         # get users
-        return self.project_adapter.get_users_by_project(pid)
+        return [User.make_user(user) for
+                user in self.project_adapter.get_users_by_project(pid)]

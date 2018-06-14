@@ -26,7 +26,9 @@
 </div>
 {% endblock %}
 
-{% include 'tc_web/error.html' with errors=errors %}
+{% block errors %}
+    {% include 'tc_web/error.html' with errors=errors %}
+{% endblock %}
 
 {% block navbar %}
     {% include 'tc_web/tasks/query_bar.html' %}

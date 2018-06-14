@@ -12,7 +12,7 @@ from tc_web import shortcuts as base
 
 def projects(request):
     if not request.user.is_authenticated:
-        raise Http404
+        return redirect('/login/')
 
     for link in ['search']:
         redirect_link = base.search_user_forms(request, link)

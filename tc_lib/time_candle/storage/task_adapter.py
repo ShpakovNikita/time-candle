@@ -111,7 +111,11 @@ class TaskFilter(PrimaryFilter):
         if self.result:
             self.ops.append(op)
 
-        self.result.append(Task.parent == tid)
+        if isinstance(tid, (list,)):
+            self.result.append(Task.parent << tid)
+        else:
+            self.result.append(Task.parent == tid)
+
         return self
 
     def title_substring(self, substring, op=PrimaryFilter.OP_AND):

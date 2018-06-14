@@ -8,8 +8,14 @@
                 <p class="h4 text-center mb-4">Add task</p>
                 <br>
                 <form method="post" class="text-center">
-                    {% csrf_token %}
+                    {% if project and project.admin_uid == user.id %}
+                    <div class="md-form" style="z-index: 10000">
+                        <input id="search_receiver" name="search_receiver" style="z-index: 10000" type="text"
 
+                               placeholder="Receiver" aria-label="Search">
+                    </div>
+                    {% endif %}
+                    {% csrf_token %}
                     <div class="fieldWrapper">
                         {{ form.title.errors }}
                         <label class="grey-text h5" for="{{ form.title.id_for_label }}">{{ form.title.label_tag }}</label>
@@ -79,6 +85,18 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(function() {
+  $("#search").autocomplete({
+    source: "/tc_web/api/get_project_users",
+    minLength: 2,
+  });
+});
+
+</script>
 {% endblock %}
 
-{% include 'tc_web/error.html' with errors=errors %}
+{% block errors %}
+    {% include 'tc_web/error.html' with errors=errors %}
+{% endblock %}

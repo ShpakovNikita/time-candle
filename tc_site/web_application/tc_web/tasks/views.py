@@ -8,6 +8,7 @@ from . import forms
 from .. import config
 from . import shortcuts
 from tc_web import shortcuts as base
+from django.contrib.auth.models import User
 
 
 def add_task(request, project_id=None, task_id=None):
@@ -15,6 +16,10 @@ def add_task(request, project_id=None, task_id=None):
         redirect_link = base.search_user_forms(request, link)
         if redirect_link:
             return redirect_link
+
+    context = {}
+    controller = Controller(uid=request.user.id,
+                            db_file=config.DATABASE_PATH)
 
     if request.method == 'POST':
         print(request.POST)
@@ -29,27 +34,47 @@ def add_task(request, project_id=None, task_id=None):
             if not deadline_time:
                 deadline_time = None
 
-            controller = Controller(uid=request.user.id,
-                                    db_file=config.DATABASE_PATH)
+            try:
+                if 'search_receiver' in request.POST \
+                        and request.POST['search_receiver']:
+                    receiver_uid = User.objects.get(
+                        username=request.POST['search_receiver']).id
+                else:
+                    receiver_uid = None
 
-            controller.add_task(title=title,
-                                time=deadline_time,
-                                priority=int(priority),
-                                status=int(status),
-                                period=period,
-                                parent_id=task_id,
-                                comment=comment,
-                                pid=project_id,
-                                receiver_uid=None)
-            if project_id is not None:
-                return redirect(reverse('tc_web:project', args=(project_id,)))
-            else:
-                return redirect(reverse('tc_web:tasks'))
+                controller.add_task(title=title,
+                                    time=deadline_time,
+                                    priority=int(priority),
+                                    status=int(status),
+                                    period=period,
+                                    parent_id=task_id,
+                                    comment=comment,
+                                    pid=project_id,
+                                    receiver_uid=receiver_uid)
+                if project_id is not None:
+                    return redirect(
+                        reverse('tc_web:project', args=(project_id,)))
+                else:
+                    return redirect(reverse('tc_web:tasks'))
+
+            except AppException as e:
+                context['errors'] = e.errors.value
+
     else:
         form = forms.AddTask()
         form.fields['title'].widget.attrs.update({'value': 'New Task'})
+        form.fields['comment'].widget.attrs.update({'value': 'Nani!?'})
 
-    return render(request, 'tc_web/tasks/add_task.html', {'form': form})
+    context['form'] = form
+    if project_id:
+        try:
+            context['project'] = controller.get_project(project_id)
+        except AppException:
+            raise Http404
+
+    print(context)
+
+    return render(request, 'tc_web/tasks/add_task.html', context)
 
 
 def change_task(request, task_id):
@@ -134,6 +159,7 @@ def project(request, project_id):
         context['tasks_list'] = tasks_list
 
         selected_project = controller.get_project(project_id)
+        selected_project.admin = User.objects.get(id=selected_project.admin_uid)
         context['project'] = selected_project
 
         redirect_view = shortcuts.task_card_post_form(request,
@@ -155,7 +181,7 @@ def project(request, project_id):
 
 def tasks(request):
     if not request.user.is_authenticated:
-        raise Http404
+        return redirect('/login/')
 
     for link in ['search']:
         redirect_link = base.search_user_forms(request, link)

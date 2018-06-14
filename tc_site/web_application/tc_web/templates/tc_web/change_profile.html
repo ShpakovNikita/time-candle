@@ -31,3 +31,7 @@
     </div>
 </div>
 {% endblock %}
+
+{% block errors %}
+    {% include 'tc_web/error.html' with errors=errors %}
+{% endblock %}

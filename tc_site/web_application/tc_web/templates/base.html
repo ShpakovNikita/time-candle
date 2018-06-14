@@ -24,7 +24,7 @@
 <!--Main Navigation-->
 <header>
     <!--Navbar-->
-    <nav class="navbar navbar-expand-lg navbar-dark mdb-color sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-dark mdb-color scrolling-navbar fixed-top">
         <div class="container">
 
             <!-- Navbar brand -->
@@ -77,6 +77,9 @@
                             <a class="dropdown-item" href="{% url 'tc_web:change_profile' user.id %}">Settings</a>
                             <a class="dropdown-item" href="{% url 'tc_web:profile' user.id %}">Check</a>
                         </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'tc_web:profile' user.id %}">{{ user.username }}</a>
                     </li>
                     {% else %}
                     <li class="nav-item">

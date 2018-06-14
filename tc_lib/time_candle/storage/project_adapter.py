@@ -263,8 +263,8 @@ class ProjectAdapter(PrimaryAdapter):
 
         query = UserProjectRelation.select().\
             where(UserProjectRelation.project == pid)
-        query = [q.user for q in query]
 
+        query = [q.user for q in query]
         users = User.select().where(User.uid << query)
 
         return [user for user in users]

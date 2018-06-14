@@ -43,7 +43,10 @@ urlpatterns = [
          views.change_profile,
          name='change_profile'),
 
-    url(r'^api/get_users/', views.get_users, name='get_users')
+    url(r'^api/get_users/', views.get_users, name='get_users'),
+    url(r'^api/get_project_users/',
+        views.get_project_users,
+        name='get_project_users')
 ]
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns

@@ -30,6 +30,7 @@ COMMANDS = {
     'receivers': lambda lst, fil: fil.receiver(list(map(int_or_none, lst))),
     'creators': lambda lst, fil: fil.creator(list(map(int_or_none, lst))),
     'tids': lambda lst, fil: fil.tid(list(map(int_or_none, lst))),
+    'parents': lambda lst, fil: fil.parent(list(map(int_or_none, lst))),
     'titles': lambda lst, fil: _get_filter_from_list_title(lst, fil)}
 
 COMPARE_OPERATORS = {}
