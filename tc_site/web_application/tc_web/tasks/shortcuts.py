@@ -20,10 +20,10 @@ def tasks_query_get_form(request, controller, default_query=''):
     if request.method == "GET":
         if 'show_me' in request.GET:
             if not default_query:
-                query_form = request.GET.get('show_me')
-            elif request.GET.get('show_me'):
+                query_form = request.GET['show_me']
+            elif request.GET['show_me']:
                 query_form = default_query + \
-                             ' AND ( ' + request.GET.get('show_me') + ' ) '
+                             ' AND ( ' + request.GET['show_me'] + ' ) '
             else:
                 query_form = default_query
 
@@ -36,7 +36,7 @@ def tasks_query_get_form(request, controller, default_query=''):
         return tasks_list
 
     else:
-        return None
+        return []
 
 
 def init_tasks(request, controller, tasks_list):

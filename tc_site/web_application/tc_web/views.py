@@ -11,6 +11,7 @@ from time_candle.enums.status import Status
 from . import config
 from . import shortcuts
 from django.contrib.auth.models import User
+import json
 
 
 def err404(request, exception):
@@ -19,18 +20,20 @@ def err404(request, exception):
 
 
 def index(request):
-    controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
-    latest_question_list = controller.get_tasks('')[:5]
-    template = loader.get_template('tc_web/index.html')
-    controller.get_tasks('tids: 10')
+    for link in ['search']:
+        redirect_link = shortcuts.search_user_forms(request, link)
+        if redirect_link:
+            return redirect_link
 
-    context = {
-        'latest_question_list': latest_question_list
-    }
-    return HttpResponse(template.render(context, request))
+    return render(request, 'tc_web/index.html')
 
 
 def profile(request, user_id):
+    for link in ['search']:
+        redirect_link = shortcuts.search_user_forms(request, link)
+        if redirect_link:
+            return redirect_link
+
     controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
 
     try:
@@ -44,7 +47,39 @@ def profile(request, user_id):
     return render(request, 'tc_web/profile.html', {'screen_user': screen_user})
 
 
+def get_users(request):
+    for link in ['search']:
+        redirect_link = shortcuts.search_user_forms(request, link)
+        if redirect_link:
+            return redirect_link
+
+    controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
+
+    if request.is_ajax():
+        q = request.GET.get('term', '')
+        re = '^' + q + '+'
+        users = User.objects.filter(username__regex=re)
+        results = []
+        for user in users:
+            user_json = {}
+            user_json['id'] = user.id
+            user_json['label'] = user.username
+            user_json['value'] = user.username
+            results.append(user_json)
+        data = json.dumps(results)
+    else:
+        data = 'fail'
+
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)
+
+
 def change_profile(request, user_id):
+    for link in ['search']:
+        redirect_link = shortcuts.search_user_forms(request, link)
+        if redirect_link:
+            return redirect_link
+
     if request.user.id != user_id:
         raise Http404
 

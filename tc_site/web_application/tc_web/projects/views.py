@@ -7,11 +7,18 @@ from time_candle.exceptions import AppException
 from . import forms
 from .. import config
 from . import shortcuts
+from tc_web import shortcuts as base
 
 
 def projects(request):
     if not request.user.is_authenticated:
         raise Http404
+
+    for link in ['search']:
+        redirect_link = base.search_user_forms(request, link)
+        if redirect_link:
+            return redirect_link
+
     controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
     projects_list = controller.get_projects('')[:5]
 
@@ -34,6 +41,11 @@ def projects(request):
 
 
 def add_project(request):
+    for link in ['search']:
+        redirect_link = base.search_user_forms(request, link)
+        if redirect_link:
+            return redirect_link
+
     if request.method == 'POST':
         print(request.POST)
         form = forms.AddProject(request.POST)

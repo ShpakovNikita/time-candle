@@ -1,4 +1,5 @@
 from django.urls import path
+from django.conf.urls import include, url
 from . import startup
 from . import views
 from .tasks import views as task_views
@@ -42,6 +43,7 @@ urlpatterns = [
          views.change_profile,
          name='change_profile'),
 
+    url(r'^api/get_users/', views.get_users, name='get_users')
 ]
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns

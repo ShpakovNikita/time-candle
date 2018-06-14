@@ -7,9 +7,15 @@ from time_candle.exceptions import AppException
 from . import forms
 from .. import config
 from . import shortcuts
+from tc_web import shortcuts as base
 
 
 def add_task(request, project_id=None, task_id=None):
+    for link in ['search']:
+        redirect_link = base.search_user_forms(request, link)
+        if redirect_link:
+            return redirect_link
+
     if request.method == 'POST':
         print(request.POST)
         form = forms.AddTask(request.POST)
@@ -49,6 +55,11 @@ def add_task(request, project_id=None, task_id=None):
 def change_task(request, task_id):
     controller = Controller(uid=request.user.id,
                             db_file=config.DATABASE_PATH)
+
+    for link in ['search']:
+        redirect_link = base.search_user_forms(request, link)
+        if redirect_link:
+            return redirect_link
 
     context = {}
 
@@ -108,6 +119,11 @@ def project(request, project_id):
     if not request.user.is_authenticated:
         raise Http404
 
+    for link in ['search']:
+        redirect_link = base.search_user_forms(request, link)
+        if redirect_link:
+            return redirect_link
+
     context = {}
 
     controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
@@ -140,6 +156,11 @@ def project(request, project_id):
 def tasks(request):
     if not request.user.is_authenticated:
         raise Http404
+
+    for link in ['search']:
+        redirect_link = base.search_user_forms(request, link)
+        if redirect_link:
+            return redirect_link
 
     context = {}
 

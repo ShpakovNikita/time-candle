@@ -11,7 +11,7 @@
                     <div class="col-md-9">
                 <p class="card-title h4">{{ task.title|truncatechars:15 }}<span class="grey-text h6">@{{ task.tid }}</span>
                     {% if task.parent %}
-                        <a href="#" class="grey-text h6">P{{ task.parent }}</a>
+                        <a href="{% url 'tc_web:change_task' task.parent %}" class="grey-text h6">Parent</a>
                     {% endif %}
                 </p>
                     <form id="del" method="post">
