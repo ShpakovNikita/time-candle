@@ -34,7 +34,7 @@
 
                     <div class="fieldWrapper">
                         {{ form.deadline_time.errors }}
-                        <label class="grey-text h5" for="{{ form.deadline_time.id_for_label }}">{{ form.deadline_time.label_tag }}</label>
+                        <label class="grey-text h5" title="{{form.deadline_time.help_text }}" for="{{ form.deadline_time.id_for_label }}">{{ form.deadline_time.label_tag }}</label>
                         <div class="container bm-2">
                             {{ form.deadline_time }}
                         </div>
@@ -93,12 +93,11 @@
 
 {% block scripts %}
 <script>
-    $(function() {
+$(function() {
   $("#search_receiver").autocomplete({
     source: "/tc_web/api/get_project_users/{{ project.pid }}/",
     minLength: 2,
   });
 });
-
 </script>
 {% endblock %}

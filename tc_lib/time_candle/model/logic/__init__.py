@@ -1,11 +1,10 @@
+"""
+This is the module for basic model logic. It uses storage adapters for some
+logical validation and to send requests to the database.
+"""
 import time_candle.storage.adapter_classes
 import time_candle.storage.task_adapter
 import time_candle.storage.project_adapter
-
-"""This is the module for basic model logic. It uses storage adapters for some
-logical validation and to send requests to the database.
-
-"""
 
 
 class Logic:

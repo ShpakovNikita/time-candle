@@ -37,7 +37,7 @@
 
                     <div class="fieldWrapper">
                         {{ form.deadline_time.errors }}
-                        <label class="grey-text h5" for="{{ form.deadline_time.id_for_label }}">{{ form.deadline_time.label_tag }}</label>
+                        <label class="grey-text h5" title="{{form.deadline_time.help_text }}" for="{{ form.deadline_time.id_for_label }}">{{ form.deadline_time.label_tag }}</label>
                         <div class="container bm-2">
                             {{ form.deadline_time }}
                         </div>
@@ -72,7 +72,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-unique">Add
+                    <button type="submit" class="btn btn-unique">Change
                     </button>
                 </form>
             </div>

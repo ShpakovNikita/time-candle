@@ -10,7 +10,6 @@ app_name = 'tc_web'
 
 
 urlpatterns = [
-    # ex: /polls/
     path('', views.index, name='index'),
 
     path('tasks/', task_views.tasks, name='tasks'),

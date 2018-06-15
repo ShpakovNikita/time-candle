@@ -1,3 +1,9 @@
+"""
+This is commands module. Commands from argparse and django will go to this
+module and it will help to separate argparser from the model. In this module
+also we have a validation for each case and conversion to the primary entities.
+Note, that we have to login anytime firstly before the actions from the user
+"""
 from time_candle.model.logic.project import ProjectLogic
 from time_candle.model.logic.task import TaskLogic
 from time_candle.model.logic.user import UserLogic
@@ -7,12 +13,6 @@ from time_candle.model import logger
 from time_candle.enums.status import Status
 from time_candle.enums.priority import Priority
 import time_candle.model.time_formatter
-"""
-This is commands module. Commands from argparse and django will go to this 
-module and it will help to separate argparser from the model. In this module 
-also we have a validation for each case and conversion to the primary entities.
-Note, that we have to login anytime firstly before the actions from the user
-"""
 
 
 class Controller:

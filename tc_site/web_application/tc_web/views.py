@@ -68,7 +68,6 @@ def get_users(request):
 
 def get_project_users(request, project_id):
     controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
-    print('horray')
     if request.is_ajax():
         q = request.GET.get('term', '')
         users = controller.get_users(project_id)
@@ -101,7 +100,6 @@ def change_profile(request, user_id):
                             db_file=config.DATABASE_PATH)
 
     if request.method == 'POST':
-        print(request.POST)
         form = forms.ChangeProfileForm(request.POST)
         if form.is_valid():
             about = form.cleaned_data.get('about')

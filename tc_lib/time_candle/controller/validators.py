@@ -1,9 +1,9 @@
-import re
-import time_candle.exceptions.validation_exceptions as v_e
 """
-This module is module for most validations some inner values and conversions. 
+This module is module for most validations some inner values and conversions.
 Also it has some other mini helper functions.
 """
+import re
+import time_candle.exceptions.validation_exceptions as v_e
 
 
 def check_name(name):

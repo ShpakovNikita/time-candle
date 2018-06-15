@@ -1,6 +1,6 @@
-"""This is the adapters package. It contains functions that appears to be useful
+"""
+This is the adapters package. It contains functions that appears to be useful
 to remove, store, pull and add data to the DB.
-
 """
 
 

@@ -24,7 +24,6 @@ def add_task(request, project_id=None, task_id=None):
                             db_file=config.DATABASE_PATH)
 
     if request.method == 'POST':
-        print(request.POST)
         form = forms.AddTask(request.POST)
         if form.is_valid():
             title = form.cleaned_data.get('title')
@@ -80,8 +79,6 @@ def add_task(request, project_id=None, task_id=None):
         except AppException:
             raise Http404
 
-    print(context)
-
     return render(request, 'tc_web/tasks/add_task.html', context)
 
 
@@ -97,7 +94,6 @@ def change_task(request, task_id):
     context = {}
 
     if request.method == 'POST':
-        print(request.POST)
         form = forms.ChangeTask(request.POST)
         if form.is_valid():
             comment = form.cleaned_data.get('comment')

@@ -50,7 +50,6 @@ def add_project(request):
             return redirect_link
 
     if request.method == 'POST':
-        print(request.POST)
         form = forms.ProjectForm(request.POST)
         if form.is_valid():
             title = form.cleaned_data.get('title')
@@ -81,7 +80,6 @@ def change_project(request, project_id):
                             db_file=config.DATABASE_PATH)
 
     if request.method == 'POST':
-        print(request.POST)
         form = forms.ProjectForm(request.POST)
         if form.is_valid():
             title = form.cleaned_data.get('title')
@@ -125,7 +123,6 @@ def add_user(request, project_id):
 
     if request.method == 'POST':
         try:
-            print(request.POST)
             try:
                 if 'search_user' in request.POST \
                         and request.POST['search_user']:

@@ -1,10 +1,10 @@
+"""
+All date logic is placed in this module.
+"""
 import re
 from datetime import datetime
 import time_candle.exceptions.model_exceptions as m_e
 from time_candle.model import logger
-"""
-All date logic is placed in this module.
-"""
 
 
 # We will be storing data only from 1970 year

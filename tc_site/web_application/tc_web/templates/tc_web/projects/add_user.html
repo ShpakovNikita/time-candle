@@ -5,10 +5,10 @@
     <div class="col-md-4 col-sm-10">
         <div class="card">
             <div class="card-body">
-                <p class="h4 text-center mb-4">Add user</p>
+                <p class="h4 text-center">Add user</p>
                 <form method="post" class="text-center">
                     {% csrf_token %}
-                    <div class="md-form" style="z-index: 10000">
+                    <div class="fieldWrapper" style="z-index: 10000">
                         <input id="search_user" name="search_user" style="z-index: 10000" type="text"
 
                                placeholder="Username" aria-label="Search">
