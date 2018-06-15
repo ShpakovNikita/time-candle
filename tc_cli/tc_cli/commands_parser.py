@@ -363,7 +363,7 @@ def run():
 
     except (AppException, AuthenticationError) as e:
         if config.VERBOSE:
-            traceback.print_exc()
+            logger.debug(traceback.format_exc())
             print('Message text: {}'.format(e.errors.value))
         else:
             print(e.message.format(e.errors.value))
