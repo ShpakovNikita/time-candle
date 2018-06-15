@@ -1,6 +1,12 @@
 # Time Candle. #
 ##### little app about your time and life #####
 ## How to install? ##
+
+### Make sure you have installed setuptools: ###
+```bash
+$ pip3 install -U pip setuptools 
+```
+
 ### Installing time candle lib ###
 First you need to install library time_candle to use console or web version, because of dependencies 
 ```bash
@@ -30,5 +36,7 @@ $ python3 -m tc_cli -h
 ```
 This command will show you the main commands for this app from command line.
 Also note that you may configure app by settings file, passing needed path's for you. 
+
+For information about how to use library in your own application check the commands module of controller package  
 
 Made by Paul Fon Boudervill.
