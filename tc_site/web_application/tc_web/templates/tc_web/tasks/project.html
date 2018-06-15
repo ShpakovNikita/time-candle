@@ -3,16 +3,16 @@
 {% if project %}
 <div class="row">
     <div class="col-md-12 mb-2">
-     <div class="card">
-     <!--Card content-->
-     <div class="card-body">
-         <h4 class="card-title text-center">{{ project.title }}<a href="{% url 'tc_web:profile' project.admin_uid %}" class="grey-text">@Admin: {{ project.admin.username }}</a></h4>
-         <p class="card-text">{{ project.description|default:'No description provided' }}</p>
-         {% if project.admin_uid == user.id %}
-            <a class="btn btn-unique" href="{% url 'tc_web:change_project' project.pid %}">Change</a>
-         {% endif %}
-     </div>
-     </div>
+         <div class="card">
+         <!--Card content-->
+         <div class="card-body">
+             <h4 class="card-title text-center">{{ project.title }}<a href="{% url 'tc_web:profile' project.admin_uid %}" class="grey-text">@Admin: {{ project.admin.username }}</a></h4>
+             <p class="card-text">{{ project.description|default:'No description provided' }}</p>
+             {% if project.admin_uid == user.id %}
+                <a class="btn btn-unique" href="{% url 'tc_web:change_project' project.pid %}">Change</a>
+             {% endif %}
+         </div>
+         </div>
     </div>
  </div>
 {% endif %}
@@ -24,14 +24,14 @@
 </div>
 </ul>
 {% else %}
- <div class="card">
-     {% if project %}
-     <!--Card content-->
-     <div class="card-body">
-         <h4 class="card-title text-center">No tasks available</h4>
-     </div>
-     {% endif %}
- </div>
+<div class="card">
+    {% if project %}
+    <!--Card content-->
+    <div class="card-body">
+        <h4 class="card-title text-center">No tasks available</h4>
+    </div>
+    {% endif %}
+</div>
 {% endif %}
 <!--Grid column-->
 {% endblock %}
@@ -78,16 +78,15 @@
 
 {% block scripts %}
 <script>
-    $(function() {
-  $("#search_user").autocomplete({
-    source: "/tc_web/api/get_project_users/{{ project.pid }}/",
-    minLength: 2,
-  });
+$(function() {
+    $("#search_user").autocomplete({
+        source: "/tc_web/api/get_project_users/{{ project.pid }}/",
+        minLength: 2,
+    });
 });
 
 </script>
 {% endblock %}
 
 {% block special %}
-
 {% endblock %}

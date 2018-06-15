@@ -94,10 +94,10 @@
 {% block scripts %}
 <script>
 $(function() {
-  $("#search_receiver").autocomplete({
-    source: "/tc_web/api/get_project_users/{{ project.pid }}/",
-    minLength: 2,
-  });
+    $("#search_receiver").autocomplete({
+        source: "/tc_web/api/get_project_users/{{ project.pid }}/",
+        minLength: 2,
+    });
 });
 </script>
 {% endblock %}

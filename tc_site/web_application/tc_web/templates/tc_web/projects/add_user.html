@@ -29,11 +29,11 @@
 
 {% block scripts %}
 <script>
-    $(function() {
-  $("#search_user").autocomplete({
-    source: "/tc_web/api/get_users",
-    minLength: 2,
-  });
+$(function() {
+    $("#search_user").autocomplete({
+        source: "/tc_web/api/get_users",
+        minLength: 2,
+    });
 });
 
 </script>

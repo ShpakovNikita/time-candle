@@ -11,7 +11,7 @@
                     <div class="col-md-9">
                 <p class="card-title h4">{{ task.title|truncatechars:15 }}<span class="grey-text h6">@{{ task.tid }}</span>
                     {% if task.parent %}
-                        <a href="{% url 'tc_web:change_task' task.parent %}" class="grey-text h6">Parent</a>
+                    <a href="{% url 'tc_web:change_task' task.parent %}" class="grey-text h6">Parent</a>
                     {% endif %}
                 </p>
                     <form id="del" method="post">
@@ -76,23 +76,23 @@
                 <!--TODO: REAL url-->
             </div>
         <!-- Card footer -->
-          <div class="rounded-bottom mdb-color darken-1 text-center pt-3">
-            <ul class="list-unstyled list-inline font-small">
-              <li class="list-inline-item pr-2">
-                  {% if task.deadline %}
-                  <a class="white-text"><i class="fa fa-clock-o pr-1"></i>{{task.deadline|date:"d M, H:i"}}</a>
-                  {% else %}
-                  <a class="white-text"><i class="fa fa-clock-o pr-1"></i>No deadline</a>
-                  {% endif %}
-                  </li>
-                {% if task.pid %}
+            <div class="rounded-bottom mdb-color darken-1 text-center pt-3">
+                <ul class="list-unstyled list-inline font-small">
+                    <li class="list-inline-item pr-2">
+                        {% if task.deadline %}
+                        <a class="white-text"><i class="fa fa-clock-o pr-1"></i>{{task.deadline|date:"d M, H:i"}}</a>
+                        {% else %}
+                        <a class="white-text"><i class="fa fa-clock-o pr-1"></i>No deadline</a>
+                        {% endif %}
+                    </li>
+                    {% if task.pid %}
                     <li class="list-inline-item pr-2"><a href="{% url 'tc_web:add_child_project_task' project_id=task.pid task_id=task.tid  %}" class="white-text"><i class="fa fa-deviantart pr-1"> </i>add child</a></li>
-                {% else %}
+                    {% else %}
                     <li class="list-inline-item pr-2"><a href="{% url 'tc_web:add_child_task' task_id=task.tid  %}" class="white-text"><i class="fa fa-deviantart pr-1"> </i>add child</a></li>
-                {% endif %}
-              <li class="list-inline-item pr-2"><a href="{% url 'tc_web:change_task' task_id=task.tid  %}" class="white-text"><i class="fa fa-arrow-right pr-1"></i>show</a></li>
-            </ul>
-          </div>
+                    {% endif %}
+                    <li class="list-inline-item pr-2"><a href="{% url 'tc_web:change_task' task_id=task.tid  %}" class="white-text"><i class="fa fa-arrow-right pr-1"></i>show</a></li>
+                </ul>
+            </div>
         </div>
         <!--/.Card-->
 
