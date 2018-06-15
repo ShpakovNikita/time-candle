@@ -55,6 +55,9 @@ def init_tasks(request, controller, tasks_list):
 
         if task.pid is not None:
             task.project_name = controller.get_project(task.pid).title
+
+            # this is what we need to know if user was inited (just to skip
+            # twice db call)
             user = None
             if task.uid == request.user.id:
                 task.receiver_name = 'You'
@@ -65,7 +68,7 @@ def init_tasks(request, controller, tasks_list):
             if task.creator_uid == request.user.id:
                 task.creator_name = 'You'
             else:
-                if not User:
+                if not user:
                     task.creator_name = controller.get_user(
                         task.creator_uid).login
                 else:

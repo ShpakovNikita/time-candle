@@ -150,7 +150,7 @@ def project(request, project_id):
     if not request.user.is_authenticated:
         raise Http404
 
-    for link in ['search']:
+    for link in ['search', 'search_user']:
         redirect_link = base.search_user_forms(request, link)
         if redirect_link:
             return redirect_link
@@ -163,6 +163,9 @@ def project(request, project_id):
         tasks_list = shortcuts.tasks_query_get_form(
             request, controller, 'projects: ' + str(project_id))
         context['tasks_list'] = tasks_list
+
+        users_list = controller.get_users(project_id)
+        context['users_list'] = users_list
 
         selected_project = controller.get_project(project_id)
         selected_project.admin = User.objects.get(id=selected_project.admin_uid)

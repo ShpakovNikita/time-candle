@@ -99,14 +99,12 @@ def get_milliseconds(formatted_time):
         # Note that here we are subtracting 1970's to define them as lower point
         final_time = (date_time - epoch).total_seconds() * 1000 - error
         if final_time < 0:
-            raise m_e.\
-                InvalidArgumentFormat('date must be from 1970\'s')
+            raise m_e.InvalidArgumentFormat(m_e.TimeMessages.TIME_EPOCH)
 
         return int(final_time)
+
     except ValueError:
-        logger.warning('the date must be ' + date_format)
-        msg = "Not a valid date: '{0}'.".format(formatted_time)
-        raise m_e.InvalidArgumentFormat(msg)
+        raise m_e.InvalidArgumentFormat(m_e.TimeMessages.TIME_FORMAT)
 
 
 def _time_get_formatted(formatted_time):
@@ -129,7 +127,7 @@ def _time_get_formatted(formatted_time):
     else:
         logger.warning('the date must be %Y-%m-%d or %Y-%m-%d %H:%M:%S')
         msg = "Not a valid date: '{0}'.".format(formatted_time)
-        raise m_e.InvalidArgumentFormat(msg)
+        raise m_e.InvalidArgumentFormat(m_e.TimeMessages.TIME_FORMAT)
 
 
 def get_datetime(milliseconds_time):

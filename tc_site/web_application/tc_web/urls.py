@@ -38,7 +38,7 @@ urlpatterns = [
     path('project/<int:project_id>/add_user',
          project_views.add_user,
          name='add_user'),
-    path('profile/<int:user_id>/', views.profile, name='profile'),
+    path('profile/id<int:user_id>/', views.profile, name='profile'),
     path('profile/change_profile/<int:user_id>/',
          views.change_profile,
          name='change_profile'),

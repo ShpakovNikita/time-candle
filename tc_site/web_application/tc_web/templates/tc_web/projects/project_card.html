@@ -40,7 +40,11 @@
 <!-- Card footer -->
   <div class="rounded-bottom mdb-color darken-1 text-center pt-3">
     <ul class="list-unstyled list-inline font-small">
+        {% if project.admin_uid == user.id %}
       <li class="list-inline-item pr-2"><a href="#" class="white-text"><i class="fa fa-arrow-right pr-1"></i>change</a></li>
+        {% else %}
+          <li class="list-inline-item pr-2"><a class="white-text"><i class="fa fa-check pr-1"></i>Nothing</a></li>
+        {% endif %}
     </ul>
   </div>
         </div>
