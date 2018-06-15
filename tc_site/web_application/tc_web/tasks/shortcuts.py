@@ -27,16 +27,15 @@ def tasks_query_get_form(request, controller, default_query=''):
             else:
                 query_form = default_query
 
-            print(query_form)
             tasks_list = controller.get_tasks(query_form)
 
         else:
             tasks_list = controller.get_tasks(default_query)
 
-        return tasks_list
-
     else:
-        return []
+        tasks_list = controller.get_tasks(default_query)
+
+    return tasks_list
 
 
 def sort_filter(request, tasks_list):

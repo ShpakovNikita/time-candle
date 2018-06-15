@@ -165,15 +165,15 @@ def project(request, project_id):
         tasks_list = shortcuts.tasks_query_get_form(
             request, controller, 'projects: ' + str(project_id))
         shortcuts.sort_filter(request, tasks_list)
-        context['tasks_list'] = tasks_list
 
         users_list = controller.get_users(project_id)
-        context['users_list'] = users_list
 
         selected_project = controller.get_project(project_id)
         selected_project.admin = User.objects.get(id=selected_project.admin_uid)
-        context['project'] = selected_project
+    except AppException:
+        raise Http404
 
+    try:
         redirect_view = shortcuts.task_card_post_form(request,
                                                       controller,
                                                       reverse('tc_web:project',
@@ -187,6 +187,10 @@ def project(request, project_id):
 
     except AppException as e:
         context['errors'] = e.errors.value
+
+    context['tasks_list'] = tasks_list
+    context['users_list'] = users_list
+    context['project'] = selected_project
 
     return render(request, 'tc_web/tasks/project.html', context)
 
@@ -204,11 +208,10 @@ def tasks(request):
 
     controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
 
-    try:
-        tasks_list = shortcuts.tasks_query_get_form(request, controller, '')
-        shortcuts.sort_filter(request, tasks_list)
-        context['tasks_list'] = tasks_list
+    tasks_list = shortcuts.tasks_query_get_form(request, controller, '')
+    shortcuts.sort_filter(request, tasks_list)
 
+    try:
         redirect_view = shortcuts.task_card_post_form(request, controller,
                                                       reverse('tc_web:tasks'))
         if redirect_view:
@@ -219,5 +222,8 @@ def tasks(request):
 
     except AppException as e:
         context['errors'] = e.errors.value
+        shortcuts.init_tasks(request, controller, tasks_list)
+
+    context['tasks_list'] = tasks_list
 
     return render(request, 'tc_web/tasks/tasks.html', context)

@@ -23,7 +23,7 @@ def projects(request):
             return redirect_link
 
     controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
-    projects_list = controller.get_projects('')[:5]
+    projects_list = controller.get_projects('')
 
     context = {
         'projects_list': projects_list
