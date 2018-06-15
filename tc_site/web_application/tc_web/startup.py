@@ -3,7 +3,7 @@ from . import config
 import time_candle.app_logger
 
 
-def startup():
+def start_up():
     if not os.path.exists(config.BASE_DIR):
         os.makedirs(config.BASE_DIR)
     time_candle.app_logger.setup_logging(

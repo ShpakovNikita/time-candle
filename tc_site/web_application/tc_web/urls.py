@@ -38,6 +38,10 @@ urlpatterns = [
     path('project/<int:project_id>/add_user',
          project_views.add_user,
          name='add_user'),
+    path('projects/change_project/<int:project_id>/',
+         project_views.change_project,
+         name='change_project'),
+
     path('profile/id<int:user_id>/', views.profile, name='profile'),
     path('profile/change_profile/<int:user_id>/',
          views.change_profile,
@@ -52,4 +56,4 @@ urlpatterns = [
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns += staticfiles_urlpatterns()
 
-startup.startup()
+startup.start_up()

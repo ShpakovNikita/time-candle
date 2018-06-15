@@ -49,7 +49,7 @@ def add_project(request):
 
     if request.method == 'POST':
         print(request.POST)
-        form = forms.AddProject(request.POST)
+        form = forms.ProjectForm(request.POST)
         if form.is_valid():
             title = form.cleaned_data.get('title')
             description = form.cleaned_data.get('description')
@@ -63,13 +63,58 @@ def add_project(request):
 
             return redirect(reverse('tc_web:projects'))
     else:
-        form = forms.AddProject()
+        form = forms.ProjectForm()
 
     return render(request, 'tc_web/projects/add_project.html', {'form': form})
 
 
+def change_project(request, project_id):
+    for link in ['search']:
+        redirect_link = base.search_user_forms(request, link)
+        if redirect_link:
+            return redirect_link
+
+    context = {'errors': None}
+    controller = Controller(uid=request.user.id,
+                            db_file=config.DATABASE_PATH)
+
+    if request.method == 'POST':
+        print(request.POST)
+        form = forms.ProjectForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data.get('title')
+            description = form.cleaned_data.get('description')
+            if not description:
+                description = None
+
+            try:
+                controller.change_project(project_id, title, description)
+
+                return redirect(reverse('tc_web:projects'))
+            except AppException as e:
+                context['errors'] = e.errors.value
+    else:
+        form = forms.ProjectForm()
+
+    context['form'] = form
+    try:
+        project = controller.get_project(project_id)
+        context['project'] = project
+        form.fields['title'].widget.attrs.update({'value': project.title})
+        form.fields['description'].widget.attrs.update(
+            {'placeholder': project.description})
+
+    except AppException as e:
+        raise Http404
+
+    if request.user.id != project.admin_uid and not context['errors']:
+        context['errors'] = 'You know that you cannot do that, right?'
+
+    return render(request, 'tc_web/projects/change_project.html', context)
+
+
 def add_user(request, project_id):
-    for link in ['search', 'search_user']:
+    for link in ['search']:
         redirect_link = base.search_user_forms(request, link)
         if redirect_link:
             return redirect_link
