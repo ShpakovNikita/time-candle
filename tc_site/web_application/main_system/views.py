@@ -1,8 +1,6 @@
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect, reverse
-from . import models
-from . import forms
+from main_system import forms
 from time_candle.controller.commands import Controller
 from tc_web import config
 

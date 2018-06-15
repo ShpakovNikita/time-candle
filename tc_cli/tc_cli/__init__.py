@@ -4,7 +4,7 @@ console.
 
 """
 import os
-from . import settings as config
+from tc_cli import settings as config
 import time_candle.app_logger
 
 if not os.path.exists(config.BASE_DIR):

@@ -1,7 +1,6 @@
 from time_candle.enums.priority import Priority
 from time_candle.enums.status import Status
 from time_candle.model import logger
-from time_candle.model.time_formatter import get_datetime
 
 
 class Task:

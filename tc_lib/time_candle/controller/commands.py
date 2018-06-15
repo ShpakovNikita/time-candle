@@ -4,8 +4,8 @@ from time_candle.model.logic.user import UserLogic
 import time_candle.controller.validators as v
 import time_candle.exceptions.validation_exceptions as v_e
 from time_candle.model import logger
-from time_candle.enums.status import key_status_dict, Status
-from time_candle.enums.priority import key_priority_dict, Priority
+from time_candle.enums.status import Status
+from time_candle.enums.priority import Priority
 import time_candle.model.time_formatter
 """
 This is commands module. Commands from argparse and django will go to this 

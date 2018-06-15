@@ -1,12 +1,14 @@
 from django.http import Http404
-from django.template import loader
-from django.shortcuts import render, redirect
+from django.shortcuts import (
+    render,
+    redirect,
+)
 from django.urls import reverse
 from time_candle.controller.commands import Controller
 from time_candle.exceptions import AppException
-from . import forms
-from .. import config
-from . import shortcuts
+from tc_web.tasks import forms
+from tc_web import config
+from tc_web.tasks import shortcuts
 from tc_web import shortcuts as base
 from django.contrib.auth.models import User
 
@@ -162,6 +164,7 @@ def project(request, project_id):
     try:
         tasks_list = shortcuts.tasks_query_get_form(
             request, controller, 'projects: ' + str(project_id))
+        shortcuts.sort_filter(request, tasks_list)
         context['tasks_list'] = tasks_list
 
         users_list = controller.get_users(project_id)
@@ -202,7 +205,8 @@ def tasks(request):
     controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
 
     try:
-        tasks_list = shortcuts.tasks_query_get_form(request, controller, '')[:10]
+        tasks_list = shortcuts.tasks_query_get_form(request, controller, '')
+        shortcuts.sort_filter(request, tasks_list)
         context['tasks_list'] = tasks_list
 
         redirect_view = shortcuts.task_card_post_form(request, controller,

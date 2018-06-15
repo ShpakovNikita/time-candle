@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import include, path
 from django.conf.urls import url
 from django.contrib.auth import views as auth_views
-from . import views
+from main_system import views
 
 handler404 = 'tc_web.views.err404'
 

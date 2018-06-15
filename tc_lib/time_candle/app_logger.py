@@ -1,6 +1,5 @@
 import logging
 import logging.config
-import time_candle.exceptions as e
 from configparser import MissingSectionHeaderError
 
 

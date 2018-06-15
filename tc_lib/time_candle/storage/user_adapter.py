@@ -3,7 +3,7 @@ from time_candle.storage.adapter_classes import Filter as PrimaryFilter
 from time_candle.storage.adapter_classes import Adapter as PrimaryAdapter
 from time_candle.storage import logger
 import time_candle.exceptions.db_exceptions as db_e
-from peewee import DoesNotExist, IntegrityError
+from peewee import DoesNotExist
 
 
 class UserFilter(PrimaryFilter):

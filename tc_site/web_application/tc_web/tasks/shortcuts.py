@@ -1,7 +1,7 @@
 from django.shortcuts import redirect
 from time_candle.enums.status import Status
+from time_candle.enums.priority import Priority
 from time_candle.model.time_formatter import get_datetime
-from django.contrib.auth.models import User
 
 
 def task_card_post_form(request, controller, redirect_link):
@@ -37,6 +37,17 @@ def tasks_query_get_form(request, controller, default_query=''):
 
     else:
         return []
+
+
+def sort_filter(request, tasks_list):
+    def custom_filter(task):
+        if task.uid == request.user.id:
+            return task.priority
+
+        else:
+            return task.priority - Priority.MAX
+
+    tasks_list.sort(key=custom_filter, reverse=True)
 
 
 def init_tasks(request, controller, tasks_list):

@@ -2,10 +2,11 @@ import argparse
 from collections import namedtuple
 from time_candle.controller.commands import Controller as AppController
 from time_candle.exceptions import AppException
-from .exceptions import AuthenticationError
+from tc_cli.exceptions import AuthenticationError
 import time_candle.app_logger
 from tc_cli import print_functions
-from .user_controller import UserAuthenticationController as UserController
+from tc_cli.user_controller import UserAuthenticationController as \
+    UserController
 from tc_cli import settings as config
 import traceback
 

@@ -1,9 +1,9 @@
 from django.urls import path
 from django.conf.urls import include, url
-from . import startup
-from . import views
-from .tasks import views as task_views
-from .projects import views as project_views
+from tc_web import startup
+from tc_web import views
+from tc_web.tasks import views as task_views
+from tc_web.projects import views as project_views
 
 
 app_name = 'tc_web'

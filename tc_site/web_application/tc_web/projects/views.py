@@ -1,12 +1,14 @@
-from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.template import loader
-from django.shortcuts import render, redirect
+from django.http import Http404
+from django.shortcuts import (
+    render,
+    redirect,
+)
 from django.urls import reverse
 from time_candle.controller.commands import Controller
 from time_candle.exceptions import AppException
-from . import forms
-from .. import config
-from . import shortcuts
+from tc_web.projects import forms
+from tc_web import config
+from tc_web.projects import shortcuts
 from tc_web import shortcuts as base
 from django.contrib.auth.models import User
 

@@ -1,5 +1,5 @@
 import os
-from . import config
+from tc_web import config
 import time_candle.app_logger
 
 

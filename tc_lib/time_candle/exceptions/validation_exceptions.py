@@ -1,5 +1,5 @@
 from enum import Enum
-from . import AppException
+from time_candle.exceptions import AppException
 
 
 # Name related things
