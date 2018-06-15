@@ -1,3 +1,40 @@
 {% extends 'base.html' %}
+
 {% block content %}
+<div class="row justify-content-md-center">
+    <div class="col-md-4 col-sm-10">
+        <div class="card">
+            <div class="card-body">
+                <p class="h4 text-center mb-4">Add user</p>
+                <form method="post" class="text-center">
+                    {% csrf_token %}
+                    <div class="md-form" style="z-index: 10000">
+                        <input id="search_user" name="search_user" style="z-index: 10000" type="text"
+
+                               placeholder="Username" aria-label="Search">
+                    </div>
+
+                    <button type="submit" class="btn btn-unique">Add
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block errors %}
+    {% include 'tc_web/error.html' with errors=errors %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(function() {
+  $("#search_user").autocomplete({
+    source: "/tc_web/api/get_users",
+    minLength: 2,
+  });
+});
+
+</script>
 {% endblock %}

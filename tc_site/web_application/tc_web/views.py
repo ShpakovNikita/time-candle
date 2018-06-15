@@ -69,7 +69,7 @@ def get_users(request):
 
 def get_project_users(request, project_id):
     controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
-
+    print('horray')
     if request.is_ajax():
         q = request.GET.get('term', '')
         users = controller.get_users(project_id)
@@ -77,9 +77,9 @@ def get_project_users(request, project_id):
         results = []
         for user in users:
             user_json = {}
-            user_json['id'] = user.id
-            user_json['label'] = user.username
-            user_json['value'] = user.username
+            user_json['id'] = user.uid
+            user_json['label'] = user.login
+            user_json['value'] = user.login
             results.append(user_json)
         data = json.dumps(results)
     else:
@@ -118,30 +118,3 @@ def change_profile(request, user_id):
         form.fields['about'].widget.attrs.update({'value': user.about})
 
     return render(request, 'tc_web/change_profile.html', {'form': form})
-
-
-def vote(request, question_id):
-    try:
-        question = Question.get(Question.id == question_id)
-    except DoesNotExist:
-        raise Http404
-
-    try:
-        selected_choice = question.choice_set.where(
-            Choice.id == int(request.POST['choice'])).get()
-    except (KeyError, DoesNotExist):
-        # Redisplay the question voting form.
-        return render(request, 'tc_web/detail.html', {
-            'question': question,
-            'error_message': "You didn't select a choice.",
-        })
-    else:
-        selected_choice.votes += 1
-        selected_choice.save()
-        # Always return an HttpResponseRedirect after successfully dealing
-        # with POST data. This prevents data from being posted twice if a
-        # user hits the Back button.
-        return HttpResponseRedirect(
-            reverse('tc_web:results', args=(question.id,)))
-
-# Create your views here.

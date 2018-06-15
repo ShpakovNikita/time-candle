@@ -1,4 +1,4 @@
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import Http404
 from django.template import loader
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -35,12 +35,18 @@ def add_task(request, project_id=None, task_id=None):
                 deadline_time = None
 
             try:
-                if 'search_receiver' in request.POST \
-                        and request.POST['search_receiver']:
-                    receiver_uid = User.objects.get(
-                        username=request.POST['search_receiver']).id
-                else:
-                    receiver_uid = None
+                try:
+                    if 'search_receiver' in request.POST \
+                            and request.POST['search_receiver']:
+                        receiver_uid = User.objects.get(
+                            username=request.POST['search_receiver']).id
+                    else:
+                        receiver_uid = None
+
+                except User.DoesNotExist:
+                    errors = type('dummy', (), {})()
+                    errors.value = 'User does not exists in this project'
+                    raise AppException(errors)
 
                 controller.add_task(title=title,
                                     time=deadline_time,

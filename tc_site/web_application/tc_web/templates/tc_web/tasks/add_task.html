@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="row justify-content-md-center">
-    <div class="col-md-4">
+    <div class="col-md-4 col-sm-10">
         <div class="card">
             <div class="card-body">
                 <p class="h4 text-center mb-4">Add task</p>
@@ -12,7 +12,7 @@
                     <div class="md-form" style="z-index: 10000">
                         <input id="search_receiver" name="search_receiver" style="z-index: 10000" type="text"
 
-                               placeholder="Receiver" aria-label="Search">
+                               placeholder="Receiver (You)" aria-label="Search">
                     </div>
                     {% endif %}
                     {% csrf_token %}
@@ -85,18 +85,20 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block errors %}
+    {% include 'tc_web/error.html' with errors=errors %}
+{% endblock %}
+
+{% block scripts %}
 <script>
     $(function() {
-  $("#search").autocomplete({
-    source: "/tc_web/api/get_project_users",
+  $("#search_receiver").autocomplete({
+    source: "/tc_web/api/get_project_users/{{ project.pid }}/",
     minLength: 2,
   });
 });
 
 </script>
-{% endblock %}
-
-{% block errors %}
-    {% include 'tc_web/error.html' with errors=errors %}
 {% endblock %}

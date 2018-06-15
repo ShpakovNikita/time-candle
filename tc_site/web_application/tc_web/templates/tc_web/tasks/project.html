@@ -35,9 +35,14 @@
 
 {% block add_buttons %}
 {% if project %}
-<div class="fixed-action-btn" style="bottom: 45px; right: 24px; z-index: 10000">
+<div class="fixed-action-btn" style="bottom: 45px; right: 24px;">
     <a class="btn-floating btn-lg red" href="{% url 'tc_web:add_project_task' project.pid %}">
         <i class="fa fa-plus"></i>
+    </a>
+</div>
+<div class="fixed-action-btn" style="bottom: 45px; right: 100px;">
+    <a class="btn-floating btn-lg red" href="{% url 'tc_web:add_user' project.pid %}">
+        <i class="fa fa-user"></i>
     </a>
 </div>
 {% endif %}

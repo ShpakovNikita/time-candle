@@ -8,6 +8,7 @@ from . import forms
 from .. import config
 from . import shortcuts
 from tc_web import shortcuts as base
+from django.contrib.auth.models import User
 
 
 def projects(request):
@@ -65,4 +66,40 @@ def add_project(request):
         form = forms.AddProject()
 
     return render(request, 'tc_web/projects/add_project.html', {'form': form})
+
+
+def add_user(request, project_id):
+    for link in ['search', 'search_user']:
+        redirect_link = base.search_user_forms(request, link)
+        if redirect_link:
+            return redirect_link
+
+    context = {}
+
+    if request.method == 'POST':
+        try:
+            print(request.POST)
+            try:
+                if 'search_user' in request.POST \
+                        and request.POST['search_user']:
+                    user_id = User.objects.get(
+                        username=request.POST['search_user']).id
+                else:
+                    user_id = None
+
+            except User.DoesNotExist:
+                errors = type('dummy', (), {})()
+                errors.value = 'User does not exists'
+                raise AppException(errors)
+
+            controller = Controller(uid=request.user.id,
+                                    db_file=config.DATABASE_PATH)
+
+            controller.add_user_to_project(user_id, project_id)
+
+            return redirect(reverse('tc_web:project', args=(project_id,)))
+        except AppException as e:
+            context['errors'] = e.errors.value
+
+    return render(request, 'tc_web/projects/add_user.html', context)
 

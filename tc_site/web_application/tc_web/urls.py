@@ -34,19 +34,19 @@ urlpatterns = [
          project_views.add_project,
          name='add_project'),
 
-    # ex: /polls/5/vote/
-    path('<int:question_id>/vote/', views.vote, name='vote'),
-
     path('project/<int:project_id>/', task_views.project, name='project'),
+    path('project/<int:project_id>/add_user',
+         project_views.add_user,
+         name='add_user'),
     path('profile/<int:user_id>/', views.profile, name='profile'),
     path('profile/change_profile/<int:user_id>/',
          views.change_profile,
          name='change_profile'),
 
     url(r'^api/get_users/', views.get_users, name='get_users'),
-    url(r'^api/get_project_users/',
-        views.get_project_users,
-        name='get_project_users')
+    path('api/get_project_users/<int:project_id>/',
+         views.get_project_users,
+         name='get_project_users')
 ]
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
