@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.http import Http404
 
 
+# merge to object's fields and return one merged object
 def merge_instances(obj_1, obj_2):
     buff_obj = copy(obj_1)
     for key, value in obj_2.__dict__.items():
@@ -13,6 +14,7 @@ def merge_instances(obj_1, obj_2):
     return buff_obj
 
 
+# initialize form for user search
 def search_user_forms(request, search_field='search', redirect_flag=True):
     if request.method == "GET":
         if search_field in request.GET:

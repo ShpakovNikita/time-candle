@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 
 
 def add_task(request, project_id=None, task_id=None):
+    # we always init our search form
     for link in ['search']:
         redirect_link = base.search_user_forms(request, link)
         if redirect_link:
@@ -36,6 +37,9 @@ def add_task(request, project_id=None, task_id=None):
                 deadline_time = None
 
             try:
+
+                # this try is needed inside other try in order to skip adding
+                # task id we haven't found our user
                 try:
                     if 'search_receiver' in request.POST \
                             and request.POST['search_receiver']:
@@ -45,6 +49,7 @@ def add_task(request, project_id=None, task_id=None):
                         receiver_uid = None
 
                 except User.DoesNotExist:
+                    # this done for more elegant way to catch exception
                     errors = type('dummy', (), {})()
                     errors.value = 'User does not exists in this project'
                     raise AppException(errors)
@@ -58,6 +63,8 @@ def add_task(request, project_id=None, task_id=None):
                                     comment=comment,
                                     pid=project_id,
                                     receiver_uid=receiver_uid)
+                # for better user experience we are checking where to go: to the
+                # project if task is project's or to the tasks page
                 if project_id is not None:
                     return redirect(
                         reverse('tc_web:project', args=(project_id,)))
@@ -69,10 +76,14 @@ def add_task(request, project_id=None, task_id=None):
 
     else:
         form = forms.AddTask()
+
+        # init form fields with default values
         form.fields['title'].widget.attrs.update({'value': 'New Task'})
         form.fields['comment'].widget.attrs.update({'value': 'Nani!?'})
 
     context['form'] = form
+
+    # check if we have rights to be on this page
     if project_id:
         try:
             context['project'] = controller.get_project(project_id)
@@ -83,15 +94,15 @@ def add_task(request, project_id=None, task_id=None):
 
 
 def change_task(request, task_id):
-    controller = Controller(uid=request.user.id,
-                            db_file=config.DATABASE_PATH)
-
+    # we always init our search form
     for link in ['search']:
         redirect_link = base.search_user_forms(request, link)
         if redirect_link:
             return redirect_link
 
     context = {}
+    controller = Controller(uid=request.user.id,
+                            db_file=config.DATABASE_PATH)
 
     if request.method == 'POST':
         form = forms.ChangeTask(request.POST)
@@ -100,17 +111,20 @@ def change_task(request, task_id):
             deadline_time = form.cleaned_data.get('deadline_time')
             priority = form.cleaned_data.get('priority')
             status = form.cleaned_data.get('status')
+
             if not deadline_time:
                 deadline_time = None
 
             if not comment:
                 comment = None
 
+            # convert to int if field checked
             if not status:
                 status = None
             else:
                 status = int(status)
 
+            # convert to int if field checked
             if not priority:
                 priority = None
             else:
@@ -131,6 +145,8 @@ def change_task(request, task_id):
         form = forms.ChangeTask()
 
     context['form'] = form
+
+    # check if we can see this page
     try:
         task = controller.get_tasks('tids: ' + str(task_id))[0]
         shortcuts.init_tasks(request, controller, [task])
@@ -148,24 +164,28 @@ def project(request, project_id):
     if not request.user.is_authenticated:
         raise Http404
 
+    # we always init our search form
     for link in ['search', 'search_user']:
         redirect_link = base.search_user_forms(request, link)
         if redirect_link:
             return redirect_link
 
     context = {}
-
     controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
 
     try:
+        # loading selected tasks
         tasks_list = shortcuts.tasks_query_get_form(
             request, controller, 'projects: ' + str(project_id))
         shortcuts.sort_filter(request, tasks_list)
 
+        # get users for side nav
         users_list = controller.get_users(project_id)
 
+        # and the project itself for more information on the page
         selected_project = controller.get_project(project_id)
         selected_project.admin = User.objects.get(id=selected_project.admin_uid)
+
     except AppException:
         raise Http404
 
@@ -178,11 +198,14 @@ def project(request, project_id):
         if redirect_view:
             return redirect_view
 
-        # convert all milliseconds fields to normal datetime
+        # convert and add fields
         shortcuts.init_tasks(request, controller, tasks_list)
 
     except AppException as e:
         context['errors'] = e.errors.value
+
+        # error won't stop us from showing the tasks!
+        shortcuts.init_tasks(request, controller, tasks_list)
 
     context['tasks_list'] = tasks_list
     context['users_list'] = users_list
@@ -195,6 +218,7 @@ def tasks(request):
     if not request.user.is_authenticated:
         return redirect('/login/')
 
+    # we always init our search form
     for link in ['search']:
         redirect_link = base.search_user_forms(request, link)
         if redirect_link:
@@ -204,6 +228,7 @@ def tasks(request):
 
     controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
 
+    # loading selected tasks
     tasks_list = shortcuts.tasks_query_get_form(request, controller, '')
     shortcuts.sort_filter(request, tasks_list)
 
@@ -213,11 +238,13 @@ def tasks(request):
         if redirect_view:
             return redirect_view
 
-        # convert all milliseconds fields to normal datetime.
+        # convert and add fields
         shortcuts.init_tasks(request, controller, tasks_list)
 
     except AppException as e:
         context['errors'] = e.errors.value
+
+        # error won't stop us from showing the tasks!
         shortcuts.init_tasks(request, controller, tasks_list)
 
     context['tasks_list'] = tasks_list

@@ -17,6 +17,7 @@ def projects(request):
     if not request.user.is_authenticated:
         return redirect('/login/')
 
+    # we always init our search form
     for link in ['search']:
         redirect_link = base.search_user_forms(request, link)
         if redirect_link:
@@ -31,10 +32,13 @@ def projects(request):
     try:
         redirect_view = shortcuts.project_card_post_form(
             request, controller, reverse('tc_web:projects'))
+
+        # if we can redirect, then do it, else just render or render with errors
+        # our template
         if redirect_view:
             return redirect_view
 
-        # convert all milliseconds fields to normal datetime.
+        # adding some fields for better view
         shortcuts.init_projects(request, controller, projects_list)
 
     except AppException as e:
@@ -44,6 +48,7 @@ def projects(request):
 
 
 def add_project(request):
+    # we always init our search form
     for link in ['search']:
         redirect_link = base.search_user_forms(request, link)
         if redirect_link:
@@ -63,6 +68,7 @@ def add_project(request):
                                    members=[])
 
             return redirect(reverse('tc_web:projects'))
+
     else:
         form = forms.ProjectForm()
 
@@ -70,6 +76,7 @@ def add_project(request):
 
 
 def change_project(request, project_id):
+    # we always init our search form
     for link in ['search']:
         redirect_link = base.search_user_forms(request, link)
         if redirect_link:
@@ -84,6 +91,8 @@ def change_project(request, project_id):
         if form.is_valid():
             title = form.cleaned_data.get('title')
             description = form.cleaned_data.get('description')
+
+            # if description if empty we pass it as not-to-change param
             if not description:
                 description = None
 
@@ -93,10 +102,14 @@ def change_project(request, project_id):
                 return redirect(reverse('tc_web:projects'))
             except AppException as e:
                 context['errors'] = e.errors.value
+
     else:
         form = forms.ProjectForm()
 
     context['form'] = form
+
+    # try because we can have some problems with rights when we try to visit
+    # page
     try:
         project = controller.get_project(project_id)
         context['project'] = project
@@ -107,6 +120,7 @@ def change_project(request, project_id):
     except AppException as e:
         raise Http404
 
+    # if you are not admin and there was no errors for you before
     if request.user.id != project.admin_uid and not context['errors']:
         context['errors'] = 'You know that you cannot do that, right?'
 
@@ -114,15 +128,21 @@ def change_project(request, project_id):
 
 
 def add_user(request, project_id):
+    # we always init our search form
     for link in ['search']:
         redirect_link = base.search_user_forms(request, link)
         if redirect_link:
             return redirect_link
 
     context = {}
+    controller = Controller(uid=request.user.id,
+                            db_file=config.DATABASE_PATH)
 
     if request.method == 'POST':
+
+        # trying to add user to project
         try:
+            # searching selected user in database
             try:
                 if 'search_user' in request.POST \
                         and request.POST['search_user']:
@@ -132,18 +152,29 @@ def add_user(request, project_id):
                     user_id = None
 
             except User.DoesNotExist:
+                # we need this for more elegant way to catch exception
                 errors = type('dummy', (), {})()
                 errors.value = 'User does not exists'
                 raise AppException(errors)
 
-            controller = Controller(uid=request.user.id,
-                                    db_file=config.DATABASE_PATH)
-
             controller.add_user_to_project(user_id, project_id)
 
             return redirect(reverse('tc_web:project', args=(project_id,)))
+
         except AppException as e:
             context['errors'] = e.errors.value
+
+    # try because we can have some problems with rights when we try to visit
+    # page
+    try:
+        project = controller.get_project(project_id)
+
+    except AppException as e:
+        raise Http404
+
+    # if you are not admin and there was no errors for you before
+    if request.user.id != project.admin_uid and not context['errors']:
+        context['errors'] = 'You know that you cannot do that, right?'
 
     return render(request, 'tc_web/projects/add_user.html', context)
 

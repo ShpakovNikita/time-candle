@@ -19,6 +19,7 @@ def err404(request, exception):
 
 
 def index(request):
+    # we always init our search form
     for link in ['search']:
         redirect_link = shortcuts.search_user_forms(request, link)
         if redirect_link:
@@ -28,6 +29,7 @@ def index(request):
 
 
 def profile(request, user_id):
+    # we always init our search form
     for link in ['search']:
         redirect_link = shortcuts.search_user_forms(request, link)
         if redirect_link:
@@ -41,11 +43,13 @@ def profile(request, user_id):
     except (User.DoesNotExist, AppException):
         raise Http404
 
+    # merge two user objects to get one full user info
     screen_user = shortcuts.merge_instances(django_user, lib_user)
 
     return render(request, 'tc_web/profile.html', {'screen_user': screen_user})
 
 
+# function for autocomplete user search
 def get_users(request):
     if request.is_ajax():
         q = request.GET.get('term', '')
@@ -66,6 +70,7 @@ def get_users(request):
     return HttpResponse(data, mimetype)
 
 
+# function for autocomplete project user search
 def get_project_users(request, project_id):
     controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
     if request.is_ajax():
@@ -88,6 +93,7 @@ def get_project_users(request, project_id):
 
 
 def change_profile(request, user_id):
+    # we always init our search form
     for link in ['search']:
         redirect_link = shortcuts.search_user_forms(request, link)
         if redirect_link:
@@ -111,6 +117,8 @@ def change_profile(request, user_id):
     else:
         form = forms.ChangeProfileForm()
         user = controller.get_user(user_id)
+
+        # init fields with default values
         form.fields['nickname'].widget.attrs.update({'value': user.nickname})
         form.fields['about'].widget.attrs.update({'value': user.about})
 

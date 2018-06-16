@@ -43,11 +43,13 @@
         <i class="fa fa-plus"></i>
     </a>
 </div>
+{% if project.admin_uid == user.id %}
 <div class="fixed-action-btn" style="bottom: 45px; right: 100px;">
     <a class="btn-floating btn-lg red" href="{% url 'tc_web:add_user' project.pid %}">
         <i class="fa fa-user"></i>
     </a>
 </div>
+{% endif %}
 {% endif %}
 
 {% block sidebar %}

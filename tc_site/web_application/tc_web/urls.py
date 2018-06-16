@@ -55,4 +55,5 @@ urlpatterns = [
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns += staticfiles_urlpatterns()
 
+# one time on runserver startup function
 startup.start_up()

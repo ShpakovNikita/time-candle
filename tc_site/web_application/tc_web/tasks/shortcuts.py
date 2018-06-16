@@ -4,6 +4,7 @@ from time_candle.enums.priority import Priority
 from time_candle.model.time_formatter import get_datetime
 
 
+# use it do define all post forms related to tasks
 def task_card_post_form(request, controller, redirect_link):
     if request.method == 'POST':
         if 'delete' in request.POST:
@@ -16,6 +17,8 @@ def task_card_post_form(request, controller, redirect_link):
             return redirect(redirect_link)
 
 
+# use this to get tasks. It checks if there was applied query and returns proper
+# tasks with filter
 def tasks_query_get_form(request, controller, default_query=''):
     if request.method == "GET":
         if 'show_me' in request.GET:
@@ -38,6 +41,8 @@ def tasks_query_get_form(request, controller, default_query=''):
     return tasks_list
 
 
+# use this function as sort. It makes your user goes first and by priority,
+# other tasks that is not yours goes later by priority
 def sort_filter(request, tasks_list):
     def custom_filter(task):
         if task.uid == request.user.id:
@@ -49,18 +54,24 @@ def sort_filter(request, tasks_list):
     tasks_list.sort(key=custom_filter, reverse=True)
 
 
+# use this function to initialize some additional fields to the library model
+# for better view and user experience or convert existing values
 def init_tasks(request, controller, tasks_list):
     for task in tasks_list:
+
+        # convert from milliseconds to datetime
         if task.deadline is not None:
             task.deadline = get_datetime(task.deadline)
         else:
             task.deadline = ''
 
+        # convert from milliseconds to datetime
         if task.realization_time is not None:
             task.realization_time = get_datetime(task.realization_time)
         else:
             task.realization_time = ''
 
+        # this value is always defined
         task.creation_time = get_datetime(task.creation_time)
 
         if task.pid is not None:
