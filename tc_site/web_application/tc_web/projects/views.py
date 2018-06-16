@@ -11,10 +11,12 @@ from tc_web import config
 from tc_web.projects import shortcuts
 from tc_web import shortcuts as base
 from django.contrib.auth.models import User
+from tc_web import logger
 
 
 def projects(request):
     if not request.user.is_authenticated:
+        logger.warning('user is not authenticated')
         return redirect('/login/')
 
     # we always init our search form
@@ -29,6 +31,7 @@ def projects(request):
     context = {
         'projects_list': projects_list
     }
+
     try:
         redirect_view = shortcuts.project_card_post_form(
             request, controller, reverse('tc_web:projects'))
@@ -43,6 +46,10 @@ def projects(request):
 
     except AppException as e:
         context['errors'] = e.errors.value
+        logger.warning(e.errors.value)
+
+        # the errors doesn't
+        shortcuts.init_projects(request, controller, projects_list)
 
     return render(request, 'tc_web/projects/projects.html', context)
 
@@ -118,6 +125,7 @@ def change_project(request, project_id):
             {'placeholder': project.description})
 
     except AppException as e:
+        logger.warning(e.errors.value)
         raise Http404
 
     # if you are not admin and there was no errors for you before
@@ -155,6 +163,7 @@ def add_user(request, project_id):
                 # we need this for more elegant way to catch exception
                 errors = type('dummy', (), {})()
                 errors.value = 'User does not exists'
+                logger.warning(errors.value)
                 raise AppException(errors)
 
             controller.add_user_to_project(user_id, project_id)
@@ -170,6 +179,7 @@ def add_user(request, project_id):
         project = controller.get_project(project_id)
 
     except AppException as e:
+        logger.warning(e.errors.value)
         raise Http404
 
     # if you are not admin and there was no errors for you before

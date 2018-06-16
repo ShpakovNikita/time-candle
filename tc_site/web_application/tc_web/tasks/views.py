@@ -11,6 +11,7 @@ from tc_web import config
 from tc_web.tasks import shortcuts
 from tc_web import shortcuts as base
 from django.contrib.auth.models import User
+from tc_web import logger
 
 
 def add_task(request, project_id=None, task_id=None):
@@ -52,6 +53,7 @@ def add_task(request, project_id=None, task_id=None):
                     # this done for more elegant way to catch exception
                     errors = type('dummy', (), {})()
                     errors.value = 'User does not exists in this project'
+                    logger.warning(errors.value)
                     raise AppException(errors)
 
                 controller.add_task(title=title,
@@ -73,6 +75,7 @@ def add_task(request, project_id=None, task_id=None):
 
             except AppException as e:
                 context['errors'] = e.errors.value
+                logger.warning(e.errors.value)
 
     else:
         form = forms.AddTask()
@@ -140,6 +143,7 @@ def change_task(request, task_id):
 
             except AppException as e:
                 context['errors'] = e.errors.value
+                logger.warning(e.errors.value)
 
     else:
         form = forms.ChangeTask()
@@ -155,6 +159,7 @@ def change_task(request, task_id):
         form.fields['deadline_time'].widget.attrs.update({'value': task.deadline})
 
     except (AppException, IndexError):
+        logger.warning('error occured during the change task')
         raise Http404
 
     return render(request, 'tc_web/tasks/change_task.html', context)
@@ -162,6 +167,7 @@ def change_task(request, task_id):
 
 def project(request, project_id):
     if not request.user.is_authenticated:
+        logger.warning('user is not authenticated')
         raise Http404
 
     # we always init our search form
@@ -203,6 +209,7 @@ def project(request, project_id):
 
     except AppException as e:
         context['errors'] = e.errors.value
+        logger.warning(e.errors.value)
 
         # error won't stop us from showing the tasks!
         shortcuts.init_tasks(request, controller, tasks_list)
@@ -216,6 +223,7 @@ def project(request, project_id):
 
 def tasks(request):
     if not request.user.is_authenticated:
+        logger.warning('user is not authenticated')
         return redirect('/login/')
 
     # we always init our search form
@@ -243,6 +251,7 @@ def tasks(request):
 
     except AppException as e:
         context['errors'] = e.errors.value
+        logger.warning(e.errors.value)
 
         # error won't stop us from showing the tasks!
         shortcuts.init_tasks(request, controller, tasks_list)

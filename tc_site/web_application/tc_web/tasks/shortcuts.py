@@ -2,11 +2,13 @@ from django.shortcuts import redirect
 from time_candle.enums.status import Status
 from time_candle.enums.priority import Priority
 from time_candle.model.time_formatter import get_datetime
+from tc_web import logger
 
 
 # use it do define all post forms related to tasks
 def task_card_post_form(request, controller, redirect_link):
     if request.method == 'POST':
+        logger.debug(request.POST)
         if 'delete' in request.POST:
             controller.remove_task(request.POST['delete'])
             return redirect(redirect_link)
@@ -21,6 +23,7 @@ def task_card_post_form(request, controller, redirect_link):
 # tasks with filter
 def tasks_query_get_form(request, controller, default_query=''):
     if request.method == "GET":
+        logger.debug(request.GET)
         if 'show_me' in request.GET:
             if not default_query:
                 query_form = request.GET['show_me']

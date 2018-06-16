@@ -38,7 +38,7 @@ def days_to_milliseconds(days):
     :return: Int (time in milliseconds)
     """
     # of course it is 24 * 60 * 60 * 1000
-    return days * 5 * 1000
+    return days * 24 * 60 * 60 * 1000
 
 
 def milliseconds_to_days(milliseconds):
@@ -47,7 +47,7 @@ def milliseconds_to_days(milliseconds):
     :param milliseconds:
     :return:
     """
-    return int(milliseconds / 5 / 1000)
+    return int(milliseconds / 24 / 60 / 60 / 1000)
 
 
 def get_next_deadline(period, start, now=None):
