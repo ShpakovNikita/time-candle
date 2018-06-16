@@ -1,5 +1,8 @@
 # Time Candle. #
 ##### little app about your time and life #####
+## Architecture ##
+For information about architecture please check Logical_View.jpg file.
+
 ## How to install? ##
 
 ### Make sure you have installed setuptools: ###
