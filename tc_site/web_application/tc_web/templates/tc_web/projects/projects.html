@@ -27,6 +27,26 @@
 </div>
 {% endblock %}
 
+{% block links %}
+<ul class="navbar-nav mr-auto">
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'tc_web:index' %}">Home
+            <span class="sr-only">(current)</span>
+        </a>
+    </li>
+    {% if user.is_authenticated %}
+    <li class="nav-item">
+        <a class="nav-link"
+           href="{% url 'tc_web:tasks' %}">Tasks</a>
+    </li>
+    <li class="nav-item active">
+        <a class="nav-link" href="{% url 'tc_web:projects' %}">Projects</a>
+    </li>
+    {% endif %}
+
+</ul>
+{% endblock %}
+
 {% block errors %}
     {% include 'tc_web/error.html' with errors=errors %}
 {% endblock %}

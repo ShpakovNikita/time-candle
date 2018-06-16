@@ -43,8 +43,9 @@
             <div class="collapse navbar-collapse" id="basicExampleNav">
 
                 <!-- Links -->
+                {% block links %}
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'tc_web:index' %}">Home
                             <span class="sr-only">(current)</span>
                         </a>
@@ -60,6 +61,7 @@
                     {% endif %}
 
                 </ul>
+                {% endblock %}
                 <!-- Links -->
 
                 {% block navbar %}
@@ -68,15 +70,13 @@
                 <!-- Links -->
                 <ul class="navbar-nav ml-auto">
                     {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Log out</a>
-                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa fa-user"></i> Profile </a>
                         <div class="dropdown-menu dropdown-menu-right dropdown-info" aria-labelledby="navbarDropdownMenuLink-4">
                             <a class="dropdown-item" href="{% url 'tc_web:change_profile' user.id %}">Settings</a>
                             <a class="dropdown-item" href="{% url 'tc_web:profile' user.id %}">Check</a>
+                            <a class="dropdown-item" href="{% url 'logout' %}">Log out</a>
                         </div>
                     </li>
                     <li class="nav-item">

@@ -31,8 +31,10 @@ ALLOWED_HOSTS = ['*']
 
 LOGIN_REDIRECT_URL = '/tc_web/'
 
-# Application definition
+# Time zone change
+TIME_ZONE = 'Europe/Moscow'
 
+# Application definition
 INSTALLED_APPS = [
     'main_system.apps.AuthConfig',
     'tc_web.apps.TCWebConfig',
@@ -110,8 +112,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
