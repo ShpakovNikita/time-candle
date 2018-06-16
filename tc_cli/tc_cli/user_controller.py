@@ -44,6 +44,7 @@ class UserAuthenticationController:
         v.check_password(password)
         user = UserInstance(login=login, password=password)
         self.user_adapter.save(user)
+        return self.user_adapter.get_id_by_login(login)
 
     def log_in(self, login, password):
         """

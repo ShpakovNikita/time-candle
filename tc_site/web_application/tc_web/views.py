@@ -35,7 +35,8 @@ def profile(request, user_id):
         if redirect_link:
             return redirect_link
 
-    controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
+    controller = Controller(uid=request.user.id,
+                            psql_config=config.DATABASE_CONFIG)
 
     try:
         django_user = User.objects.get(id=user_id)
@@ -72,7 +73,8 @@ def get_users(request):
 
 # function for autocomplete project user search
 def get_project_users(request, project_id):
-    controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
+    controller = Controller(uid=request.user.id,
+                            psql_config=config.DATABASE_CONFIG)
     if request.is_ajax():
         q = request.GET.get('term', '')
         users = controller.get_users(project_id)
@@ -103,7 +105,7 @@ def change_profile(request, user_id):
         raise Http404
 
     controller = Controller(uid=request.user.id,
-                            db_file=config.DATABASE_PATH)
+                            psql_config=config.DATABASE_CONFIG)
 
     if request.method == 'POST':
         form = forms.ChangeProfileForm(request.POST)

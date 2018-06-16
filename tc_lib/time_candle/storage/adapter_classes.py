@@ -73,7 +73,7 @@ class BaseModel(Model):
 
 
 class User(BaseModel):
-    uid = PrimaryKeyField()
+    uid = CharField(unique=True)
 
     # user fields
     # for UserModel's own_tasks we have a relation field in Task class from

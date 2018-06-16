@@ -687,10 +687,11 @@ def _process_add_user(parsed_args):
         if parsed_args.password == '':
             raise ValueError('You must specify the password!')
 
-        user_controller.add_user(parsed_args.login,
-                                 parsed_args.password,
-                                 parsed_args.mail[0])
+        external_id = user_controller.add_user(parsed_args.login,
+                                               parsed_args.password,
+                                               parsed_args.mail[0])
         app_controller.add_user(parsed_args.login,
+                                external_id,
                                 parsed_args.nickname[0],
                                 parsed_args.about[0])
 

@@ -8,13 +8,14 @@ from tc_web import config
 def signup(request):
     if request.method == 'POST':
         controller = Controller(uid=request.user.id,
-                                db_file=config.DATABASE_PATH)
+                                psql_config=config.DATABASE_CONFIG)
 
         form = forms.SignUpForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
             username = form.cleaned_data.get('username')
-            controller.add_user(username)
+            print(user.id)
+            controller.add_user(username, user.id)
 
             raw_password = form.cleaned_data.get('password1')
 

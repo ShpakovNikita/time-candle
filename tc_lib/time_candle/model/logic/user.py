@@ -15,10 +15,12 @@ class UserLogic(Logic):
 
     def add_user(self,
                  login,
+                 external_id,
                  nickname,
                  about):
         # add user to the database
         user = UserInstance(login=login,
+                            uid=external_id,
                             nickname=nickname,
                             about=about)
         self.user_adapter.save(user)

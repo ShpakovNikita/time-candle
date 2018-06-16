@@ -93,7 +93,8 @@ class UserAdapter(PrimaryAdapter):
         except DoesNotExist:
             logger.debug('adding user...')
 
-        User.create(login=obj.login,
+        User.create(uid=obj.uid,
+                    login=obj.login,
                     about=obj.about,
                     nickname=obj.nickname)
 

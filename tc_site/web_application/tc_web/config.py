@@ -18,9 +18,16 @@ LOG_PATH = os.path.join(BASE_DIR, LOG_FILE)
 LOG_CONF = 'logging.conf'
 LOG_CONF_PATH = os.path.join(BASE_DIR, LOG_CONF)
 
-# This is lib database file name
+# This is lib database file name (but we will be using postgresql)
 DATABASE_FILE = 'data.db'
 DATABASE_PATH = os.path.join(BASE_DIR, DATABASE_FILE)
+
+DATABASE_CONFIG = {
+            'NAME': 'mydb',
+            'USER': 'shaft',
+            'HOST': '/var/run/postgresql',
+            'PASSWORD': '',
+            'PORT': '5432'}
 
 # This is the user (cli) database file name
 USERS_DATABASE_FILE = 'users.db'

@@ -23,7 +23,7 @@ def add_task(request, project_id=None, task_id=None):
 
     context = {}
     controller = Controller(uid=request.user.id,
-                            db_file=config.DATABASE_PATH)
+                            psql_config=config.DATABASE_CONFIG)
 
     if request.method == 'POST':
         form = forms.AddTask(request.POST)
@@ -105,7 +105,7 @@ def change_task(request, task_id):
 
     context = {}
     controller = Controller(uid=request.user.id,
-                            db_file=config.DATABASE_PATH)
+                            psql_config=config.DATABASE_CONFIG)
 
     if request.method == 'POST':
         form = forms.ChangeTask(request.POST)
@@ -177,7 +177,8 @@ def project(request, project_id):
             return redirect_link
 
     context = {}
-    controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
+    controller = Controller(uid=request.user.id,
+                            psql_config=config.DATABASE_CONFIG)
 
     try:
         # loading selected tasks
@@ -239,7 +240,8 @@ def tasks(request):
 
     context = {}
 
-    controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
+    controller = Controller(uid=request.user.id,
+                            psql_config=config.DATABASE_CONFIG)
 
     # loading selected tasks
     try:

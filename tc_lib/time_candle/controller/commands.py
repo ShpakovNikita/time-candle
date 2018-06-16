@@ -248,6 +248,7 @@ class Controller:
 
     def add_user(self,
                  login,
+                 external_id,
                  nickname=None,
                  about=''):
         """
@@ -267,6 +268,7 @@ class Controller:
         v.check_name(nickname)
 
         self.user_logic.add_user(login,
+                                 external_id,
                                  nickname,
                                  about)
 
