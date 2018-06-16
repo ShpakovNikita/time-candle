@@ -4,7 +4,7 @@ import os
 from time_candle.storage import logger
 
 
-db_filename = 'data.db'
+db_filename = ':memory:'
 _db_proxy = Proxy()
 
 
@@ -134,43 +134,110 @@ class UserProjectRelation(BaseModel):
     project = ForeignKeyField(Project, related_name='project')
 
 
+class _PsqlConfigChoices:
+    NAME = 'NAME'
+    USER = 'USER'
+    HOST = 'HOST'
+    PASSWORD = 'PASSWORD'
+    PORT = 'PORT'
+
+
 # Maybe it is wise to create another relations table with the time rules and etc
 # but for not we have only deadline time. So simple.
-
 class Adapter:
 
     _db_initialized = False
 
-    def __init__(self, uid, db_name=db_filename):
+    def __init__(self, uid, db_name=None,
+                 psql_config=None):
+        """
+        Init for db adapter. You should select which db you will be using (from
+        file sqlite or postgresql)
+        :param uid: User id
+        :param db_name: Name for sqlite db file, if you want to use it (if none
+        of database is selected then sqlite default db in memory will be created
+        )
+        :param psql_config: Config dict for postgresql configuration or None.
+        This is the example of this dict:
+         {
+            'NAME': 'mydb',
+            'USER': 'shaft',
+            'HOST': '/var/run/postgresql',
+            'PASSWORD': '',
+            'PORT': '5432'
+         }
+        """
         self.uid = uid
 
-        if db_name is None:
-            db_name = db_filename
+        if not db_name and not psql_config:
+            raise db_e.DatabaseConfigureError(
+                db_e.DatabaseMessages.MULTIPLE_DATABASE_SELECTION)
 
-        self.db_name = db_name
-        self._db_exists = os.path.exists(self.db_name)
+        elif psql_config:
+            self.psql_config = psql_config
 
-        if not Adapter._db_initialized:
-            self._db_initialize()
-            Adapter._db_initialized = True
+            if not Adapter._db_initialized:
+                self._db_psql_initialize()
+                Adapter._db_initialized = True
 
-        if not self._db_exists:
-            self._create_database()
+            self._init_psql_tables()
 
-            # but this will never be used later
-            self._db_exists = True
+        else:
+            if db_name is None:
+                db_name = db_filename
 
+            self.db_name = db_name
+            self._db_exists = os.path.exists(self.db_name)
+
+            if not Adapter._db_initialized:
+                self._db_sqlite_initialize()
+                Adapter._db_initialized = True
+
+            if not self._db_exists:
+                self._create_sqlite_database()
+
+                # but this will never be used later
+                self._db_exists = True
+
+    # sqlite methods
     @staticmethod
-    def _create_database():
+    def _create_sqlite_database():
         User.create_table()
         Project.create_table()
         UserProjectRelation.create_table()
         Task.create_table()
         logger.debug("Database created")
 
-    def _db_initialize(self):
+    def _db_sqlite_initialize(self):
         db = SqliteDatabase(self.db_name)
         _db_proxy.initialize(db)
 
-    def _db_exists(self):
+    def _db_sqlite_exists(self):
         return os.path.exists(self.db_name)
+
+    # postgresql methods
+    @staticmethod
+    def _init_psql_tables():
+        if not User.table_exists():
+            User.create_table()
+        if not Project.table_exists():
+            Project.create_table()
+        if not UserProjectRelation.table_exists():
+            UserProjectRelation.create_table()
+        if not Task.table_exists():
+            Task.create_table()
+
+        logger.debug("Database tables initialized")
+
+    def _db_psql_initialize(self):
+        try:
+            db = PostgresqlDatabase(self.psql_config[_PsqlConfigChoices.NAME],
+                                    user=self.psql_config[_PsqlConfigChoices.USER],
+                                    password=self.psql_config[_PsqlConfigChoices.PASSWORD],
+                                    host=self.psql_config[_PsqlConfigChoices.HOST],
+                                    port=self.psql_config[_PsqlConfigChoices.PORT])
+        except KeyError:
+            raise db_e.DatabaseConfigureError(
+                db_e.DatabaseMessages.INVALID_PSQL_CONFIG)
+
+        _db_proxy.initialize(db)

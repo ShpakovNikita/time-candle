@@ -17,10 +17,10 @@ import time_candle.model.time_formatter
 
 class Controller:
 
-    def __init__(self, db_file=None, uid=None):
-        self.task_logic = TaskLogic(db_file, uid)
-        self.project_logic = ProjectLogic(db_file, uid)
-        self.user_logic = UserLogic(db_file, uid)
+    def __init__(self, db_file=None, uid=None, psql_config=None):
+        self.task_logic = TaskLogic(db_file, uid, psql_config=psql_config)
+        self.project_logic = ProjectLogic(db_file, uid, psql_config=psql_config)
+        self.user_logic = UserLogic(db_file, uid, psql_config=psql_config)
 
     def add_user_to_project(self, uid, pid):
         """

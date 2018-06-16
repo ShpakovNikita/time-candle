@@ -272,7 +272,7 @@ def run():
     global app_controller, user_controller
     user_controller = UserController(db_file=config.USERS_DATABASE_PATH)
     user = UserController.load_user()
-    app_controller = AppController(db_file=config.DATABASE_PATH,
+    app_controller = AppController(psql_config=config.DATABASE_CONFIG,
                                    uid=user.uid)
 
     parser = argparse.ArgumentParser(prog='time_candle')

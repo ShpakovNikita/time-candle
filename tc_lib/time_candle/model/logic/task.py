@@ -9,8 +9,8 @@ from . import Logic
 
 class TaskLogic(Logic):
 
-    def __init__(self, db_name=None, uid=None):
-        super().__init__(db_name, uid)
+    def __init__(self, db_name=None, uid=None, psql_config=None):
+        super().__init__(db_name, uid, psql_config)
 
     def add_task(self, title, priority, status, deadline_time,
                  parent_id, comment, pid, uid, period):

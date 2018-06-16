@@ -5,19 +5,20 @@ logical validation and to send requests to the database.
 import time_candle.storage.adapter_classes
 import time_candle.storage.task_adapter
 import time_candle.storage.project_adapter
+import time_candle.storage.user_adapter
 
 
 class Logic:
 
-    def __init__(self, db_file=None, uid=None):
+    def __init__(self, db_file=None, uid=None, psql_config=None):
         self.task_adapter = time_candle.storage.task_adapter. \
-            TaskAdapter(db_file)
+            TaskAdapter(db_name=db_file, psql_config=psql_config)
 
         self.project_adapter = time_candle.storage.project_adapter. \
-            ProjectAdapter(db_file)
+            ProjectAdapter(db_name=db_file, psql_config=psql_config)
 
         self.user_adapter = time_candle.storage.user_adapter. \
-            UserAdapter(db_file)
+            UserAdapter(db_name=db_file, psql_config=psql_config)
 
         self._auth(uid)
 

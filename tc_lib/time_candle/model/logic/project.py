@@ -7,8 +7,8 @@ from time_candle.model.instances.user import User
 
 class ProjectLogic(Logic):
 
-    def __init__(self, db_name=None, uid=None):
-        super().__init__(db_name, uid)
+    def __init__(self, db_name=None, uid=None, psql_config=None):
+        super().__init__(db_name, uid, psql_config)
 
     def add_user_to_project(self, uid, pid):
         # add user to the project

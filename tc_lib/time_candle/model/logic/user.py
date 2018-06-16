@@ -10,8 +10,8 @@ from . import Logic
 
 class UserLogic(Logic):
 
-    def __init__(self, db_name=None, uid=None):
-        super().__init__(db_name, uid)
+    def __init__(self, db_name=None, uid=None, psql_config=None):
+        super().__init__(db_name, uid, psql_config)
 
     def add_user(self,
                  login,

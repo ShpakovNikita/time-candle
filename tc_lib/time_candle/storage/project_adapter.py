@@ -66,8 +66,8 @@ class ProjectFilter(PrimaryFilter):
 
 
 class ProjectAdapter(PrimaryAdapter):
-    def __init__(self, db_name=None, uid=None):
-        super().__init__(uid, db_name)
+    def __init__(self, db_name=None, uid=None, psql_config=None):
+        super().__init__(uid, db_name, psql_config)
 
     def get_by_filter(self, filter_instance):
         """

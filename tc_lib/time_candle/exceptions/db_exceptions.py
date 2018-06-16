@@ -2,6 +2,27 @@ from enum import Enum
 from time_candle.exceptions import AppException
 
 
+class DatabaseConfigureError(AppException):
+    def __init__(self, errors=None,
+                 message='The database is not properly configured {}'):
+        super().__init__(errors, message)
+
+
+class DatabaseMessages(Enum):
+    # This is pre defined messages that will be associated with db errors all
+    # over the project
+    MULTIPLE_DATABASE_SELECTION = 'You passed init params for postgres and ' \
+                                  'sqlite database'
+    INVALID_PSQL_CONFIG = """Make sure that your config has following format:
+    {
+        'NAME': 'mydb',
+        'USER': 'shaft',
+        'HOST': '/var/run/postgresql',
+        'PASSWORD': '',
+        'PORT': '5432'
+    }"""
+
+
 # Login related things
 class InvalidLoginError(AppException):
     def __init__(self, errors=None, message='The login is invalid! {}'):
@@ -29,6 +50,7 @@ class InvalidUidError(AppException):
 class InvalidPasswordError(AppException):
     def __init__(self, errors=None, message='The password is invalid! {}'):
         super().__init__(errors, message)
+
 
 class PasswordMessages(Enum):
     # This is pre defined messages that will be associated with password all
