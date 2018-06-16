@@ -1,6 +1,7 @@
 from time_candle.storage.adapter_classes import User
 from time_candle.storage.adapter_classes import Filter as PrimaryFilter
 from time_candle.storage.adapter_classes import Adapter as PrimaryAdapter
+from time_candle.model.instances.user import User as UserInstance
 from time_candle.storage import logger
 import time_candle.exceptions.db_exceptions as db_e
 from peewee import DoesNotExist
@@ -64,7 +65,7 @@ class UserAdapter(PrimaryAdapter):
         """
         query = User.select().where(filter_instance.to_query())
 
-        return [user for user in query]
+        return [UserInstance.make_user(user) for user in query]
 
     @staticmethod
     def save(obj):
@@ -133,4 +134,4 @@ class UserAdapter(PrimaryAdapter):
             raise db_e.InvalidUidError(
                 db_e.LoginMessages.USER_DOES_NOT_EXISTS)
 
-        return obj
+        return UserInstance.make_user(obj)

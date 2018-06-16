@@ -184,7 +184,12 @@ def project(request, project_id):
         tasks_list = shortcuts.tasks_query_get_form(
             request, controller, 'projects: ' + str(project_id))
         shortcuts.sort_filter(request, tasks_list)
+    except AppException as e:
+        context['errors'] = e.errors.value
+        tasks_list = controller.get_tasks('projects: ' + str(project_id))
+        shortcuts.sort_filter(request, tasks_list)
 
+    try:
         # get users for side nav
         users_list = controller.get_users(project_id)
 
@@ -237,7 +242,13 @@ def tasks(request):
     controller = Controller(uid=request.user.id, db_file=config.DATABASE_PATH)
 
     # loading selected tasks
-    tasks_list = shortcuts.tasks_query_get_form(request, controller, '')
+    try:
+        tasks_list = shortcuts.tasks_query_get_form(request, controller, '')
+    except AppException as e:
+        context['errors'] = e.errors.value
+        tasks_list = controller.get_tasks()
+        shortcuts.sort_filter(request, tasks_list)
+
     shortcuts.sort_filter(request, tasks_list)
 
     try:

@@ -21,12 +21,11 @@ class TaskLogic(Logic):
         # not lower then parent's
 
         if parent_id is not None:
-            parent_task = TaskInstance.make_task(
-                self.task_adapter.get_task_by_id(parent_id))
+            parent_task = self.task_adapter.get_task_by_id(parent_id)
             status = max(status, parent_task.status)
             priority = max(priority, parent_task.priority)
 
-        logger.debug('time in milliseconds %s' % deadline_time)
+        logger.debug('time in milliseconds %s', deadline_time)
 
         # Check for rights and id's
         if uid is None:
@@ -86,8 +85,8 @@ class TaskLogic(Logic):
                             get_now_milliseconds(),
                             period=period)
 
-        logger.debug('task configured and ready to save , the task id is %s'
-                     % task.tid)
+        logger.debug('task configured and ready to save , the task id is %s',
+                     task.tid)
 
         self.task_adapter.save(task)
 
@@ -99,11 +98,9 @@ class TaskLogic(Logic):
 
     def change_task(self, tid, priority, status, time, comment):
         # change task in the database
-        task = TaskInstance.make_task(
-            self.task_adapter.get_task_by_id(tid))
+        task = self.task_adapter.get_task_by_id(tid)
         if task.parent is not None:
-            parent_task = TaskInstance.make_task(
-                self.task_adapter.get_task_by_id(task.parent))
+            parent_task = self.task_adapter.get_task_by_id(task.parent)
             if status is not None:
                 status = max(status, parent_task.status)
 
@@ -153,11 +150,10 @@ class TaskLogic(Logic):
         # get tasks by filter
         fil = time_candle.model.tokenizer.parse_string(string_fil)
         tasks = self.task_adapter.get_by_filter(fil)
-        task_instances = [TaskInstance.make_task(task) for task in tasks]
-        for task in task_instances:
+        for task in tasks:
             self._update(task)
 
-        return task_instances
+        return tasks
 
     def _update(self, task):
         changed_flag = False
@@ -182,7 +178,7 @@ class TaskLogic(Logic):
             # if we are changed it then we are in progress
             if old_deadline != task.deadline:
                 task.status = Status.IN_PROGRESS
-                logger.debug('status in progress for period task %s' % task.tid)
+                logger.debug('status in progress for period task %s', task.tid)
                 changed_flag = True
 
         if changed_flag:

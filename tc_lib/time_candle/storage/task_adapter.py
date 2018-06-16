@@ -4,6 +4,7 @@ from time_candle.storage.adapter_classes import (
 )
 from time_candle.storage.adapter_classes import Filter as PrimaryFilter
 from time_candle.storage.adapter_classes import Adapter as PrimaryAdapter
+from time_candle.model.instances.task import Task as TaskInstance
 from time_candle.storage import logger
 import time_candle.exceptions.db_exceptions as db_e
 from peewee import (
@@ -268,8 +269,7 @@ class TaskAdapter(PrimaryAdapter):
             where(filter_instance.to_query())
 
         # return converted query to the outer module
-        result = [task for task in query]
-        return result
+        return [TaskInstance.make_task(task) for task in query]
 
     def save(self, obj):
         """
@@ -325,7 +325,7 @@ class TaskAdapter(PrimaryAdapter):
             # if you are guest
             raise db_e.InvalidLoginError(db_e.TaskMessages.DO_NOT_HAVE_RIGHTS)
 
-        logger.debug('task\'s parent %s' % table_task.parent)
+        logger.debug('task\'s parent %s', table_task.parent)
 
         logger.debug('task saved to database')
 
@@ -341,11 +341,11 @@ class TaskAdapter(PrimaryAdapter):
                                    ((Task.creator == self.uid) |
                                     (Task.receiver == self.uid)))
         try:
-            return task.get()
+            return TaskInstance.make_task(task.get())
 
         except DoesNotExist:
-            logger.info('There is no such tid %s in the database for your user'
-                        % tid)
+            logger.info('There is no such tid %s in the database for your user',
+                        tid)
             try:
                 # if we can find such tid, then we don't have rights
                 self._get_available_tasks().select().\
@@ -391,8 +391,7 @@ class TaskAdapter(PrimaryAdapter):
         :return: Int
         """
         query = Task.select().order_by(Task.tid.desc())
-        logger.debug('getting last id from query...{}'
-                     .format(query))
+        logger.debug('getting last id from query...')
 
         try:
             # task query
@@ -414,7 +413,7 @@ class TaskAdapter(PrimaryAdapter):
             for task in query:
                 self.remove_task_by_id(task.tid)
 
-            logger.info('removing task by tid %s' % tid)
+            logger.info('removing task by tid %s', tid)
             task = self._get_available_tasks().\
                 select().where((Task.tid == tid) &
                                ((Task.receiver == self.uid) |
@@ -424,5 +423,5 @@ class TaskAdapter(PrimaryAdapter):
 
         except DoesNotExist:
             logger.info(
-                'There is no such tid %s in the database for your user' % tid)
+                'There is no such tid %s in the database for your user', tid)
             raise db_e.InvalidTidError(db_e.TaskMessages.TASK_DOES_NOT_EXISTS)

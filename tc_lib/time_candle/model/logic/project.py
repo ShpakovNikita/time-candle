@@ -45,16 +45,14 @@ class ProjectLogic(Logic):
     def get_project(self, pid):
         fil = ProjectFilter().pid(pid)
         try:
-            return ProjectInstance.make_project(
-                self.project_adapter.get_by_filter(fil)[0])
+            return self.project_adapter.get_by_filter(fil)[0]
         except IndexError:
             raise db_e.InvalidPidError(
                 db_e.ProjectMessages.PROJECT_DOES_NOT_EXISTS)
 
     def change_project(self, pid, title, description):
         # change project in the database
-        project = ProjectInstance.make_project(
-            self.project_adapter.get_project_by_id(pid))
+        project = self.project_adapter.get_project_by_id(pid)
         if description is not None:
             project.description = description
         if title is not None:
@@ -66,9 +64,9 @@ class ProjectLogic(Logic):
         # get projects by passed substring
         fil = ProjectFilter().title_substring(substr)
         projects = self.project_adapter.get_by_filter(fil)
-        return [ProjectInstance.make_project(project) for project in projects]
+        return projects
 
     def get_users(self, pid):
         # get users
-        return [User.make_user(user) for
-                user in self.project_adapter.get_users_by_project(pid)]
+        users = self.project_adapter.get_users_by_project(pid)
+        return users

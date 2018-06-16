@@ -7,6 +7,8 @@ from time_candle.storage.adapter_classes import (
 )
 from time_candle.storage.adapter_classes import Filter as PrimaryFilter
 from time_candle.storage.adapter_classes import Adapter as PrimaryAdapter
+from time_candle.model.instances.project import Project as ProjectInstance
+from time_candle.model.instances.user import User as UserInstance
 import time_candle.exceptions.db_exceptions as db_e
 from time_candle.storage import logger
 
@@ -78,8 +80,7 @@ class ProjectAdapter(PrimaryAdapter):
             where(filter_instance.to_query())
 
         # return converted query to the outer module
-        result = [project for project in query]
-        return result
+        return [ProjectInstance.make_project(project) for project in query]
 
     def save(self, obj):
         """
@@ -136,11 +137,11 @@ class ProjectAdapter(PrimaryAdapter):
             # if so, ge get this project by pid
             project = Project.select().where((Project.pid == pid))
 
-            return project.get()
+            return ProjectInstance.make_project(project.get())
 
         except DoesNotExist:
-            logger.info('There is no such pid %s in the database for your user'
-                        % pid)
+            logger.info('There is no such pid %s in the database for your user',
+                        pid)
             raise db_e.InvalidPidError(
                 db_e.ProjectMessages.PROJECT_DOES_NOT_EXISTS)
 
@@ -250,7 +251,7 @@ class ProjectAdapter(PrimaryAdapter):
         :param pid: Project's id
         :return: Bool
         """
-        logger.debug('the uid is %s' % uid)
+        logger.debug('the uid is %s', uid)
 
         try:
             UserProjectRelation.select(). \
@@ -272,7 +273,7 @@ class ProjectAdapter(PrimaryAdapter):
         query = [q.user for q in query]
         users = User.select().where(User.uid << query)
 
-        return [user for user in users]
+        return [UserInstance.make_user(user) for user in users]
 
     def remove_project_by_id(self, pid):
         """
@@ -316,7 +317,7 @@ class ProjectAdapter(PrimaryAdapter):
         """
 
         query = Project.select().order_by(Project.pid.desc())
-        logger.debug('getting last id from query...{}'.format(query))
+        logger.debug('getting last id from query...')
 
         try:
             # project query

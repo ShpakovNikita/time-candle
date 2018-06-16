@@ -28,10 +28,10 @@ class UserLogic(Logic):
         fil = UserFilter().nickname_substring(substr)
         users = self.user_adapter.get_by_filter(fil)
 
-        return [UserInstance.make_user(user) for user in users]
+        return users
 
     def get_user(self, uid):
-        return UserInstance.make_user(self.user_adapter.get_user_by_id(uid))
+        return self.user_adapter.get_user_by_id(uid)
 
     def change_user(self, uid, nickname, about):
         user = self.user_adapter.get_user_by_id(uid)
