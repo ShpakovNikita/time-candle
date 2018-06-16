@@ -19,13 +19,16 @@ class TaskLogic(Logic):
         # This code is also checking is our parent tid exists in the database
         # for logged user. The max func needed to set tasks status and priority
         # not lower then parent's
-
         if parent_id is not None:
             parent_task = self.task_adapter.get_task_by_id(parent_id)
             status = max(status, parent_task.status)
             priority = max(priority, parent_task.priority)
 
         logger.debug('time in milliseconds %s', deadline_time)
+        logger.info('time now (from milliseconds to datetime) %s',
+                    time_candle.model.time_formatter.get_datetime(
+                        time_candle.model.time_formatter.get_now_milliseconds()
+                    ))
 
         # Check for rights and id's
         if uid is None:
