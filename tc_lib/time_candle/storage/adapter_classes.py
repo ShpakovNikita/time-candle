@@ -1,4 +1,5 @@
 from peewee import *
+from playhouse import db_url
 import time_candle.exceptions.db_exceptions as db_e
 import os
 from time_candle.storage import logger
@@ -149,7 +150,7 @@ class Adapter:
     _db_initialized = False
 
     def __init__(self, uid, db_name=None,
-                 psql_config=None):
+                 psql_config=None, connect_url=None):
         """
         Init for db adapter. You should select which db you will be using (from
         file sqlite or postgresql)
@@ -169,7 +170,7 @@ class Adapter:
         """
         self.uid = uid
 
-        if not db_name and not psql_config:
+        if db_name and psql_config:
             raise db_e.DatabaseConfigureError(
                 db_e.DatabaseMessages.MULTIPLE_DATABASE_SELECTION)
 
@@ -178,6 +179,15 @@ class Adapter:
 
             if not Adapter._db_initialized:
                 self._db_psql_initialize()
+                Adapter._db_initialized = True
+
+            self._init_psql_tables()
+
+        elif connect_url:
+            self.connect_url = connect_url
+
+            if not Adapter._db_initialized:
+                self._db_connect_initialize()
                 Adapter._db_initialized = True
 
             self._init_psql_tables()
@@ -240,4 +250,8 @@ class Adapter:
             raise db_e.DatabaseConfigureError(
                 db_e.DatabaseMessages.INVALID_PSQL_CONFIG)
 
+        _db_proxy.initialize(db)
+
+    def _db_connect_initialize(self):
+        db = db_url.connect(self.connect_url)
         _db_proxy.initialize(db)

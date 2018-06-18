@@ -1,7 +1,6 @@
 from django import forms
 from time_candle.enums.status import status_dict, Status
 from time_candle.enums.priority import priority_dict, Priority
-from django.contrib.admin.widgets import AdminDateWidget
 
 
 STATUS_CHOICES = tuple(status_dict.items())
@@ -20,7 +19,7 @@ class AddTask(forms.Form):
     status = forms.ChoiceField(
         label='status', choices=STATUS_CHOICES, initial=Status.IN_PROGRESS,
         required=False)
-    period = forms.IntegerField(label='period in days', required=False)
+    period = forms.FloatField(label='period in days', required=False)
 
 
 class ChangeTask(forms.Form):

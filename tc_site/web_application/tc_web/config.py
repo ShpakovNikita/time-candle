@@ -22,6 +22,7 @@ LOG_CONF_PATH = os.path.join(BASE_DIR, LOG_CONF)
 DATABASE_FILE = 'data.db'
 DATABASE_PATH = os.path.join(BASE_DIR, DATABASE_FILE)
 
+# check as None on heroku
 DATABASE_CONFIG = {
             'NAME': 'mydb',
             'USER': 'shaft',
@@ -29,9 +30,7 @@ DATABASE_CONFIG = {
             'PASSWORD': '',
             'PORT': '5432'}
 
-# This is the user (cli) database file name
-USERS_DATABASE_FILE = 'users.db'
-USERS_DATABASE_PATH = os.path.join(BASE_DIR, USERS_DATABASE_FILE)
+DATABASE_URL = 'postgres://hicxmadptdigzw:c700b29bc7775f349fa9d1246847a874905f9fbd0a2976c508c211987d2739ae@ec2-54-228-181-43.eu-west-1.compute.amazonaws.com:5432/ddeov1tnkuco57'
 
 # This is the logging flag
 ENABLED = True

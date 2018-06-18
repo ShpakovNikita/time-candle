@@ -10,15 +10,22 @@ import time_candle.storage.user_adapter
 
 class Logic:
 
-    def __init__(self, db_file=None, uid=None, psql_config=None):
+    def __init__(self,
+                 db_file=None,
+                 uid=None,
+                 psql_config=None,
+                 connect_url=None):
         self.task_adapter = time_candle.storage.task_adapter. \
-            TaskAdapter(db_name=db_file, psql_config=psql_config)
+            TaskAdapter(db_name=db_file, psql_config=psql_config,
+                        connect_url=connect_url)
 
         self.project_adapter = time_candle.storage.project_adapter. \
-            ProjectAdapter(db_name=db_file, psql_config=psql_config)
+            ProjectAdapter(db_name=db_file, psql_config=psql_config,
+                           connect_url=connect_url)
 
         self.user_adapter = time_candle.storage.user_adapter. \
-            UserAdapter(db_name=db_file, psql_config=psql_config)
+            UserAdapter(db_name=db_file, psql_config=psql_config,
+                        connect_url=connect_url)
 
         self._auth(uid)
 

@@ -183,7 +183,8 @@ _PROJECT_TASKS = [TaskDummie(uid=2, creator_uid=1, tid=12, pid=1, deadline=None,
 
 def _init_user_table():
     for user in _USERS:
-        User.create(login=user.login,
+        User.create(uid=user.uid,
+                    login=user.login,
                     nickname=user.nickname,
                     password=user.password)
 

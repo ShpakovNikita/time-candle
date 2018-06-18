@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.http import Http404
+from time_candle.controller.commands import Controller
+from tc_web import config
 
 
 # merge to object's fields and return one merged object
@@ -28,3 +30,14 @@ def search_user_forms(request, search_field='search', redirect_flag=True):
                 return redirect(reverse('tc_web:profile', args=(profile_uid,)))
             else:
                 return profile_uid
+
+
+def get_controller(request):
+    if config.DATABASE_CONFIG:
+        controller = Controller(uid=request.user.id,
+                                psql_config=config.DATABASE_CONFIG)
+    else:
+        controller = Controller(uid=request.user.id,
+                                connect_url=config.DATABASE_URL)
+
+    return controller

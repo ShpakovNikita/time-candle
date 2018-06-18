@@ -7,8 +7,12 @@ from tc_web import config
 
 def signup(request):
     if request.method == 'POST':
-        controller = Controller(uid=request.user.id,
-                                psql_config=config.DATABASE_CONFIG)
+        if config.DATABASE_CONFIG:
+            controller = Controller(uid=request.user.id,
+                                    psql_config=config.DATABASE_CONFIG)
+        else:
+            controller = Controller(uid=request.user.id,
+                                    connect_url=config.DATABASE_URL)
 
         form = forms.SignUpForm(request.POST)
         if form.is_valid():

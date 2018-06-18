@@ -22,7 +22,7 @@ class InvalidTimeError(AppException):
 class TimeMessages(Enum):
     # This is pre defined messages that will be associated with password all
     # over the project
-    TIME_SHIFT = 'You cannot create tasks in the past'
+    TIME_SHIFT = 'You cannot make tasks in the past'
     NOT_VALID_PERIOD = 'Yor period is too big in general or too small for ' \
                        'deadline'
     NO_DEADLINE = 'You must specify first deadline for period task'

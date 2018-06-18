@@ -1,7 +1,10 @@
 from django.shortcuts import redirect
 from time_candle.enums.status import Status
 from time_candle.enums.priority import Priority
-from time_candle.model.time_formatter import get_datetime
+from time_candle.model.time_formatter import (
+    get_datetime,
+    milliseconds_to_days,
+)
 from tc_web import logger
 
 
@@ -73,6 +76,9 @@ def init_tasks(request, controller, tasks_list):
             task.realization_time = get_datetime(task.realization_time)
         else:
             task.realization_time = ''
+
+        if task.period is not None:
+            task.period = milliseconds_to_days(task.period)
 
         # this value is always defined
         task.creation_time = get_datetime(task.creation_time)

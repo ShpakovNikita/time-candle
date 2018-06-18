@@ -22,8 +22,7 @@ def add_task(request, project_id=None, task_id=None):
             return redirect_link
 
     context = {}
-    controller = Controller(uid=request.user.id,
-                            psql_config=config.DATABASE_CONFIG)
+    controller = base.get_controller(request)
 
     if request.method == 'POST':
         form = forms.AddTask(request.POST)
@@ -104,8 +103,7 @@ def change_task(request, task_id):
             return redirect_link
 
     context = {}
-    controller = Controller(uid=request.user.id,
-                            psql_config=config.DATABASE_CONFIG)
+    controller = base.get_controller(request)
 
     if request.method == 'POST':
         form = forms.ChangeTask(request.POST)
@@ -156,7 +154,9 @@ def change_task(request, task_id):
         shortcuts.init_tasks(request, controller, [task])
         context['task'] = task
         form.fields['comment'].widget.attrs.update({'value': task.comment})
-        form.fields['deadline_time'].widget.attrs.update({'value': task.deadline})
+        logger.debug('task\'s deadline time is: %s', task.deadline)
+        form.fields['deadline_time'].widget.attrs.update(
+            {'value': task.deadline})
 
     except (AppException, IndexError):
         logger.warning('error occured during the change task')
@@ -177,8 +177,7 @@ def project(request, project_id):
             return redirect_link
 
     context = {}
-    controller = Controller(uid=request.user.id,
-                            psql_config=config.DATABASE_CONFIG)
+    controller = base.get_controller(request)
 
     try:
         # loading selected tasks
@@ -240,8 +239,7 @@ def tasks(request):
 
     context = {}
 
-    controller = Controller(uid=request.user.id,
-                            psql_config=config.DATABASE_CONFIG)
+    controller = base.get_controller(request)
 
     # loading selected tasks
     try:

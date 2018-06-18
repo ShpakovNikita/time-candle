@@ -25,8 +25,7 @@ def projects(request):
         if redirect_link:
             return redirect_link
 
-    controller = Controller(uid=request.user.id,
-                            psql_config=config.DATABASE_CONFIG)
+    controller = base.get_controller(request)
     projects_list = controller.get_projects('')
 
     context = {
@@ -68,8 +67,7 @@ def add_project(request):
             title = form.cleaned_data.get('title')
             description = form.cleaned_data.get('description')
 
-            controller = Controller(uid=request.user.id,
-                                    psql_config=config.DATABASE_CONFIG)
+            controller = base.get_controller(request)
 
             controller.add_project(title=title,
                                    description=description,
@@ -91,8 +89,7 @@ def change_project(request, project_id):
             return redirect_link
 
     context = {'errors': None}
-    controller = Controller(uid=request.user.id,
-                            psql_config=config.DATABASE_CONFIG)
+    controller = base.get_controller(request)
 
     if request.method == 'POST':
         form = forms.ProjectForm(request.POST)
@@ -144,8 +141,7 @@ def add_user(request, project_id):
             return redirect_link
 
     context = {}
-    controller = Controller(uid=request.user.id,
-                            psql_config=config.DATABASE_CONFIG)
+    controller = base.get_controller(request)
 
     if request.method == 'POST':
 

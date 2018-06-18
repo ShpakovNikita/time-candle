@@ -364,7 +364,7 @@ class TestUserAdapter(unittest.TestCase):
 
         # if we got right id
         self.assertEqual(self.adapter.get_id_by_login(_USERS[0].login),
-                         _USERS[0].uid)
+                         str(_USERS[0].uid))
 
         # what if we get unexistent user
         with self.assertRaises(db_e.InvalidLoginError):
@@ -443,7 +443,7 @@ class TestUserAdapter(unittest.TestCase):
         # we check our result on length, but we have also to check if they are
         # right
         for user in users:
-            self.assertIn(user.uid, [1, 2, 5, 6, 7])
+            self.assertIn(user.uid, ['1', '2', '5', '6', '7'])
 
     @unittest.skip("Skipping this test for now because of newer lib version")
     def test_in_remove_from_project(self):

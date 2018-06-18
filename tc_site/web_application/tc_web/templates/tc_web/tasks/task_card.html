@@ -1,6 +1,6 @@
 
     <!--Grid column-->
-    <div class="col-lg-4 col-md-6 mb-4">
+    <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
 
         <!--Card-->
         <div class="card">
@@ -8,7 +8,7 @@
             <div class="card-body">
                 <!--Title-->
                 <div class="row" style="margin-bottom: -20px">
-                    <div class="col-md-9">
+                    <div class="col-sm-9">
                 <p class="card-title h4">{{ task.title|truncatechars:15 }}<span class="grey-text h6">@{{ task.tid }}</span>
                     {% if task.parent %}
                     <a href="{% url 'tc_web:change_task' task.parent %}" class="grey-text h6">Parent</a>
@@ -17,7 +17,7 @@
                     <form id="del" method="post">
                     {% csrf_token %}
                     </div>
-                        <div class="col-md-3"><button value={{ task.tid }} type="submit" name='delete' onclick="document.getElementById('del').submit();"
+                        <div class="col-sm-3"><button value={{ task.tid }} type="submit" name='delete' onclick="document.getElementById('del').submit();"
                                 class="btn btn-red btn-sm" style="margin-top: -3px"><i
                                 class="fa fa-times"></i></button></div>
 
@@ -26,13 +26,13 @@
                 <hr>
                 <!--Text-->
                 <div class="row">
-                    <div class="col-md-9">
+                    <div class="col-sm-9">
                         <p class="card-text">{{ task.comment|default:"No comments provided"|truncatechars:38 }}</p>
                     </div>
                     {% if task.status == 3 %}
                         <div class="col-sm-3 text-center"><i class="fa fa-check pr-1"></i></div>
                     {% elif task.status == 0 %}
-                        <div class="col-md-3">
+                        <div class="col-sm-3">
                             <form id="check" method="post">
                                 {% csrf_token %}
                                 <button value={{ task.tid }} type="submit" name='check' onclick="document.getElementById('check').submit();"
@@ -41,13 +41,13 @@
                             </form>
                         </div>
                     {% elif task.status == 1 %}
-                        <div class="col-md-3">
+                        <div class="col-sm-3">
                             <a
                                 class="btn btn-black btn-sm" disabled="disabled" style="margin-top: -100px; margin-bottom: -100px"><i
                                 class="fa fa-check"></i></a>
                         </div>
                     {% else %}
-                        <div class="col-md-3">
+                        <div class="col-sm-3">
                             <form method="post" id="check">
                                 {% csrf_token %}
                                 <button value={{ task.tid }} type="submit" name='check' onclick="document.getElementById('check').submit();"
@@ -59,16 +59,16 @@
                 </div>
                 {% if task.pid %}
                     <div class="row">
-                        <div class="col-md-6 mt-2">
+                        <div class="col-sm-6 mt-2">
                             <a href="{% url 'tc_web:project' project_id=task.pid %}" class="btn btn-sm btn-red" style="margin-bottom: -10px; width: 110%">Proj:{{ task.project_name|truncatechars:20 }}</a>
                         </div>
-                        <div class="col-md-6 mt-2">
+                        <div class="col-sm-6 mt-2">
                             <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-unique" style=" margin-bottom: -10px; width: 100%">Exec:{{ task.receiver_name|truncatechars:20 }}</a>
                         </div>
                     </div>
                 {% else %}
                 <div class="row">
-                    <div class="col-md-12 mt-2">
+                    <div class="col-sm-12 mt-2">
                         <a class="btn btn-sm btn-red" href="{% url 'tc_web:profile' user_id=user.id  %}" style="width: 95%; margin-bottom: -10px">Personal task</a>
                     </div>
                 </div>

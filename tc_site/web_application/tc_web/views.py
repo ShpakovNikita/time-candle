@@ -4,10 +4,8 @@ from django.http import (
 )
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from time_candle.controller.commands import Controller
 from time_candle.exceptions import AppException
 from tc_web import forms
-from tc_web import config
 from tc_web import shortcuts
 from django.contrib.auth.models import User
 import json
@@ -35,8 +33,7 @@ def profile(request, user_id):
         if redirect_link:
             return redirect_link
 
-    controller = Controller(uid=request.user.id,
-                            psql_config=config.DATABASE_CONFIG)
+    controller = shortcuts.get_controller(request)
 
     try:
         django_user = User.objects.get(id=user_id)
@@ -73,8 +70,7 @@ def get_users(request):
 
 # function for autocomplete project user search
 def get_project_users(request, project_id):
-    controller = Controller(uid=request.user.id,
-                            psql_config=config.DATABASE_CONFIG)
+    controller = shortcuts.get_controller(request)
     if request.is_ajax():
         q = request.GET.get('term', '')
         users = controller.get_users(project_id)
@@ -104,8 +100,7 @@ def change_profile(request, user_id):
     if request.user.id != user_id:
         raise Http404
 
-    controller = Controller(uid=request.user.id,
-                            psql_config=config.DATABASE_CONFIG)
+    controller = shortcuts.get_controller(request)
 
     if request.method == 'POST':
         form = forms.ChangeProfileForm(request.POST)

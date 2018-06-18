@@ -9,8 +9,12 @@ from . import Logic
 
 class TaskLogic(Logic):
 
-    def __init__(self, db_name=None, uid=None, psql_config=None):
-        super().__init__(db_name, uid, psql_config)
+    def __init__(self,
+                 db_name=None,
+                 uid=None,
+                 psql_config=None,
+                 connect_url=None):
+        super().__init__(db_name, uid, psql_config, connect_url)
 
     def add_task(self, title, priority, status, deadline_time,
                  parent_id, comment, pid, uid, period):
@@ -52,13 +56,6 @@ class TaskLogic(Logic):
             # we checking that deadline is in the future
             if time_candle.model.time_formatter.time_delta(deadline_time) < 0:
                 raise m_e.InvalidTimeError(m_e.TimeMessages.TIME_SHIFT)
-
-            # and if there is a period we make sure that period is bigger than
-            # delta time between now and deadline
-            if period is not None and \
-                    period < deadline_time - time_candle.model.time_formatter.\
-                    get_now_milliseconds():
-                raise m_e.InvalidTimeError(m_e.TimeMessages.NOT_VALID_PERIOD)
 
         # also we must specify deadline if there is a period
         if period is not None and deadline_time is None:
@@ -133,14 +130,17 @@ class TaskLogic(Logic):
                     get_now_milliseconds()
 
         if time is not None:
-            # we cannot allow to make deadline in the past
-            if time_candle.model.time_formatter.time_delta(time) < 0:
-                raise m_e.InvalidTimeError(m_e.TimeMessages.TIME_SHIFT)
+            # if the time is like before, it can be in the past. But in any
+            # other cases it is not logical to move deadlines in the past
+            if task.deadline != time:
+                # we cannot allow to make deadline in the past
+                if time_candle.model.time_formatter.time_delta(time) < 0:
+                    raise m_e.InvalidTimeError(m_e.TimeMessages.TIME_SHIFT)
 
-            # also we should make task unexpired if we moved deadline and it was
-            # expired
-            if task.status == Status.EXPIRED:
-                task.status = Status.IN_PROGRESS
+                # also we should make task unexpired if we moved deadline and it
+                # was expired
+                if task.status == Status.EXPIRED:
+                    task.status = Status.IN_PROGRESS
 
             task.deadline = time
 

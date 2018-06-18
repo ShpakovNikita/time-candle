@@ -72,15 +72,14 @@
                     {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa fa-user"></i> Profile </a>
+                            <i class="fa fa-user"></i>{{ user.username }}@{{ user.id }}</a>
                         <div class="dropdown-menu dropdown-menu-right dropdown-info" aria-labelledby="navbarDropdownMenuLink-4">
                             <a class="dropdown-item" href="{% url 'tc_web:change_profile' user.id %}">Settings</a>
-                            <a class="dropdown-item" href="{% url 'tc_web:profile' user.id %}">Check</a>
-                            <a class="dropdown-item" href="{% url 'logout' %}">Log out</a>
+                            <a class="dropdown-item" href="{% url 'tc_web:profile' user.id %}">Profile</a>
                         </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tc_web:profile' user.id %}">{{ user.username }}@{{ user.id }}</a>
+                        <a class="nav-link" href="{% url 'logout' %}">Log out</a>
                     </li>
                     {% else %}
                     <li class="nav-item">

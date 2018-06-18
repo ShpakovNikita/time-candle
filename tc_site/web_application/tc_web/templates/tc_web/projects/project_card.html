@@ -1,6 +1,6 @@
 
 <!--Grid column-->
-<div class="col-lg-4 col-md-6 mb-4">
+<div class="col-lg-4 col-md-6 col-sm-12 mb-4">
 
     <!--Card-->
     <div class="card">
@@ -8,13 +8,13 @@
         <div class="card-body">
             <!--Title-->
             <div class="row" style="margin-bottom: -20px">
-                <div class="col-md-9">
+                <div class="col-sm-9">
             <h4 class="card-title">{{ project.title }}<span class="grey-text">@{{ project.pid }}</span>
             </h4>
                 <form id="del" method="post">
                 {% csrf_token %}
                 </div>
-                    <div class="col-md-3"><button value={{ project.pid }} type="submit" name='delete' onclick="document.getElementById('del').submit();"
+                    <div class="col-sm-3"><button value={{ project.pid }} type="submit" name='delete' onclick="document.getElementById('del').submit();"
                             class="btn btn-red btn-sm" style="margin-top: -3px"><i
                             class="fa fa-times"></i></button></div>
 
@@ -23,15 +23,15 @@
             <hr>
             <!--Text-->
             <div class="row">
-                <div class="col-md-9">
+                <div class="col-sm-9">
                     <p class="card-text">{{ project.description|default:"No description provided"|truncatechars:29 }}</p>
                 </div>
             </div>
             <div class="row mt-2">
-                <div class="col-md-6">
+                <div class="col-sm-6">
                     <a href="{% url 'tc_web:project' project.pid %}" class="btn btn-sm btn-red" style="margin-bottom: -10px; width: 110%">Check tasks</a>
                 </div>
-                <div class="col-md-6">
+                <div class="col-sm-6">
                     <div disabled="disabled" class="btn btn-sm btn-unique" style=" margin-bottom: -10px; width: 100%">Admin:{{ project.admin_name|truncatechars:20 }}</div>
                 </div>
             </div>

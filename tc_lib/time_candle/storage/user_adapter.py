@@ -53,8 +53,12 @@ class UserFilter(PrimaryFilter):
 
 
 class UserAdapter(PrimaryAdapter):
-    def __init__(self, db_name=None, uid=None, psql_config=None):
-        super().__init__(uid, db_name, psql_config)
+    def __init__(self,
+                 db_name=None,
+                 uid=None,
+                 psql_config=None,
+                 connect_url=None):
+        super().__init__(uid, db_name, psql_config, connect_url)
 
     @staticmethod
     def get_by_filter(filter_instance):
