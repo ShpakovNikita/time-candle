@@ -1,6 +1,7 @@
 from time_candle.storage.adapter_classes import (
     Task,
     UserProjectRelation,
+    Project,
 )
 from time_candle.storage.adapter_classes import Filter as PrimaryFilter
 from time_candle.storage.adapter_classes import Adapter as PrimaryAdapter
@@ -274,6 +275,37 @@ class TaskAdapter(PrimaryAdapter):
 
         # return converted query to the outer module
         return [TaskInstance.make_task(task) for task in query]
+
+    def has_rights(self, tid):
+        """
+        This function returns bool value for current user. It checks if he can
+        modify this task or not
+        :param tid: Task's id
+        :return: Bool
+        """
+        try:
+            task = Task.select().where(Task.tid == tid).get()
+
+        except DoesNotExist:
+            raise db_e.InvalidTidError(
+                db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
+
+        try:
+            if task.creator == self.uid and task.receiver == self.uid:
+                pass
+
+            elif task.project:
+                project = Project.select().where(
+                    Project.pid == task.project).get()
+                return project.admin == self.uid
+
+            else:
+                Task.select().where(Task.creator == self.uid).get()
+
+            return True
+
+        except DoesNotExist:
+            return False
 
     def save(self, obj):
         """

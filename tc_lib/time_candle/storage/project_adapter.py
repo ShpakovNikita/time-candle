@@ -97,7 +97,10 @@ class ProjectAdapter(PrimaryAdapter):
         :return: None
         """
         try:
-            self.has_rights(obj.pid)
+            if not self.has_rights(obj.pid):
+                raise db_e.InvalidLoginError(
+                    db_e.ProjectMessages.DO_NOT_HAVE_RIGHTS)
+
             project = Project.select().where(Project.pid == obj.pid).get()
             self._update(project, obj)
             return
@@ -152,7 +155,7 @@ class ProjectAdapter(PrimaryAdapter):
     def has_rights(self, pid):
         """
         This function checks if logged user has rights to do something inside
-        the project
+        the project (except deleting and modifying his own tasks)
         :param pid: Project's id
         :return: Bool
         """
@@ -170,8 +173,7 @@ class ProjectAdapter(PrimaryAdapter):
             return True
 
         except DoesNotExist:
-            raise db_e.InvalidLoginError(
-                db_e.ProjectMessages.DO_NOT_HAVE_RIGHTS)
+            return False
 
     def add_user_to_project_by_id(self, uid, pid):
         """
@@ -287,7 +289,9 @@ class ProjectAdapter(PrimaryAdapter):
         :param pid: Project's id
         :return: None
         """
-        self.has_rights(pid)
+        if not self.has_rights(pid):
+            raise db_e.InvalidLoginError(
+                db_e.ProjectMessages.DO_NOT_HAVE_RIGHTS)
 
         try:
             UserProjectRelation.delete(). \

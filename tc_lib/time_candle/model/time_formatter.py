@@ -126,7 +126,6 @@ def _time_get_formatted(formatted_time):
         return date_string + ' ' + formatted_time
     else:
         logger.warning('the date must be %Y-%m-%d or %Y-%m-%d %H:%M:%S')
-        msg = "Not a valid date: '{0}'.".format(formatted_time)
         raise m_e.InvalidArgumentFormat(m_e.TimeMessages.TIME_FORMAT)
 
 

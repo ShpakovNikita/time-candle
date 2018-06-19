@@ -155,6 +155,24 @@ class Controller:
         """
         self.project_logic.remove_user_from_project(uid, pid)
 
+    def has_rights_to_modify_task(self, tid):
+        """
+        This function returns bool value that shows if we can modify selected
+        task or not
+        :param tid: Task's id
+        :return: Bool
+        """
+        return self.task_logic.has_rights_to_modify(tid)
+
+    def has_rights_to_modify_project(self, pid):
+        """
+        This function returns bool value that shows if we can modify selected
+        project or not
+        :param pid: Projects's id
+        :return: Bool
+        """
+        return self.project_logic.has_rights_to_modify(pid)
+
     def change_task(self,
                     tid,
                     priority=None,

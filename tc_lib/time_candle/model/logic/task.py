@@ -46,7 +46,9 @@ class TaskLogic(Logic):
             logger.debug('pid is not none')
             if task_uid != self.uid:
                 logger.debug('the receiver is not us')
-                self.project_adapter.has_rights(pid)
+                if self.project_adapter.has_rights(pid):
+                    raise m_e.InvalidLoginError(
+                        m_e.ProjectMessages.DO_NOT_HAVE_RIGHTS)
             else:
                 logger.debug('we are the receiver')
                 self.project_adapter.is_user_in_project(self.uid, pid)
@@ -60,6 +62,9 @@ class TaskLogic(Logic):
         # also we must specify deadline if there is a period
         if period is not None and deadline_time is None:
             raise m_e.InvalidTimeError(m_e.TimeMessages.NO_DEADLINE)
+
+        if period is not None and period < 0:
+            raise m_e.InvalidTimeError(m_e.TimeMessages.NEGATIVE_PERIOD)
 
         if status == Status.EXPIRED and deadline_time is None:
             raise m_e.InvalidTimeError(m_e.TimeMessages.NO_DEADLINE)
@@ -91,6 +96,9 @@ class TaskLogic(Logic):
         self.task_adapter.save(task)
 
         logger.debug('task added')
+
+    def has_rights_to_modify(self, tid):
+        return self.task_adapter.has_rights(tid)
 
     def remove_task(self, tid):
         # remove task from database

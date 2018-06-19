@@ -46,6 +46,9 @@ class ProjectLogic(Logic):
         # remove project from database if have rights
         self.project_adapter.remove_project_by_id(pid)
 
+    def has_rights_to_modify(self, pid):
+        return self.project_adapter.has_rights(pid)
+
     def get_project(self, pid):
         fil = ProjectFilter().pid(pid)
         try:

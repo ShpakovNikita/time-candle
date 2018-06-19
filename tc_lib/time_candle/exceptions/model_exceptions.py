@@ -26,8 +26,9 @@ class TimeMessages(Enum):
     NOT_VALID_PERIOD = 'Yor period is too big in general or too small for ' \
                        'deadline'
     NO_DEADLINE = 'You must specify first deadline for period task'
-    TIME_FORMAT = 'Time must be in %Y-%m-%d %H:%M:%S format or %H:%M:%S'
+    TIME_FORMAT = 'Time must be in YYYY-MM-DD H:M:S format or %H:%M:%S'
     TIME_EPOCH = 'Time cannot create time below 1970\'s'
+    NEGATIVE_PERIOD = 'Period cannot be negative'
 
 
 # Status related things
@@ -41,3 +42,15 @@ class StatusMessages(Enum):
     # over the project
     EXPIRED_NOT_VALID = 'You cannot make done task as expired. First you have' \
                         ' to make task undone'
+
+
+# Login related things
+class InvalidLoginError(AppException):
+    def __init__(self, errors=None, message='The login is invalid! {}'):
+        super().__init__(errors, message)
+
+
+class ProjectMessages(Enum):
+    # This is pre defined messages that will be associated with projects all
+    # over the project
+    DO_NOT_HAVE_RIGHTS = 'You don\'t have rights to modify this project'
