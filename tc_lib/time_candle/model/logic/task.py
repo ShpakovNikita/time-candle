@@ -92,7 +92,6 @@ class TaskLogic(Logic):
 
         logger.debug('task configured and ready to save , the task id is %s',
                      task.tid)
-
         self.task_adapter.save(task)
 
         logger.debug('task added')
@@ -117,6 +116,7 @@ class TaskLogic(Logic):
 
         if priority is not None:
             task.priority = priority
+
         if status is not None:
             # if status is not done, then realization time is None
             if status != Status.DONE:

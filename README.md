@@ -1,3 +1,4 @@
+![Heroku](https://heroku-badge.herokuapp.com/?app=timecandle)
 # Time Candle. #
 ##### little app about your time and life #####
 ## Architecture ##

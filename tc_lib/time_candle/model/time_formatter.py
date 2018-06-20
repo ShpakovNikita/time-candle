@@ -13,6 +13,9 @@ epoch = datetime.utcfromtimestamp(1970)
 # One hour error that are got from the epoch timestamp
 error = 0
 
+# Time format
+FORMAT = '%Y-%m-%d %H:%M:%S'
+
 
 # Get time_stamp func
 def time_delta(milliseconds,
@@ -25,7 +28,7 @@ def time_delta(milliseconds,
     :return: Int (our timestamp)
     """
     if now is None:
-        now = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+        now = datetime.strftime(datetime.now(), FORMAT)
         now = get_milliseconds(now)
 
     return milliseconds - now
@@ -59,7 +62,7 @@ def get_next_deadline(period, start, now=None):
     :return: Int (next deadline)
     """
     if now is None:
-        now = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+        now = datetime.strftime(datetime.now(), FORMAT)
         now = get_milliseconds(now)
 
     if now < start:
@@ -73,7 +76,7 @@ def get_now_milliseconds():
     This functions returns now datetime in milliseconds with epoch calculations
     :return: Int
     """
-    now = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+    now = datetime.strftime(datetime.now(), FORMAT)
     return get_milliseconds(now)
 
 
@@ -87,13 +90,11 @@ def get_milliseconds(formatted_time):
     :type formatted_time: String
     :return: Int
     """
-
-    date_format = '%Y-%m-%d %H:%M:%S'
     logger.debug('passed time %s' % formatted_time)
 
     try:
         date_time = datetime.strptime(_time_get_formatted(formatted_time),
-                                      date_format)
+                                      FORMAT)
         logger.debug('date converted')
 
         # Note that here we are subtracting 1970's to define them as lower point
@@ -152,7 +153,7 @@ def date_to_string(date_time):
     :param date_time: datetime instance
     :return: String
     """
-    return datetime.strftime(date_time, '%Y-%m-%d %H:%M:%S')
+    return datetime.strftime(date_time, FORMAT)
 
 
 def milliseconds_to_string(milliseconds):
