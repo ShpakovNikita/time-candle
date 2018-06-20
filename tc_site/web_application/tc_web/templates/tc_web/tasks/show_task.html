@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-md-center">
+    <div class="col-lg-6 col-md-8 col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <p class="h4 card-title text-center mb-4">Task: {{ task.title }}<span class="grey-text">@{{ task.tid }}</span></p>
+                <hr>
+                <p class="h4 text-center mb-4">Comments: {{ task.comment }}</p>
+                <hr>
+                <p class="h4 text-center mb-4">Created: {{ task.creation_time|date:"d M Y, H:i" }}</p>
+                {% if task.pid %}
+                    <p class="h4 text-center mb-4">Project: <a href="{% url 'tc_web:project' task.pid %}" class="btn btn-sm btn-unique">{{ task.project_name|truncatechars:20 }}</a></p>
+                {% endif %}
+                {% if task.parent %}
+                    <p class="h4 text-center mb-4">Parent task: {{ task.parent_task.title }}<a href="{% url 'tc_web:change_task' task.parent %}" class="grey-text">@{{ task.parent_task.tid }}</a></p>
+                {% endif %}
+                {% if task.pid %}
+                <p class="h4 text-center mb-4">Creator: <a href="{% url 'tc_web:profile' user_id=task.creator_uid %}" class="btn btn-sm btn-unique">{{ task.creator_name|truncatechars:20 }}</a></p>
+                <p class="h4 text-center mb-4">Executor: <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-unique">{{ task.receiver_name|truncatechars:20 }}</a></p>
+                {% endif %}
+                {% if task.period %}
+                    <p class="h4 text-center mb-4">Period: {{ task.period }} day{{ task.period|pluralize }}</p>
+                {% endif %}
+                {% if task.realization_time %}
+                    <p class="h4 text-center mb-4">Checked: {{ task.realization_time|date:"d M Y, H:i" }}</p>
+                {% endif %}
+
+                {% if task.deadline %}
+                    <p class="h4 text-center mb-4">Deadline: {{ task.deadline|date:"d M Y, H:i" }}</p>
+                {% else %}
+                    <p class="h4 text-center mb-4">No deadline</p>
+                {% endif %}
+
+                {% if task.status == 3 %}
+                    <p class="h4 text-center mb-4">Status: <span class="grey-text">DONE</span></p>
+                {% elif task.status == 2 %}
+                    <p class="h4 text-center mb-4">Status: <span class="grey-text">IN PROGRESS</span></p>
+                {% elif task.status == 1 %}
+                    <p class="h4 text-center mb-4">Status: <span class="grey-text">CANCELLED</span></p>
+                {% elif task.status == 0 %}
+                    <p class="h4 text-center mb-4">Status: <span class="grey-text">EXPIRED</span></p>
+                {% endif %}
+                {% if task.priority == 4 %}
+                    <p class="h4 text-center mb-4">Priority: <span class="grey-text">MAX</span></p>
+                {% elif task.priority == 3 %}
+                    <p class="h4 text-center mb-4">Priority: <span class="grey-text">HIGH</span></p>
+                {% elif task.priority == 2 %}
+                    <p class="h4 text-center mb-4">Priority: <span class="grey-text">MEDIUM</span></p>
+                {% elif task.priority == 1 %}
+                    <p class="h4 text-center mb-4">Priority: <span class="grey-text">LOW</span></p>
+                {% elif task.priority == 0 %}
+                    <p class="h4 text-center mb-4">Priority: <span class="grey-text">MIN</span></p>
+                {% endif %}
+
+                {% if task.has_rights %}
+                    <p class="text-center"><a href="{% url 'tc_web:change_task' task_id=task.tid  %}" class="btn btn-unique">Change</a></p>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block errors %}
+    {% include 'tc_web/error.html' with errors=errors %}
+{% endblock %}

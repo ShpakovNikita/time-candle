@@ -28,7 +28,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', 'https://timecandle.herokuapp.com']
 
 LOGIN_REDIRECT_URL = '/tc_web/'
 
@@ -37,6 +37,8 @@ TIME_ZONE = 'Europe/Moscow'
 
 # Application definition
 INSTALLED_APPS = [
+    'bootstrap3',
+    'bootstrap3_datetime',
     'main_system.apps.AuthConfig',
     'tc_web.apps.TCWebConfig',
     'django.contrib.admin',
@@ -80,24 +82,15 @@ WSGI_APPLICATION = 'main_system.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
-# Delete this section on heroku
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
+
+DATABASES = {
+'default': {'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME': 'mydb',
             'USER': 'shaft',
             'HOST': '/var/run/postgresql',
             'PASSWORD': '',
-            'PORT': '5432'
-        }
-    }
-else:
-    DATABASES = {
-        'default': dj_database_url.config(
-            default='postgres://hicxmadptdigzw:c700b29bc7775f349fa9d1246847a874905f9fbd0a2976c508c211987d2739ae@ec2-54-228-181-43.eu-west-1.compute.amazonaws.com:5432/ddeov1tnkuco57'
-        )
-    }
+            'PORT': '5432'}
+}
 
 
 # Password validation

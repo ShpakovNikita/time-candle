@@ -17,17 +17,36 @@
             <hr>
             <h5 class="card-text">In current state we have a web application that you are using right now, and a console application, that you may find in the lowest link below. Also here you may find API for Time Candle and use it for free in any cases.</h5>
         </div>
+        <h2 class="card-title text-center">Guidelines</h2>
+        <hr>
+        <div class="container">
+            <h5 class="card-text">
+                Also Time Candle has querying algorithms that provides a tool for advanced task search. Use the following filters for it:
+                Parents: tasks with specified parents.
+                Tids: tasks with specified tids
+                Receiver: tasks with specified receivers pay ids
+                Titles: Strings for tasks titles
+                Supported operators: AND, OR, (, ).
+                Special filters:
+                Parents: None - prints only personal tasks
+                Examples:
+                (parents: 1 5 3 OR tids: 4 6 7) AND titles: new work candy
+            </h5>
+        </div>
+        <hr>
+        <h2 class="card-title text-center">TODO</h2>
+        <hr>
+        <div class="container">
+            <h5 class="card-text">
+                Complete query guideline and query itself, more beautiful and 'material' show forms + index base view
+            </h5>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block links %}
 <ul class="navbar-nav mr-auto">
-    <li class="nav-item active">
-        <a class="nav-link" href="{% url 'tc_web:index' %}">Home
-            <span class="sr-only">(current)</span>
-        </a>
-    </li>
     {% if user.is_authenticated %}
     <li class="nav-item">
         <a class="nav-link"

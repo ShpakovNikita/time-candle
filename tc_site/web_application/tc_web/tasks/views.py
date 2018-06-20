@@ -4,14 +4,17 @@ from django.shortcuts import (
     redirect,
 )
 from django.urls import reverse
-from time_candle.controller.commands import Controller
 from time_candle.exceptions import AppException
+from time_candle.model.time_formatter import FORMAT
 from tc_web.tasks import forms
 from tc_web import config
 from tc_web.tasks import shortcuts
 from tc_web import shortcuts as base
 from django.contrib.auth.models import User
 from tc_web import logger
+from datetime import datetime
+
+PICKER_FORMAT = '%m/%d/%Y %I:%M %p'
 
 
 def add_task(request, project_id=None, task_id=None):
@@ -35,7 +38,12 @@ def add_task(request, project_id=None, task_id=None):
             period = form.cleaned_data.get('period')
             if not deadline_time:
                 deadline_time = None
+            else:
+                deadline_time = datetime.strptime(deadline_time.lower(),
+                                                  PICKER_FORMAT)
+                deadline_time = deadline_time.strftime(FORMAT)
 
+            print(deadline_time, type(deadline_time))
             try:
 
                 # this try is needed inside other try in order to skip adding
@@ -95,6 +103,29 @@ def add_task(request, project_id=None, task_id=None):
     return render(request, 'tc_web/tasks/add_task.html', context)
 
 
+def show_task(request, task_id):
+    # we always init our search form
+    for link in ['search']:
+        redirect_link = base.search_user_forms(request, link)
+        if redirect_link:
+            return redirect_link
+
+    context = {}
+    controller = base.get_controller(request)
+
+    # check if we can see this page
+    try:
+        task = controller.get_tasks('tids: ' + str(task_id))[0]
+        shortcuts.init_tasks(request, controller, [task])
+        context['task'] = task
+
+    except (AppException, IndexError):
+        logger.warning('error occured during the show task')
+        raise Http404
+
+    return render(request, 'tc_web/tasks/show_task.html', context)
+
+
 def change_task(request, task_id):
     # we always init our search form
     for link in ['search']:
@@ -115,6 +146,10 @@ def change_task(request, task_id):
 
             if not deadline_time:
                 deadline_time = None
+            else:
+                deadline_time = datetime.strptime(deadline_time.lower(),
+                                                  PICKER_FORMAT)
+                deadline_time = deadline_time.strftime(FORMAT)
 
             if not comment:
                 comment = None
@@ -155,8 +190,14 @@ def change_task(request, task_id):
         context['task'] = task
         form.fields['comment'].widget.attrs.update({'value': task.comment})
         logger.debug('task\'s deadline time is: %s', task.deadline)
+
+        if not task.deadline:
+            default_deadline = ''
+        else:
+            default_deadline = task.deadline.strftime(PICKER_FORMAT)
+
         form.fields['deadline_time'].widget.attrs.update(
-            {'value': task.deadline})
+            {'value': default_deadline})
 
     except (AppException, IndexError):
         logger.warning('error occured during the change task')
@@ -201,11 +242,7 @@ def project(request, project_id):
         raise Http404
 
     try:
-        redirect_view = shortcuts.task_card_post_form(request,
-                                                      controller,
-                                                      reverse('tc_web:project',
-                                                              args=(project_id,)
-                                                              ))
+        redirect_view = shortcuts.task_card_post_form(request, controller)
         if redirect_view:
             return redirect_view
 
@@ -252,8 +289,7 @@ def tasks(request):
     shortcuts.sort_filter(request, tasks_list)
 
     try:
-        redirect_view = shortcuts.task_card_post_form(request, controller,
-                                                      reverse('tc_web:tasks'))
+        redirect_view = shortcuts.task_card_post_form(request, controller)
         if redirect_view:
             return redirect_view
 

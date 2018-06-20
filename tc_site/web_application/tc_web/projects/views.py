@@ -4,10 +4,8 @@ from django.shortcuts import (
     redirect,
 )
 from django.urls import reverse
-from time_candle.controller.commands import Controller
 from time_candle.exceptions import AppException
 from tc_web.projects import forms
-from tc_web import config
 from tc_web.projects import shortcuts
 from tc_web import shortcuts as base
 from django.contrib.auth.models import User
@@ -33,8 +31,7 @@ def projects(request):
     }
 
     try:
-        redirect_view = shortcuts.project_card_post_form(
-            request, controller, reverse('tc_web:projects'))
+        redirect_view = shortcuts.project_card_post_form(request, controller)
 
         # if we can redirect, then do it, else just render or render with errors
         # our template

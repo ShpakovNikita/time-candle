@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.http import Http404
 from time_candle.controller.commands import Controller
 from tc_web import config
+from django.contrib.auth.decorators import login_required
 
 
 # merge to object's fields and return one merged object
@@ -36,8 +37,18 @@ def get_controller(request):
     if config.DATABASE_CONFIG:
         controller = Controller(uid=request.user.id,
                                 psql_config=config.DATABASE_CONFIG)
+    elif config.DATABASE_PATH:
+        controller = Controller(uid=request.user.id,
+                                db_file=config.DATABASE_PATH)
     else:
         controller = Controller(uid=request.user.id,
                                 connect_url=config.DATABASE_URL)
 
     return controller
+
+
+def search_users(func):
+    def wrap(request, *args, **kwargs):
+
+        return func(request, *args, **kwargs)
+    return wrap

@@ -18,7 +18,7 @@
                 <p class="h4 text-center mb-4">Executor: <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-unique">{{ task.receiver_name|truncatechars:20 }}</a></p>
                 {% endif %}
                 {% if task.period %}
-                    <p class="h4 text-center mb-4">Period: {{ task.period }} days</p>
+                    <p class="h4 text-center mb-4">Period: {{ task.period }} day{{ task.period|pluralize }}</p>
                 {% endif %}
                 {% if task.realization_time %}
                     <p class="h4 text-center mb-4">Checked: {{ task.realization_time|date:"d M Y, H:i" }}</p>
@@ -72,7 +72,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-unique">Change
+                    <button type="submit" class="btn btn-unique">Commit
                     </button>
                 </form>
             </div>

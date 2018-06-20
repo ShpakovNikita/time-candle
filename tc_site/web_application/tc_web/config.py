@@ -20,7 +20,7 @@ LOG_CONF_PATH = os.path.join(BASE_DIR, LOG_CONF)
 
 # This is lib database file name (but we will be using postgresql)
 DATABASE_FILE = 'data.db'
-DATABASE_PATH = os.path.join(BASE_DIR, DATABASE_FILE)
+DATABASE_PATH = None # os.path.join(BASE_DIR, DATABASE_FILE)
 
 # check as None on heroku
 DATABASE_CONFIG = {

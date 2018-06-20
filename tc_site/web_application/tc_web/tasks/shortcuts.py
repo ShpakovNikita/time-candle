@@ -9,17 +9,20 @@ from tc_web import logger
 
 
 # use it do define all post forms related to tasks
-def task_card_post_form(request, controller, redirect_link):
+def task_card_post_form(request, controller):
+    print('post_check')
     if request.method == 'POST':
-        logger.debug(request.POST)
+        print(request.POST)
         if 'delete' in request.POST:
+            print(request.POST['delete'])
             controller.remove_task(request.POST['delete'])
-            return redirect(redirect_link)
+            print('success')
+            return redirect(request.META.get('HTTP_REFERER'))
 
         elif 'check' in request.POST:
             controller.change_task(
                 request.POST['check'], status=Status.DONE)
-            return redirect(redirect_link)
+            return redirect(request.META.get('HTTP_REFERER'))
 
 
 # use this to get tasks. It checks if there was applied query and returns proper
@@ -103,6 +106,11 @@ def init_tasks(request, controller, tasks_list):
                         task.creator_uid).login
                 else:
                     task.creator_name = user.login
+
+            task.has_rights = controller.has_rights_to_modify_task(task.tid)
+
+        else:
+            task.has_rights = True
 
         if task.parent:
             task.parent_task = controller.get_tasks('tids: ' + str(task.parent))[0]
