@@ -160,11 +160,43 @@ class TaskLogic(Logic):
     def get_tasks(self, string_fil):
         # get tasks by filter
         fil = time_candle.model.tokenizer.parse_string(string_fil)
-        tasks = self.task_adapter.get_by_filter(fil)
-        for task in tasks:
+
+        all_tasks = self.task_adapter.get_by_filter(
+            time_candle.model.tokenizer.parse_string(''))
+
+        # we will update all tasks, not only gotten, because we need to know
+        # status of the child (for tree view)
+        for task in all_tasks:
             self._update(task)
 
-        return tasks
+        # and only after update we will get new filtered tasks and init their
+        # childs
+        filtered_tasks = self.task_adapter.get_by_filter(fil)
+
+        # this is needed to replace filtered tasks references on references of
+        # the main all_tasks list
+        self._substitute_tasks(filtered_tasks, all_tasks)
+
+        self._init_childs(filtered_tasks, all_tasks)
+
+        return filtered_tasks
+
+    @staticmethod
+    def _substitute_tasks(sub_list, main_list):
+        for task in sub_list:
+            task = next(filter(lambda t: t.tid == task.tid, main_list))
+
+    @staticmethod
+    def _init_childs(filtered_tasks, all_tasks):
+        for child_task in all_tasks:
+            if child_task.parent:
+                try:
+                    parent_task = next(filter(
+                        lambda t: t.tid == child_task.parent, filtered_tasks))
+
+                    parent_task.childs.append(child_task)
+                except StopIteration:
+                    pass
 
     def _update(self, task):
         changed_flag = False

@@ -42,7 +42,7 @@ class TestTaskLogic(unittest.TestCase):
         self.controller.remove_task(1)
         self.assertEqual(len(self.controller.get_tasks('')), 0)
 
-    def test_get_by_filter(self):
+    def test_primary_get_by_filter(self):
         _init_task_table()
         _init_project_tasks_table()
 
@@ -97,6 +97,37 @@ class TestTaskLogic(unittest.TestCase):
 
     def test_period_tasks(self):
         pass
+
+    def test_time_get_by_filter_tasks(self):
+        pass
+
+    def test_child_get_tasks(self):
+        _init_task_table()
+        _init_project_tasks_table()
+        self._change_user(_USERS[0].uid)
+
+        selected_tasks = self.controller.get_tasks('')
+
+        # we have to be 100% sure that we are getting proper tasks
+        task_1 = next(filter(lambda t: t.tid == 1, selected_tasks))
+        task_2 = next(filter(lambda t: t.tid == 2, selected_tasks))
+
+        self.assertEquals(len(task_1.childs), 2)
+        self.assertEquals(len(task_2.childs), 1)
+
+        task_12 = next(filter(lambda t: t.tid == 12, selected_tasks))
+        task_13 = next(filter(lambda t: t.tid == 13, selected_tasks))
+
+        self.assertEquals(len(task_12.childs), 1)
+        self.assertEquals(len(task_13.childs), 0)
+
+        self._change_user(_USERS[2].uid)
+
+        task_12 = next(filter(lambda t: t.tid == 12, selected_tasks))
+        task_13 = next(filter(lambda t: t.tid == 13, selected_tasks))
+
+        self.assertEquals(len(task_12.childs), 1)
+        self.assertEquals(len(task_13.childs), 0)
 
     def test_union(self):
         fil_1 = TaskFilter().to_query()

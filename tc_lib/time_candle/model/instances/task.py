@@ -26,6 +26,7 @@ class Task:
                  creation_time=0,
                  period=None):
         logger.debug('creating a task...')
+        self.childs = []
 
         self.uid = uid
         self.creator_uid = creator_uid
