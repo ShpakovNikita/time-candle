@@ -111,9 +111,13 @@ class TestTaskLogic(unittest.TestCase):
         # we have to be 100% sure that we are getting proper tasks
         task_1 = next(filter(lambda t: t.tid == 1, selected_tasks))
         task_2 = next(filter(lambda t: t.tid == 2, selected_tasks))
+        task_3 = next(filter(lambda t: t.tid == 3, task_1.childs))
 
         self.assertEquals(len(task_1.childs), 2)
         self.assertEquals(len(task_2.childs), 1)
+
+        # 2 layout of depth test
+        self.assertEquals(len(task_3.childs), 1)
 
         task_12 = next(filter(lambda t: t.tid == 12, selected_tasks))
         task_13 = next(filter(lambda t: t.tid == 13, selected_tasks))

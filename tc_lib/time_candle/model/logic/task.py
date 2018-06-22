@@ -183,8 +183,9 @@ class TaskLogic(Logic):
 
     @staticmethod
     def _substitute_tasks(sub_list, main_list):
-        for task in sub_list:
-            task = next(filter(lambda t: t.tid == task.tid, main_list))
+        for i in range(len(sub_list)):
+            sub_list[i] = next(
+                filter(lambda t: t.tid == sub_list[i].tid, main_list))
 
     @staticmethod
     def _init_childs(filtered_tasks, all_tasks):
@@ -192,7 +193,7 @@ class TaskLogic(Logic):
             if child_task.parent:
                 try:
                     parent_task = next(filter(
-                        lambda t: t.tid == child_task.parent, filtered_tasks))
+                        lambda t: t.tid == child_task.parent, all_tasks))
 
                     parent_task.childs.append(child_task)
                 except StopIteration:

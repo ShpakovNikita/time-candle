@@ -8,13 +8,34 @@
             <div class="card-body">
                 <!--Title-->
                 <div class="row" style="margin-bottom: -20px">
-                    <div class="col-sm-9">
-                        <p class="card-title h4">{{ task.title|truncatechars:15 }}<span class="grey-text h6">@{{ task.tid }}</span>
-                            {% if task.parent %}
-                            <a href="{% url 'tc_web:change_task' task.parent %}" class="grey-text h6">Parent</a>
-                            {% endif %}
+                    {% if task.childs %}
+                    <div class="col-sm-5">
+                        <p class="card-title h4">{{ task.title|truncatechars:9 }}
                         </p>
                     </div>
+                    {% else %}
+                    <div class="col-sm-9">
+                        <p class="card-title h4">{{ task.title|truncatechars:18 }}
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Small button group -->
+                    {% if task.childs %}
+                    <div class="col-sm-4">
+                        <div class="btn-group ml-2" style="margin-right: -10%">
+                            <button style="margin-top: -3px" class="btn btn-red btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-group"></i>
+                            </button>
+                            <ul class="dropdown-menu" style="overflow-y: scroll; overflow-x: hidden; height: 300px; width: 200px">
+                                {% for child_task in task.childs %}
+                                    {% include "tc_web/tasks/tree_view_template.html" with node=child_task %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+
                     <div class="col-sm-3">
                         {% if task.has_rights %}
                             <form id="del_{{ task.tid }}" method="post">
@@ -32,7 +53,7 @@
                 <!--Text-->
                 <div class="row">
                     <div class="col-sm-9">
-                        <p class="card-text">{{ task.comment|default:"No comments provided"|truncatechars:38 }}</p>
+                        <p class="card-text">{{ task.comment|default:"No comments provided"|truncatechars:26 }}</p>
                     </div>
                     {% if task.status == 3 %}
                         <div class="col-sm-3 text-center"><i class="fa fa-check pr-1"></i></div>
@@ -52,7 +73,7 @@
                         </div>
                     {% endif %}
                 </div>
-                <div class="row ml-1">
+                <div class="row ml-1 mt-2">
                     {% if task.status == 3 %}
                         <div class="badge badge-success">DONE</div>
                     {% elif task.status == 2 %}
@@ -72,6 +93,9 @@
                         <div class="badge badge-info ml-2">LOW PRIORITY</div>
                     {% elif task.priority == 0 %}
                         <div class="badge badge-default ml-2">MIN PRIORITY</div>
+                    {% endif %}
+                    {% if task.parent %}
+                        <a class="badge hoverable badge-pill blue trigger ml-2" href="{% url 'tc_web:show_task' task.parent %}">PARENT<i class="fa fa-arrow-up"></i></a>
                     {% endif %}
                 </div>
                 {% if task.pid %}

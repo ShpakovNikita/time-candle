@@ -9,8 +9,7 @@
             <!--Title-->
             <div class="row" style="margin-bottom: -20px">
                 <div class="col-sm-9">
-                    <h4 class="card-title">{{ project.title }}<span class="grey-text">@{{ project.pid }}</span>
-                    </h4>
+                    <h4 class="card-title">{{ project.title|truncatechars:18 }}</h4>
                 </div>
                 <div class="col-sm-3">
                     {% if project.has_rights %}
@@ -30,8 +29,8 @@
             <hr>
             <!--Text-->
             <div class="row">
-                <div class="col-sm-9">
-                    <p class="card-text">{{ project.description|default:"No description provided"|truncatechars:29 }}</p>
+                <div class="col-sm-12">
+                    <p class="card-text">{{ project.description|default:"No description provided"|truncatechars:45 }}</p>
                 </div>
             </div>
             <div class="row mt-2">

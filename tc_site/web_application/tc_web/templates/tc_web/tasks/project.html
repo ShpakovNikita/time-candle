@@ -6,7 +6,7 @@
          <div class="card">
          <!--Card content-->
          <div class="card-body">
-             <h4 class="card-title text-center">{{ project.title }}<a href="{% url 'tc_web:profile' project.admin_uid %}" class="grey-text">@Admin: {{ project.admin.username }}</a></h4>
+             <h4 class="card-title text-center">{{ project.title }}<a href="{% url 'tc_web:profile' project.admin_uid %}" class="grey-text">@Admin: {{ project.admin.username }}; </a><span class="grey-text">Id{{ project.pid }}</span></h4>
              <p class="card-text">{{ project.description|default:'No description provided' }}</p>
              {% if project.admin_uid == user.id %}
                 <a class="btn btn-unique" href="{% url 'tc_web:change_project' project.pid %}">Change</a>

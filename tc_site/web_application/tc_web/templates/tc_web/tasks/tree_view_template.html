@@ -1,0 +1,36 @@
+{% if node.childs %}
+    <li>
+        <div class="row">
+            <div class="col-sm-1">
+            {% if node.status == 3 %}
+                <i class="ml-1 mt-1 fa fa-check"></i>
+            {% else %}
+                <i class="ml-1 mt-1 fa fa-close"></i>
+           {% endif %}
+            </div>
+            <div class="col-sm-9">
+                <a style="margin-left: -30px" class="dropdown-item" href="{% url 'tc_web:show_task' node.tid %}">{{ node.title|truncatechars:20 }}   <i class="fa fa-arrow-down"></i></a>
+            </div>
+        </div>
+    </li>
+    <div class="dropdown-divider"></div>
+    {% for child in node.childs %}
+        {% include 'tc_web/tasks/tree_view_template.html' with node=child %}
+    {% endfor %}
+    <div class="dropdown-divider"></div>
+{% else %}
+    <li>
+        <div class="row">
+            <div class="col-sm-1">
+            {% if node.status == 3 %}
+                <i class="ml-1 mt-1 fa fa-check"></i>
+            {% else %}
+                <i class="ml-1 mt-1 fa fa-close"></i>
+           {% endif %}
+            </div>
+            <div class="col-sm-9">
+                <a style="margin-left: -30px" class="dropdown-item" href="{% url 'tc_web:show_task' node.tid %}">{{ node.title|truncatechars:20 }}</a>
+            </div>
+        </div>
+    </li>
+{% endif %}
