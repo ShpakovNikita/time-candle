@@ -1,11 +1,12 @@
 from time_candle.model.instances.task import Task as TaskInstance
+from time_candle.model.instances.message import TaskMessages
 import time_candle.exceptions.model_exceptions as m_e
 from time_candle.model import logger
 import time_candle.model.tokenizer
 import time_candle.model.time_formatter
 from time_candle.enums.status import Status
 from time_candle.storage.task_adapter import TaskFilter
-from . import Logic
+from time_candle.model.logic import Logic
 
 
 class TaskLogic(Logic):
@@ -109,7 +110,12 @@ class TaskLogic(Logic):
 
     def remove_task(self, tid):
         # remove task from database
+        task = self.task_adapter.get_task_by_id(tid)
         self.task_adapter.remove_task_by_id(tid)
+        self.queue.append(
+            task.uid, TaskMessages.TASK_REMOVED.format(task.tid))
+
+        self.queue.flush()
 
     def change_task(self, tid, priority, status, time, comment):
         # change task in the database
@@ -137,7 +143,7 @@ class TaskLogic(Logic):
             if status != Status.DONE:
                 task.realization_time = None
 
-            if status == Status.EXPIRED :
+            if status == Status.EXPIRED:
                 if task.deadline is None:
                     raise m_e.InvalidTimeError(m_e.TimeMessages.NO_DEADLINE)
 
@@ -149,6 +155,8 @@ class TaskLogic(Logic):
                         m_e.StatusMessages.EXPIRED_NOT_VALID)
 
                 self._set_status_expired_to_childs(task)
+                self.queue.append(
+                    task.uid, TaskMessages.TASK_EXPIRED.format(task.tid))
 
             task.status = status
             # mark time for the done task
@@ -177,6 +185,8 @@ class TaskLogic(Logic):
 
         self.task_adapter.save(task)
 
+        self.queue.flush()
+
     def get_tasks(self, string_fil):
         # get tasks by filter
         fil = time_candle.model.tokenizer.parse_string(string_fil)
@@ -198,6 +208,8 @@ class TaskLogic(Logic):
 
         self._init_childs(filtered_tasks, all_tasks)
 
+        # potentially we may have messages in _update() method
+        self.queue.flush()
         return filtered_tasks
 
     # use this function only when you checked task as Done
@@ -224,6 +236,8 @@ class TaskLogic(Logic):
             if child.status == Status.IN_PROGRESS:
                 # run this function on the lower tree levels
                 child.status = Status.EXPIRED
+                self.queue.append(
+                    child.uid, TaskMessages.TASK_EXPIRED.format(child.tid))
                 self.task_adapter.save(child)
                 self._set_status_expired_to_childs(child)
 
@@ -253,6 +267,9 @@ class TaskLogic(Logic):
                 time_formatter.time_delta(task.deadline) < 0 \
                 and task.status == Status.IN_PROGRESS:
             task.status = Status.EXPIRED
+            self.queue.append(
+                task.uid, TaskMessages.TASK_EXPIRED.format(task.tid))
+
             self._set_status_expired_to_childs(task)
             logger.debug('tasks status updated')
             changed_flag = True

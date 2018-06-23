@@ -2,7 +2,7 @@ from time_candle.model.instances.project import Project as ProjectInstance
 import time_candle.exceptions.db_exceptions as db_e
 from time_candle.storage.project_adapter import ProjectFilter
 from time_candle.model.logic import Logic
-from time_candle.model.instances.user import User
+from time_candle.model.instances.message import ProjectMessages
 
 
 class ProjectLogic(Logic):
@@ -16,7 +16,17 @@ class ProjectLogic(Logic):
 
     def add_user_to_project(self, uid, pid):
         # add user to the project
+        project = self.project_adapter.get_project_by_id(pid)
         self.project_adapter.add_user_to_project_by_id(uid, pid)
+
+        user = self.user_adapter.get_user_by_id(uid)
+        self.queue.append(
+            project.admin_uid, ProjectMessages.USER_ADDED.format(
+                user.login, project.title))
+        self.queue.append(
+            uid, ProjectMessages.USER_INVITED.format(project.title))
+
+        self.queue.flush()
 
     def remove_user_from_project(self, uid, pid):
         # remove user from project
@@ -44,7 +54,13 @@ class ProjectLogic(Logic):
 
     def remove_project(self, pid):
         # remove project from database if have rights
+        project = self.project_adapter.get_project_by_id(pid)
         self.project_adapter.remove_project_by_id(pid)
+        self.queue.append(
+            project.admin_uid, ProjectMessages.PROJECT_REMOVED.format(
+                project.title))
+
+        self.queue.flush()
 
     def has_rights_to_modify(self, pid):
         return self.project_adapter.has_rights(pid)

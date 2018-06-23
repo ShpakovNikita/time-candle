@@ -2,18 +2,21 @@ from time_candle.model import logger
 
 # This is the message templates
 
-# project:
-USER_ADDED = 'User {} has been added to the project'
-PROJECT_REMOVED = 'Project {} has been removed from the history'
-USER_INVITED = 'You have been invited to the project: {}'
 
-# user:
-USER_JOINED = 'Welcome to your new place, {}!'
-PROFILE_CHANGED = 'You have changed your profile'
+class ProjectMessages:
+    USER_ADDED = 'User {} has been added to the project: {}'
+    PROJECT_REMOVED = 'Project {} has been removed from the history'
+    USER_INVITED = 'You have been invited to the project: {}'
 
-# task:
-TASK_REMOVED = 'Task {} has been removed'
-TASK_EXPIRED = 'Task {} has expired status now'
+
+class UserMessages:
+    USER_JOINED = 'Welcome to your new place, {}!'
+    PROFILE_CHANGED = 'You have changed your profile'
+
+
+class TaskMessages:
+    TASK_REMOVED = 'Task {} has been removed'
+    TASK_EXPIRED = 'Task {} has expired status now'
 
 
 class Message:

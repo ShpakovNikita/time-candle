@@ -1,9 +1,5 @@
 from time_candle.model.instances.user import User as UserInstance
-import time_candle.exceptions.model_exceptions as m_e
-from time_candle.model import logger
-import time_candle.model.tokenizer
-import time_candle.model.time_formatter
-from time_candle.enums.status import Status
+from time_candle.model.instances.message import UserMessages
 from time_candle.storage.user_adapter import UserFilter
 from . import Logic
 
@@ -28,6 +24,10 @@ class UserLogic(Logic):
                             nickname=nickname,
                             about=about)
         self.user_adapter.save(user)
+        self.queue.append(
+            external_id, UserMessages.USER_JOINED.format(login))
+
+        self.queue.flush()
 
     def get_users(self, substr):
         # get users by passed substring
@@ -48,3 +48,6 @@ class UserLogic(Logic):
             user.about = about
 
         self.user_adapter.save(user)
+        self.queue.append(uid, UserMessages.USER_JOINED)
+
+        self.queue.flush()

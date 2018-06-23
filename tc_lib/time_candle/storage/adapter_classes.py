@@ -90,7 +90,9 @@ class Message(BaseModel):
     mid = PrimaryKeyField()
 
     content = CharField()
-    user = ForeignKeyField(User, related_name='user')
+
+    # user's uid
+    user = CharField()
 
 
 class Project(BaseModel):
@@ -245,6 +247,7 @@ class Adapter:
         if not Task.table_exists():
             Task.create_table()
         if not Message.table_exists():
+            print(123)
             Message.create_table()
 
         logger.debug("Database tables initialized")

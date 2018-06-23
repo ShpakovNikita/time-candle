@@ -8,6 +8,37 @@ import time_candle.storage.project_adapter
 import time_candle.storage.user_adapter
 
 
+class MessagesQueue:
+
+    def __init__(self, message_adapter):
+        """
+        Constructor
+        :param message_adapter: of course it is UserAdapter, but in this case we
+         will only use message methods
+        """
+        self.queue = []
+        self.message_adapter = message_adapter
+
+    def append(self, receiver, message_content):
+        """
+        Appends message instance to the queue
+        :param message_content: message string
+        :param receiver: receiver's id
+        :return: None
+        """
+        self.queue.append((message_content, receiver))
+
+    def flush(self):
+        """
+        Use this function to send all messages previously added to the object
+        :return: None
+        """
+        for message_content, receiver in self.queue:
+            self.message_adapter.send_message(receiver, message_content)
+
+        self.queue.clear()
+
+
 class Logic:
 
     def __init__(self,
@@ -28,6 +59,7 @@ class Logic:
                         connect_url=connect_url)
 
         self._auth(uid)
+        self.queue = MessagesQueue(self.user_adapter)
 
     def _auth(self, uid=None):
         """
