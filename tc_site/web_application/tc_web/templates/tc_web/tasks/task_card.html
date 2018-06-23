@@ -8,33 +8,10 @@
             <div class="card-body">
                 <!--Title-->
                 <div class="row" style="margin-bottom: -20px">
-                    {% if task.childs %}
-                    <div class="col-sm-5">
-                        <p class="card-title h4">{{ task.title|truncatechars:9 }}
-                        </p>
-                    </div>
-                    {% else %}
                     <div class="col-sm-9">
                         <p class="card-title h4">{{ task.title|truncatechars:18 }}
                         </p>
                     </div>
-                    {% endif %}
-
-                    <!-- Small button group -->
-                    {% if task.childs %}
-                    <div class="col-sm-4">
-                        <div class="btn-group ml-2" style="margin-right: -10%">
-                            <button style="margin-top: -3px" class="btn btn-red btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa fa-group"></i>
-                            </button>
-                            <ul class="dropdown-menu" style="overflow-y: scroll; overflow-x: hidden; height: 300px; width: 200px">
-                                {% for child_task in task.childs %}
-                                    {% include "tc_web/tasks/tree_view_template.html" with node=child_task %}
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                    {% endif %}
 
                     <div class="col-sm-3">
                         {% if task.has_rights %}
@@ -55,6 +32,7 @@
                     <div class="col-sm-9">
                         <p class="card-text">{{ task.comment|default:"No comments provided"|truncatechars:26 }}</p>
                     </div>
+
                     {% if task.status == 3 %}
                         <div class="col-sm-3 text-center"><i class="fa fa-check pr-1"></i></div>
                     {% elif task.has_rights %}
@@ -73,7 +51,7 @@
                         </div>
                     {% endif %}
                 </div>
-                <div class="row ml-1 mt-2">
+                <div class="row ml-0 mt-2">
                     {% if task.status == 3 %}
                         <div class="badge badge-success">DONE</div>
                     {% elif task.status == 2 %}
@@ -84,27 +62,38 @@
                         <div class="badge badge-danger">EXPIRED</div>
                     {% endif %}
                     {% if task.priority == 4 %}
-                        <div class="badge badge-danger ml-2">MAX PRIORITY</div>
+                        <div class="badge badge-danger ml-1">MAX PRIOR</div>
                     {% elif task.priority == 3 %}
-                        <div class="badge badge-warning ml-2">HIGH PRIORITY</div>
+                        <div class="badge badge-warning ml-1">HIGH PRIOR</div>
                     {% elif task.priority == 2 %}
-                        <div class="badge badge-primary ml-2">MEDIUM PRIORITY</div>
+                        <div class="badge badge-primary ml-1">MEDIUM PRIOR</div>
                     {% elif task.priority == 1 %}
-                        <div class="badge badge-info ml-2">LOW PRIORITY</div>
+                        <div class="badge badge-info ml-1">LOW PRIOR</div>
                     {% elif task.priority == 0 %}
-                        <div class="badge badge-default ml-2">MIN PRIORITY</div>
+                        <div class="badge badge-default ml-1">MIN PRIOR</div>
                     {% endif %}
                     {% if task.parent %}
-                        <a class="badge hoverable badge-pill blue trigger ml-2" href="{% url 'tc_web:show_task' task.parent %}">PARENT<i class="fa fa-arrow-up"></i></a>
+                        <a style="width: 22%" class="badge hoverable badge-pill blue trigger ml-1" href="{% url 'tc_web:show_task' task.parent %}">PARENT<i class="fa fa-arrow-up"></i></a>
+                    {% endif %}
+                    {% if task.childs %}
+
+                            <a style="width: 13%" class="ml-0 trigger hoverable badge badge-pill blue dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-group"></i>
+                            </a>
+                            <ul class="dropdown-menu" style="overflow-y: scroll; overflow-x: hidden; max-height: 300px; width: 200px">
+                                {% for child_task in task.childs %}
+                                    {% include "tc_web/tasks/tree_view_template.html" with node=child_task %}
+                                {% endfor %}
+                            </ul>
                     {% endif %}
                 </div>
                 {% if task.pid %}
                     <div class="row">
                         <div class="col-sm-6 mt-2">
-                            <a href="{% url 'tc_web:project' project_id=task.pid %}" class="btn btn-sm btn-red" style="margin-bottom: -10px; width: 110%">Proj:{{ task.project_name|truncatechars:20 }}</a>
+                            <a href="{% url 'tc_web:project' project_id=task.pid %}" class="btn btn-sm btn-red" style="margin-bottom: -10px; width: 110%">Proj:{{ task.project_name|truncatechars:12 }}</a>
                         </div>
                         <div class="col-sm-6 mt-2">
-                            <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-unique" style=" margin-bottom: -10px; width: 100%">Exec:{{ task.receiver_name|truncatechars:20 }}</a>
+                            <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-unique" style=" margin-bottom: -10px; width: 100%">Exec:{{ task.receiver_name|truncatechars:12 }}</a>
                         </div>
                     </div>
                 {% else %}

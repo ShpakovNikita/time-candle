@@ -4,6 +4,7 @@ from time_candle.model import logger
 import time_candle.model.tokenizer
 import time_candle.model.time_formatter
 from time_candle.enums.status import Status
+from time_candle.storage.task_adapter import TaskFilter
 from . import Logic
 
 
@@ -25,6 +26,11 @@ class TaskLogic(Logic):
         # not lower then parent's
         if parent_id is not None:
             parent_task = self.task_adapter.get_task_by_id(parent_id)
+
+            if parent_task.status == Status.DONE:
+                raise m_e.InvalidStatusError(
+                    m_e.StatusMessages.MAKE_PARENT_STATUS_DONE)
+
             status = max(status, parent_task.status)
             priority = max(priority, parent_task.priority)
 
@@ -109,12 +115,21 @@ class TaskLogic(Logic):
         if task.parent is not None:
             parent_task = self.task_adapter.get_task_by_id(task.parent)
             if status is not None:
+                if parent_task.status == Status.DONE and status != Status.DONE:
+                    raise m_e.InvalidStatusError(
+                        m_e.StatusMessages.CHANGE_PARENT_STATUS_DONE)
+
                 status = max(status, parent_task.status)
 
             if priority is not None:
+                # check if our new priority is not lower than parent's
                 priority = max(priority, parent_task.priority)
 
         if priority is not None:
+            # checking for running the recursion
+            if priority > task.priority:
+                self._set_priority_to_childs(task, priority)
+
             task.priority = priority
 
         if status is not None:
@@ -134,6 +149,7 @@ class TaskLogic(Logic):
             task.status = status
             # mark time for the done task
             if status == Status.DONE:
+                self._check_childs(task)
                 task.realization_time = time_candle.model.time_formatter.\
                     get_now_milliseconds()
 
@@ -161,8 +177,7 @@ class TaskLogic(Logic):
         # get tasks by filter
         fil = time_candle.model.tokenizer.parse_string(string_fil)
 
-        all_tasks = self.task_adapter.get_by_filter(
-            time_candle.model.tokenizer.parse_string(''))
+        all_tasks = self.task_adapter.get_by_filter(TaskFilter())
 
         # we will update all tasks, not only gotten, because we need to know
         # status of the child (for tree view)
@@ -180,6 +195,23 @@ class TaskLogic(Logic):
         self._init_childs(filtered_tasks, all_tasks)
 
         return filtered_tasks
+
+    # use this function only when you checked task as Done
+    def _check_childs(self, task, status_for_check=Status.DONE):
+        childs = self.task_adapter.get_by_filter(TaskFilter().parent(task.tid))
+        for child in childs:
+            if child.status < status_for_check:
+                raise m_e.InvalidStatusError(
+                    m_e.StatusMessages.CHILD_STATUS_UNEXPECTED)
+
+    def _set_priority_to_childs(self, task, priority_to_set):
+        childs = self.task_adapter.get_by_filter(TaskFilter().parent(task.tid))
+        for child in childs:
+            if child.priority < priority_to_set:
+                # run this function on the lower tree levels
+                child.priority = priority_to_set
+                self.task_adapter.save(child)
+                self._set_priority_to_childs(child, priority_to_set)
 
     @staticmethod
     def _substitute_tasks(sub_list, main_list):

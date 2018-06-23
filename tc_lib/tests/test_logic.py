@@ -2,6 +2,7 @@ from tests import *
 from time_candle.controller.commands import Controller
 from time_candle.model.tokenizer import parse_string
 import time_candle.exceptions.show_me_exceptions as sm_e
+import time_candle.exceptions.model_exceptions as m_e
 
 
 # TODO: Mock. It is really hard to implement here. Like very-very-very hard.
@@ -100,6 +101,90 @@ class TestTaskLogic(unittest.TestCase):
 
     def test_time_get_by_filter_tasks(self):
         pass
+
+    def test_add_get_priority_depth_dependency(self):
+        _init_task_table()
+        _init_project_tasks_table()
+        self._change_user(_USERS[0].uid)
+
+        self.controller.change_task(_TASKS[0].tid, priority=Priority.HIGH)
+        task_9 = self.controller.get_tasks('tids: ' + str(_TASKS[8].tid))[0]
+        self.assertLessEqual(task_9.priority, Priority.HIGH)
+
+        self.controller.change_task(_TASKS[0].tid, priority=Priority.LOW)
+        task_9 = self.controller.get_tasks('tids: ' + str(_TASKS[8].tid))[0]
+        self.assertLessEqual(task_9.priority, Priority.HIGH)
+
+        self.controller.change_task(_TASKS[0].tid, priority=Priority.MAX)
+        task_9 = self.controller.get_tasks('tids: ' + str(_TASKS[8].tid))[0]
+        self.assertLessEqual(task_9.priority, Priority.MAX)
+
+    def test_add_get_priority_dependency(self):
+        self._change_user(_USERS[0].uid)
+
+        self.controller.add_task(title=_TASKS[0].title,
+                                 priority=_TASKS[0].priority,
+                                 parent_id=_TASKS[0].parent)
+        self.controller.change_task(_TASKS[0].tid, priority=Priority.HIGH)
+        self.controller.add_task(title=_TASKS[1].title,
+                                 priority=Priority.MEDIUM,
+                                 parent_id=_TASKS[1].parent)
+
+        task_1 = self.controller.get_tasks('tids: ' + str(_TASKS[1].tid))[0]
+        self.assertEquals(task_1.priority, Priority.HIGH)
+
+        self.controller.change_task(_TASKS[0].tid, priority=Priority.MEDIUM)
+        # update out task
+        task_1 = self.controller.get_tasks('tids: ' + str(_TASKS[1].tid))[0]
+        self.assertEquals(task_1.priority, Priority.HIGH)
+
+        self.controller.change_task(_TASKS[0].tid, priority=Priority.MAX)
+        task_1 = self.controller.get_tasks('tids: ' + str(_TASKS[1].tid))[0]
+        self.assertEquals(task_1.priority, Priority.MAX)
+
+    def test_add_change_status_dependency(self):
+        self._change_user(_USERS[0].uid)
+
+        self.controller.add_task(title=_TASKS[0].title,
+                                 status=_TASKS[0].status,
+                                 parent_id=_TASKS[0].parent)
+        self.controller.change_task(_TASKS[0].tid, status=Status.DONE)
+
+        # check that we cannot make child to the done task
+        with self.assertRaises(m_e.InvalidStatusError):
+            self.controller.add_task(title=_TASKS[1].title,
+                                     status=_TASKS[1].status,
+                                     parent_id=_TASKS[1].parent)
+
+        # after changing the status we may do this
+        self.controller.change_task(_TASKS[0].tid, status=Status.IN_PROGRESS)
+        self.controller.add_task(title=_TASKS[1].title,
+                                 status=_TASKS[1].status,
+                                 parent_id=_TASKS[1].parent)
+
+    def test_change_status_dependency(self):
+        _init_task_table()
+        _init_project_tasks_table()
+        self._change_user(_USERS[0].uid)
+
+        # check that due to dependencies we cannot do our tasks
+        with self.assertRaises(m_e.InvalidStatusError):
+            self.controller.change_task(1, status=Status.DONE)
+            self.controller.change_task(3, status=Status.DONE)
+            self.controller.change_task(9, status=Status.DONE)
+
+        # by the chain from lowest levels we will do them
+        # tid 3 chain:
+        self.controller.change_task(11, status=Status.DONE)
+        self.controller.change_task(9, status=Status.DONE)
+        self.controller.change_task(3, status=Status.DONE)
+
+        # tid 2 chain:
+        self.controller.change_task(10, status=Status.DONE)
+        self.controller.change_task(2, status=Status.DONE)
+
+        # tid 1 main do:
+        self.controller.change_task(1, status=Status.DONE)
 
     def test_child_get_tasks(self):
         _init_task_table()
