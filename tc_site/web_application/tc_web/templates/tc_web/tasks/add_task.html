@@ -69,10 +69,12 @@
                             {% for value, text in form.status.field.choices %}
                             {% if text == 'in_progress' %}
                                 <input type="radio" name="status" id="status_{{ forloop.counter }}" checked="checked" value="{{ value }}"></input>
+                                <label for="status_{{ forloop.counter }}">{{ text }}</label>
+                            {% elif text == 'expired' %}
                             {% else %}
                                 <input type="radio" name="status" id="status_{{ forloop.counter }}" value="{{ value }}"></input>
+                                <label for="status_{{ forloop.counter }}">{{ text }}</label>
                             {% endif %}
-                            <label for="status_{{ forloop.counter }}">{{ text }}</label>
                             {% endfor %}
                         </div>
                     </div>

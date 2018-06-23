@@ -86,6 +86,13 @@ class User(BaseModel):
     about = CharField(default='')
 
 
+class Message(BaseModel):
+    mid = PrimaryKeyField()
+
+    content = CharField()
+    user = ForeignKeyField(User, related_name='user')
+
+
 class Project(BaseModel):
     pid = PrimaryKeyField()
 
@@ -216,6 +223,7 @@ class Adapter:
         Project.create_table()
         UserProjectRelation.create_table()
         Task.create_table()
+        Message.create_table()
         logger.debug("Database created")
 
     def _db_sqlite_initialize(self):
@@ -236,6 +244,8 @@ class Adapter:
             UserProjectRelation.create_table()
         if not Task.table_exists():
             Task.create_table()
+        if not Message.table_exists():
+            Message.create_table()
 
         logger.debug("Database tables initialized")
 

@@ -1,8 +1,11 @@
+from datetime import time
+
 from tests import *
 from time_candle.controller.commands import Controller
 from time_candle.model.tokenizer import parse_string
 import time_candle.exceptions.show_me_exceptions as sm_e
 import time_candle.exceptions.model_exceptions as m_e
+import time_candle.model.time_formatter as formatter
 
 
 # TODO: Mock. It is really hard to implement here. Like very-very-very hard.
@@ -131,18 +134,18 @@ class TestTaskLogic(unittest.TestCase):
                                  parent_id=_TASKS[1].parent)
 
         task_1 = self.controller.get_tasks('tids: ' + str(_TASKS[1].tid))[0]
-        self.assertEquals(task_1.priority, Priority.HIGH)
+        self.assertEqual(task_1.priority, Priority.HIGH)
 
         self.controller.change_task(_TASKS[0].tid, priority=Priority.MEDIUM)
         # update out task
         task_1 = self.controller.get_tasks('tids: ' + str(_TASKS[1].tid))[0]
-        self.assertEquals(task_1.priority, Priority.HIGH)
+        self.assertEqual(task_1.priority, Priority.HIGH)
 
         self.controller.change_task(_TASKS[0].tid, priority=Priority.MAX)
         task_1 = self.controller.get_tasks('tids: ' + str(_TASKS[1].tid))[0]
-        self.assertEquals(task_1.priority, Priority.MAX)
+        self.assertEqual(task_1.priority, Priority.MAX)
 
-    def test_add_change_status_dependency(self):
+    def test_add_change_done_status_dependency(self):
         self._change_user(_USERS[0].uid)
 
         self.controller.add_task(title=_TASKS[0].title,
@@ -161,6 +164,35 @@ class TestTaskLogic(unittest.TestCase):
         self.controller.add_task(title=_TASKS[1].title,
                                  status=_TASKS[1].status,
                                  parent_id=_TASKS[1].parent)
+
+    def test_change_task_deadline(self):
+        _init_task_table()
+        _init_project_tasks_table()
+        self._change_user(_USERS[0].uid)
+        task_1 = self.controller.get_tasks('tids: ' + str(_TASKS[0].tid))[0]
+
+        self.assertEqual(task_1.deadline, None)
+
+        # far-far future
+        self.controller.change_task(1, time='2077-07-20 21:29:00')
+        task_1 = self.controller.get_tasks('tids: ' + str(_TASKS[0].tid))[0]
+
+        self.assertNotEqual(task_1.deadline, None)
+
+    # this test tests that childs will become also expired if not done due to
+    # their parent expiration
+    def test_change_expired_status_dependency(self):
+        _init_task_table()
+        _init_project_tasks_table()
+        self._change_user(_USERS[0].uid)
+
+        with self.assertRaises(m_e.InvalidTimeError):
+            self.controller.change_task(1, status=Status.EXPIRED)
+
+        self.controller.change_task(1, time='2077-01-01 20:00:00')
+        task_1 = self.controller.get_tasks('tids: ' + str(_TASKS[0].tid))[0]
+        print('desu!', task_1.deadline)
+        self.controller.change_task(1, status=Status.EXPIRED)
 
     def test_change_status_dependency(self):
         _init_task_table()
@@ -198,26 +230,38 @@ class TestTaskLogic(unittest.TestCase):
         task_2 = next(filter(lambda t: t.tid == 2, selected_tasks))
         task_3 = next(filter(lambda t: t.tid == 3, task_1.childs))
 
-        self.assertEquals(len(task_1.childs), 2)
-        self.assertEquals(len(task_2.childs), 1)
+        self.assertEqual(len(task_1.childs), 2)
+        self.assertEqual(len(task_2.childs), 1)
 
         # 2 layout of depth test
-        self.assertEquals(len(task_3.childs), 1)
+        self.assertEqual(len(task_3.childs), 1)
 
         task_12 = next(filter(lambda t: t.tid == 12, selected_tasks))
         task_13 = next(filter(lambda t: t.tid == 13, selected_tasks))
 
-        self.assertEquals(len(task_12.childs), 1)
-        self.assertEquals(len(task_13.childs), 0)
+        self.assertEqual(len(task_12.childs), 1)
+        self.assertEqual(len(task_13.childs), 0)
 
         self._change_user(_USERS[2].uid)
 
         task_12 = next(filter(lambda t: t.tid == 12, selected_tasks))
         task_13 = next(filter(lambda t: t.tid == 13, selected_tasks))
 
-        self.assertEquals(len(task_12.childs), 1)
-        self.assertEquals(len(task_13.childs), 0)
+        self.assertEqual(len(task_12.childs), 1)
+        self.assertEqual(len(task_13.childs), 0)
 
     def test_union(self):
         fil_1 = TaskFilter().to_query()
         self.assertEqual(parse_string('').to_query(), fil_1)
+
+
+class TestFormatting(unittest.TestCase):
+    def test_days_milliseconds_formatting(self):
+        ms = formatter.days_to_milliseconds(1)
+        self.assertEqual(ms, 1 * 24 * 60 * 60 * 1000)
+
+        days = formatter.milliseconds_to_days(ms)
+        self.assertEqual(1, 1)
+
+    def test_datetime_milliseconds_formatting(self):
+        pass

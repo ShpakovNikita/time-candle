@@ -31,8 +31,10 @@ class TaskLogic(Logic):
                 raise m_e.InvalidStatusError(
                     m_e.StatusMessages.MAKE_PARENT_STATUS_DONE)
 
-            status = max(status, parent_task.status)
             priority = max(priority, parent_task.priority)
+
+        if status == Status.EXPIRED:
+            raise m_e.InvalidStatusError(m_e.StatusMessages.ADD_EXPIRED)
 
         logger.debug('time in milliseconds %s', deadline_time)
         logger.info('time now (from milliseconds to datetime) %s',
@@ -119,8 +121,6 @@ class TaskLogic(Logic):
                     raise m_e.InvalidStatusError(
                         m_e.StatusMessages.CHANGE_PARENT_STATUS_DONE)
 
-                status = max(status, parent_task.status)
-
             if priority is not None:
                 # check if our new priority is not lower than parent's
                 priority = max(priority, parent_task.priority)
@@ -137,14 +137,18 @@ class TaskLogic(Logic):
             if status != Status.DONE:
                 task.realization_time = None
 
-            if status == Status.EXPIRED and time is None:
-                raise m_e.InvalidTimeError(m_e.TimeMessages.NO_DEADLINE)
+            if status == Status.EXPIRED :
+                if task.deadline is None:
+                    raise m_e.InvalidTimeError(m_e.TimeMessages.NO_DEADLINE)
 
-            # we cannot change done task to the expired. Note, that we can make
-            # done task as some other task and then we may change it to expired
-            elif status == Status.EXPIRED and task.status == Status.DONE:
-                raise m_e.InvalidStatusError(
-                    m_e.StatusMessages.EXPIRED_NOT_VALID)
+                # we cannot change done task to the expired. Note, that we can
+                # make done task as some other task and then we may change it to
+                # expired
+                if task.status == Status.DONE:
+                    raise m_e.InvalidStatusError(
+                        m_e.StatusMessages.EXPIRED_NOT_VALID)
+
+                self._set_status_expired_to_childs(task)
 
             task.status = status
             # mark time for the done task
@@ -213,6 +217,16 @@ class TaskLogic(Logic):
                 self.task_adapter.save(child)
                 self._set_priority_to_childs(child, priority_to_set)
 
+    # it sets expired status to all childs that in progress
+    def _set_status_expired_to_childs(self, task):
+        childs = self.task_adapter.get_by_filter(TaskFilter().parent(task.tid))
+        for child in childs:
+            if child.status == Status.IN_PROGRESS:
+                # run this function on the lower tree levels
+                child.status = Status.EXPIRED
+                self.task_adapter.save(child)
+                self._set_status_expired_to_childs(child)
+
     @staticmethod
     def _substitute_tasks(sub_list, main_list):
         for i in range(len(sub_list)):
@@ -239,6 +253,7 @@ class TaskLogic(Logic):
                 time_formatter.time_delta(task.deadline) < 0 \
                 and task.status == Status.IN_PROGRESS:
             task.status = Status.EXPIRED
+            self._set_status_expired_to_childs(task)
             logger.debug('tasks status updated')
             changed_flag = True
 

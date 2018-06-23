@@ -42,6 +42,7 @@ class StatusMessages(Enum):
     # over the project
     EXPIRED_NOT_VALID = 'You cannot make done task as expired. First you have' \
                         ' to make task undone'
+    ADD_EXPIRED = 'You cannot make expired tasks'
     CHILD_STATUS_UNEXPECTED = 'Not all child tasks were done. Please, check ' \
                               'them'
     CHANGE_PARENT_STATUS_DONE = 'Parent status is done, you cannot change ' \

@@ -90,6 +90,18 @@ class ProjectMessages(Enum):
     USER_ALREADY_EXISTS = 'The selected user already exists in this project'
 
 
+# Project related things
+class InvalidMidError(AppException):
+    def __init__(self, errors=None, message='The pid is invalid! {}'):
+        super().__init__(errors, message)
+
+
+class MidMessages(Enum):
+    # This is pre defined messages that will be associated with projects all
+    # over the project
+    DO_NOT_HAVE_RIGHTS = 'You don\'t have rights to modify this message'
+
+
 # Filters related things
 class InvalidFilterOperator(AppException):
     def __init__(self, errors=None, message='The filter operator is invalid! {}'

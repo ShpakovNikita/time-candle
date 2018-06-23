@@ -73,11 +73,11 @@
                         <div class="badge badge-default ml-1">MIN PRIOR</div>
                     {% endif %}
                     {% if task.parent %}
-                        <a style="width: 22%" class="badge hoverable badge-pill blue trigger ml-1" href="{% url 'tc_web:show_task' task.parent %}">PARENT<i class="fa fa-arrow-up"></i></a>
+                        <a style="width: 22%; margin-right: -1px" class="badge hoverable badge-pill blue trigger ml-1" href="{% url 'tc_web:show_task' task.parent %}">PARENT<i class="fa fa-arrow-up"></i></a>
                     {% endif %}
                     {% if task.childs %}
 
-                            <a style="width: 13%" class="ml-0 trigger hoverable badge badge-pill blue dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a style="width: 13%" class="ml-1 trigger hoverable badge badge-pill blue dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fa fa-group"></i>
                             </a>
                             <ul class="dropdown-menu" style="overflow-y: scroll; overflow-x: hidden; max-height: 300px; width: 200px">

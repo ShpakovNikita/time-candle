@@ -1,7 +1,9 @@
 from time_candle.storage.adapter_classes import User
+from time_candle.storage.adapter_classes import Message
 from time_candle.storage.adapter_classes import Filter as PrimaryFilter
 from time_candle.storage.adapter_classes import Adapter as PrimaryAdapter
 from time_candle.model.instances.user import User as UserInstance
+from time_candle.model.instances.message import Message as MessageInstance
 from time_candle.storage import logger
 import time_candle.exceptions.db_exceptions as db_e
 from peewee import DoesNotExist
@@ -65,7 +67,7 @@ class UserAdapter(PrimaryAdapter):
         """
         This function returns storage objects by the given UserFilter.
         :param filter_instance: UserFilter with defined filters
-        :return: List of User objects without passwords
+        :return: List of UserInstance
         """
         query = User.select().where(filter_instance.to_query())
 
@@ -140,3 +142,32 @@ class UserAdapter(PrimaryAdapter):
                 db_e.LoginMessages.USER_DOES_NOT_EXISTS)
 
         return UserInstance.make_user(obj)
+
+    ############################################################################
+    # MESSAGES (It is better not to create another adapter for this feature)   #
+    ############################################################################
+
+    def get_messages(self):
+        """
+        This function returns all messages for current user
+        :return: List of messages
+        """
+        query = Message.select().where(Message.user == self.uid)
+        return [MessageInstance.make_message(message) for message in query]
+
+    def remove_message(self, mid):
+        try:
+            message = Message.select().where(
+                (Message.mid == mid) & (Message.user == self.uid)).get()
+
+            message.delete_instance()
+            logger.debug('Message has been removed')
+        except DoesNotExist:
+            raise db_e.InvalidMidError(db_e.MidMessages.DO_NOT_HAVE_RIGHTS)
+
+    @staticmethod
+    def send_message(uid, message_str):
+        Message.create(user=uid,
+                       content=message_str)
+
+        logger.debug('Message has been sent')
