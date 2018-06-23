@@ -51,3 +51,13 @@ class UserLogic(Logic):
         self.queue.append(uid, UserMessages.USER_JOINED)
 
         self.queue.flush()
+
+    ############################################################################
+    # MESSAGES (It is better not to create another logic inst for this feature)#
+    ############################################################################
+
+    def get_messages(self):
+        return self.user_adapter.get_messages()
+
+    def remove_message(self, mid):
+        self.user_adapter.remove_message(mid)

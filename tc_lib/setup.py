@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='time_candle',
-    version="0.2",
+    version="0.3",
     license='MIT',
     description='little and unuseful time tracker',
     author='Paul Fon Boudervill',

@@ -306,3 +306,18 @@ class Controller:
         :return: None
         """
         self.user_logic.change_user(uid, nickname, about)
+
+    def get_messages(self):
+        """
+        This function returns messages for logged user
+        :return: List of messages
+        """
+        return self.user_logic.get_messages()
+
+    def remove_message(self, mid):
+        """
+        This function removes selected message
+        :param mid: id of message to remove
+        :return: None
+        """
+        self.user_logic.remove_message(mid)
