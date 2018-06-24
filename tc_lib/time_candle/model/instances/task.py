@@ -19,8 +19,6 @@ class Task:
                  status=Status.IN_PROGRESS,
                  priority=Priority.MEDIUM,
                  parent=None,
-                 # instead of controller for now we have only deadline
-                 # controller=None
                  comment='',
                  realization_time=None,
                  creation_time=0,
@@ -52,6 +50,8 @@ class Task:
         - other obj project with pid
         - tid
         - deadline_time
+        - creation_time
+        - realization_time
         - title
         - status
         - priority

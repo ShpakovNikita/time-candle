@@ -22,15 +22,25 @@
         <div class="container">
             <h5 class="card-text">
                 Also Time Candle has querying algorithms that provides a tool for advanced task search. Use the following filters for it:
-                Parents: tasks with specified parents.
-                Tids: tasks with specified tids
-                Receiver: tasks with specified receivers pay ids
-                Titles: Strings for tasks titles
+                parents: tasks with specified parents.
+                tids: tasks with specified tids
+                receiver: tasks with specified receivers pay ids
+                titles: Strings for tasks titles
                 Supported operators: AND, OR, (, ).
                 Special filters:
-                Parents: None - prints only personal tasks
+                parents: None - prints only personal tasks
+                deadline_time:
+                 - range filter: (example) '2010-10-10 20:20:20' .. '2012-10-10 20:20:20'
+                 - compare filter: (example) > '2010-10-10 20:20:20'
+                (operators supported:
+                >, >=, ==, <=, <, !=
+                )
+
+                creation_time: - same as deadline_time
                 Examples:
                 (parents: 1 5 3 OR tids: 4 6 7) AND titles: new work candy
+                deadline_time: '2010-10-10 20:20:20' .. '2012-10-10 20:20:20'
+                creation_time: > '2010-10-10 20:20:20'
             </h5>
         </div>
         <hr>

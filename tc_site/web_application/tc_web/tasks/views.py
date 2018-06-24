@@ -3,6 +3,7 @@ from django.shortcuts import (
     render,
     redirect,
 )
+from time_candle.enums.status import Status
 from django.urls import reverse
 from time_candle.exceptions import AppException
 from time_candle.model.time_formatter import FORMAT
@@ -65,7 +66,7 @@ def add_task(request, project_id=None, task_id=None):
                 controller.add_task(title=title,
                                     time=deadline_time,
                                     priority=int(priority),
-                                    status=int(status),
+                                    status=Status.IN_PROGRESS,
                                     period=period,
                                     parent_id=task_id,
                                     comment=comment,

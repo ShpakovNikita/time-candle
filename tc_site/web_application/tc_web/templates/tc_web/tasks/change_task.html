@@ -2,21 +2,124 @@
 
 {% block content %}
 <div class="row justify-content-md-center">
-    <div class="col-lg-4 col-md-8 col-sm-12">
+    <div class="col-lg-7 col-md-9 col-sm-12">
         <div class="card">
             <div class="card-body">
-                <p class="h4 text-center mb-4">Change task: {{ task.title }}<span class="grey-text">@{{ task.tid }}</span></p>
-                <p class="h4 text-center mb-4">Created: {{ task.creation_time|date:"d M Y, H:i" }}</p>
+                <!-- Tasks hat -->
+                <p class="h4 card-title mb-4 ml-4">{{ task.title }} <span class="grey-text">id{{ task.tid }}</span></p>
+                <hr>
+                <!-- Tasks hat -->
+
+                <!-- Project part -->
                 {% if task.pid %}
-                    <p class="h4 text-center mb-4">Project: <a href="{% url 'tc_web:project' task.pid %}" class="btn btn-sm btn-unique">{{ task.project_name|truncatechars:20 }}</a></p>
+                    <p class="h5 card-title mb-3 ml-4">This is the project task:</p>
+                    <div class="row ml-4">
+                        <div class="col-sm-6">
+                            <div class="mycontent-left border-right border-light">
+                                <div class="row">
+                                    <div class="col-sm-5 mb-3">
+                                        <p class="h5 mt-1">Project:</p>
+                                    </div>
+                                    <div class="col-sm-7 mb-3">
+                                        <p class="h5"><a href="{% url 'tc_web:project' task.pid %}" style="min-width: 100px;" class="badge hoverable badge-pill purple-gradient">{{ task.project_name|truncatechars:14 }}</a></p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <p class="card-text">You may click on badges for bonus info</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="mycontent-right">
+                                <div class="row">
+                                    <div class="col-sm-5 mb-2">
+                                        <p class="h5 mt-1">Creator:</p>
+                                    </div>
+                                    <div class="col-sm-7 mb-2">
+                                        <p class="h5"><a href="{% url 'tc_web:profile' user_id=task.creator_uid %}" style="min-width: 100px;" class="badge hoverable badge-pill aqua-gradient">{{ task.creator_name|truncatechars:14 }}</a></p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <p class="h5 mt-1">Executor:</p>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <p class="h5"><a href="{% url 'tc_web:profile' user_id=task.uid %}" style="min-width: 100px;" class="badge hoverable badge-pill peach-gradient">{{ task.receiver_name|truncatechars:14 }}</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
                 {% endif %}
-                {% if task.parent %}
-                    <p class="h4 text-center mb-4">Parent task: {{ task.parent_task.title }}<a href="{% url 'tc_web:change_task' task.parent %}" class="grey-text">@{{ task.parent_task.tid }}</a></p>
+                <!-- Project part -->
+
+                <!-- Time checking -->
+                <div class="row ml-4">
+                    <div class="col-sm-6">
+                        <p class="h5 mb-1">Creation time: </p>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <p class="h6 mb-1 grey-text">{{ task.creation_time|date:"d M Y, H:i" }} </p>
+                    </div>
+                </div>
+
+                {% if task.period %}
+                    <p class="h5 mb-1">Period: {{ task.period }} day{{ task.period|pluralize }}</p>
                 {% endif %}
-                {% if task.pid %}
-                <p class="h4 text-center mb-4">Creator: <a href="{% url 'tc_web:profile' user_id=task.creator_uid %}" class="btn btn-sm btn-unique">{{ task.creator_name|truncatechars:20 }}</a></p>
-                <p class="h4 text-center mb-4">Executor: <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-unique">{{ task.receiver_name|truncatechars:20 }}</a></p>
+                <hr>
+                <!-- Time checking -->
+
+                <!-- Level dependency -->
+                {% if task.parent or task.childs %}
+                    <div class="row ml-4">
+                        <div class="col-sm-6">
+                            <div class="mycontent-left border-right border-light">
+                                {% if task.parent %}
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <p class="h5 mb-1 mt-1">Parent task:</p>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <p class="h5"><a href="{% url 'tc_web:show_task' task.parent %}" style="min-width: 100px;" class="badge hoverable badge-pill blue-gradient"> {{ task.parent_task.title }}</a></p>
+                                        </div>
+                                    </div>
+
+                                {% else %}
+                                    <p class="h6 mb-1 mt-1 grey-text">Task have no parent</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="mycontent-right">
+                                {% if task.childs %}
+                                    <div class="row">
+                                        <div class="col-sm-5">
+                                            <p class="h5 mb-1 mt-1">Childs: </p>
+                                        </div>
+
+                                        <div class="col-sm-7">
+                                            <a style="width: 100px" class="badge hoverable badge-pill blue-gradient dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            </a>
+                                            <ul class="dropdown-menu" style="overflow-y: scroll; overflow-x: hidden; max-height: 400px; width: 300px">
+                                                {% for child_task in task.childs %}
+                                                    {% include "tc_web/tasks/tree_view_template.html" with node=child_task %}
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <p class="h6 mb-1 mt-1 grey-text">Task have no childs</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
                 {% endif %}
+                <!-- Level dependency -->
+
                 {% if task.period %}
                     <p class="h4 text-center mb-4">Period: {{ task.period }} day{{ task.period|pluralize }}</p>
                 {% endif %}
@@ -72,8 +175,19 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-unique">Commit
-                    </button>
+                    <hr>
+                    <div class="row justify-content-sm-center mt-2 mr-3">
+                        <div class="col-sm-5">
+                            <div class="text-center">
+                                <a class="btn btn-unique" style="width: 60%" onClick="javascript:history.go(-1);">Back</a>
+                            </div>
+                        </div>
+                    {% if task.has_rights %}
+                        <div class="col-sm-5">
+                          <p class="text-center"><a href="{% url 'tc_web:change_task' task_id=task.tid  %}" class="btn btn-unique">Change</a></p>
+                        </div>
+                    {% endif %}
+                </div>
                 </form>
             </div>
         </div>

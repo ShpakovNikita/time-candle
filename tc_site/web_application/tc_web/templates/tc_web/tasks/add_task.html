@@ -63,31 +63,22 @@
                     </div>
 
                     <div class="fieldWrapper">
-                        {{ form.status.errors }}
-                        <label class="grey-text h5" for="{{ form.status.id_for_label }}">{{ form.status.label_tag }}</label>
-                        <div class="container bm-2">
-                            {% for value, text in form.status.field.choices %}
-                            {% if text == 'in_progress' %}
-                                <input type="radio" name="status" id="status_{{ forloop.counter }}" checked="checked" value="{{ value }}"></input>
-                                <label for="status_{{ forloop.counter }}">{{ text }}</label>
-                            {% elif text == 'expired' %}
-                            {% else %}
-                                <input type="radio" name="status" id="status_{{ forloop.counter }}" value="{{ value }}"></input>
-                                <label for="status_{{ forloop.counter }}">{{ text }}</label>
-                            {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <div class="fieldWrapper">
                         {{ form.period.errors }}
                         <label class="grey-text h5" for="{{ form.period.id_for_label }}">{{ form.period.label_tag }}</label>
                         <div class="container bm-2">
                             {{ form.period }}
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-unique">Add
-                    </button>
+
+                    <hr>
+                    <div class="row justify-content-sm-center mt-2">
+                        <div class="col-sm-5">
+                            <a class="btn btn-unique" onClick="javascript:history.go(-1);">Back</a>
+                        </div>
+                        <div class="col-sm-5">
+                            <button type="submit" class="btn btn-unique">Add</button>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>

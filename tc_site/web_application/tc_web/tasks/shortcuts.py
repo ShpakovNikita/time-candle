@@ -72,9 +72,12 @@ def init_tasks(request, controller, tasks_list):
         else:
             task.deadline = ''
 
+        print(task.realization_time)
         # convert from milliseconds to datetime
         if task.realization_time is not None:
+            print('hoh', task.realization_time)
             task.realization_time = get_datetime(task.realization_time)
+            print('heh', task.realization_time)
         else:
             task.realization_time = ''
 

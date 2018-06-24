@@ -17,10 +17,22 @@
         <h3><i class="fa fa-envelope prefix grey-text"> Email: </i> {{ screen_user.email }}</h3>
         <h3><i class="fa fa-comment prefix grey-text"> About: </i> {{ screen_user.about }}</h3>
 
-        {% if user.is_authenticated and user.id == screen_user.id %}
-        <div class="text-center py-4 mt-3">
-            <a class="btn btn-unique" href="{% url 'tc_web:change_profile' user.id %}">Change</a>
-        </div>
+        <hr>
+        {% if user.id == screen_user.id %}
+            <div class="row justify-content-sm-center mt-2 mr-3">
+                <div class="col-sm-5">
+                    <div class="text-center">
+                        <a class="btn btn-unique" style="width: 30%" onClick="javascript:history.go(-1);">Back</a>
+                    </div>
+                </div>
+                <div class="col-sm-5">
+                    <p class="text-center"><a href="{% url 'tc_web:change_profile' user.id %}" class="btn btn-unique">Change</a></p>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center py-4 mt-3">
+                <a class="btn btn-unique" onClick="javascript:history.go(-1);">Change</a>
+            </div>
         {% endif %}
 
         <!-- Material form register -->

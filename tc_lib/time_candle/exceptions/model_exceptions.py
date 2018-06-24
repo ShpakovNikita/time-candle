@@ -25,7 +25,7 @@ class TimeMessages(Enum):
     TIME_SHIFT = 'You cannot make tasks in the past'
     NOT_VALID_PERIOD = 'Yor period is too big in general or too small for ' \
                        'deadline'
-    NO_DEADLINE = 'You must specify first deadline for period task'
+    NO_DEADLINE = 'You must specify first deadline for this task'
     TIME_FORMAT = 'Time must be in YYYY-MM-DD H:M:S format'
     TIME_EPOCH = 'Time cannot create time below 1970\'s'
     NEGATIVE_PERIOD = 'Period cannot be negative'

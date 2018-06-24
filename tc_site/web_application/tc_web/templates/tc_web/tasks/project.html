@@ -6,11 +6,20 @@
          <div class="card">
          <!--Card content-->
          <div class="card-body">
-             <h4 class="card-title text-center">{{ project.title }}<a href="{% url 'tc_web:profile' project.admin_uid %}" class="grey-text">@Admin: {{ project.admin.username }}; </a><span class="grey-text">Id{{ project.pid }}</span></h4>
-             <p class="card-text">{{ project.description|default:'No description provided' }}</p>
-             {% if project.admin_uid == user.id %}
-                <a class="btn btn-unique" href="{% url 'tc_web:change_project' project.pid %}">Change</a>
-             {% endif %}
+              <div class="row">
+                  <div class="col-sm-8">
+                      <p class="h4 card-title mb-4 ml-4">{{ project.title }} <span class="grey-text">id{{ project.pid}}</span></p>
+                  </div>
+
+                  <div class="col-sm-4">
+                      <h4 class="card-title text-center">Admin: <a href="{% url 'tc_web:profile' project.admin_uid %}" class="grey-text"> {{ project.admin.username }}</a><span class="grey-text">; id {{ project.pid }}</span></h4>
+                  </div>
+              </div>
+              <p class="card-text mb-2 ml-4">{{ project.description|default:"No comments provided" }}</p>
+              <hr>
+              {% if project.admin_uid == user.id %}
+                   <a class="btn btn-unique" href="{% url 'tc_web:change_project' project.pid %}">Change</a>
+              {% endif %}
          </div>
          </div>
     </div>
