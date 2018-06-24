@@ -152,13 +152,13 @@ class UserAdapter(PrimaryAdapter):
         This function returns all messages for current user
         :return: List of messages
         """
-        query = Message.select().where(Message.user == self.uid)
+        query = Message.select().where(Message.uid == self.uid)
         return [MessageInstance.make_message(message) for message in query]
 
     def remove_message(self, mid):
         try:
             message = Message.select().where(
-                (Message.mid == mid) & (Message.user == self.uid)).get()
+                (Message.mid == mid) & (Message.uid == self.uid)).get()
 
             message.delete_instance()
             logger.debug('Message has been removed')
@@ -167,7 +167,6 @@ class UserAdapter(PrimaryAdapter):
 
     @staticmethod
     def send_message(uid, message_str):
-        Message.create(user=uid,
+        Message.create(uid=uid,
                        content=message_str)
-
         logger.debug('Message has been sent')

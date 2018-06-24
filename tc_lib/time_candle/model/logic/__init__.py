@@ -72,3 +72,4 @@ class Logic:
 
         self.project_adapter.uid = self.uid
         self.task_adapter.uid = self.uid
+        self.user_adapter.uid = self.uid

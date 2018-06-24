@@ -32,6 +32,10 @@ class TaskLogic(Logic):
                 raise m_e.InvalidStatusError(
                     m_e.StatusMessages.MAKE_PARENT_STATUS_DONE)
 
+            if parent_task.period is not None:
+                raise m_e.InvalidParentError(
+                    m_e.ParentMessages.PARENT_HAS_PERIOD)
+
             priority = max(priority, parent_task.priority)
 
         if status == Status.EXPIRED:
@@ -113,7 +117,7 @@ class TaskLogic(Logic):
         task = self.task_adapter.get_task_by_id(tid)
         self.task_adapter.remove_task_by_id(tid)
         self.queue.append(
-            task.uid, TaskMessages.TASK_REMOVED.format(task.tid))
+            task.uid, TaskMessages.TASK_REMOVED.format(task.title))
 
         self.queue.flush()
 
@@ -156,7 +160,7 @@ class TaskLogic(Logic):
 
                 self._set_status_expired_to_childs(task)
                 self.queue.append(
-                    task.uid, TaskMessages.TASK_EXPIRED.format(task.tid))
+                    task.uid, TaskMessages.TASK_EXPIRED.format(task.title))
 
             task.status = status
             # mark time for the done task
@@ -237,7 +241,7 @@ class TaskLogic(Logic):
                 # run this function on the lower tree levels
                 child.status = Status.EXPIRED
                 self.queue.append(
-                    child.uid, TaskMessages.TASK_EXPIRED.format(child.tid))
+                    child.uid, TaskMessages.TASK_EXPIRED.format(child.title))
                 self.task_adapter.save(child)
                 self._set_status_expired_to_childs(child)
 
@@ -268,7 +272,7 @@ class TaskLogic(Logic):
                 and task.status == Status.IN_PROGRESS:
             task.status = Status.EXPIRED
             self.queue.append(
-                task.uid, TaskMessages.TASK_EXPIRED.format(task.tid))
+                task.uid, TaskMessages.TASK_EXPIRED.format(task.title))
 
             self._set_status_expired_to_childs(task)
             logger.debug('tasks status updated')

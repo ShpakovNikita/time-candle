@@ -14,9 +14,7 @@ def task_card_post_form(request, controller):
     if request.method == 'POST':
         logger.debug(request.POST)
         if 'delete' in request.POST:
-            print(request.POST['delete'])
             controller.remove_task(request.POST['delete'])
-            print('success')
             return redirect(request.META.get('HTTP_REFERER'))
 
         elif 'check' in request.POST:

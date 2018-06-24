@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from time_candle.exceptions import AppException
 from tc_web import forms
+from tc_web import logger
 from tc_web import shortcuts
 from django.contrib.auth.models import User
 import json
@@ -13,7 +14,7 @@ import json
 
 def err404(request, exception):
     return render(
-        request, 'polls/404.html', status=404)
+        request, 'tc_web/404.html', status=404)
 
 
 def index(request):
@@ -34,6 +35,7 @@ def profile(request, user_id):
             return redirect_link
 
     controller = shortcuts.get_controller(request)
+    context = {}
 
     try:
         django_user = User.objects.get(id=user_id)
@@ -43,8 +45,20 @@ def profile(request, user_id):
 
     # merge two user objects to get one full user info
     screen_user = shortcuts.merge_instances(django_user, lib_user)
+    context['screen_user'] = screen_user
 
-    return render(request, 'tc_web/profile.html', {'screen_user': screen_user})
+    if user_id == request.user.id:
+
+        if request.method == 'POST':
+            logger.debug(request.POST)
+            if 'delete' in request.POST:
+                controller.remove_message(request.POST['delete'])
+                return redirect(request.META.get('HTTP_REFERER'))
+
+        messages = controller.get_messages()
+        context['messages'] = messages
+
+    return render(request, 'tc_web/profile.html', context)
 
 
 # function for autocomplete user search

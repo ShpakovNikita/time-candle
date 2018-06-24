@@ -206,6 +206,39 @@ class TaskFilter(PrimaryFilter):
 
         return self
 
+    def creation_time(self,
+                      creation_time,
+                      storage_op=OP_EQUALS,
+                      op=PrimaryFilter.OP_AND):
+        # in this function we also have to compare on less or greater, that's
+        # why another operator arg is needed
+        if self.result:
+            self.ops.append(op)
+
+        if TaskFilter.OP_GREATER == storage_op:
+            self.result.append(Task.creation_time > creation_time)
+
+        elif TaskFilter.OP_GREATER_OR_EQUALS == storage_op:
+            self.result.append(Task.creation_time >= creation_time)
+
+        elif TaskFilter.OP_EQUALS == storage_op:
+            self.result.append(Task.creation_time == creation_time)
+
+        elif TaskFilter.OP_LESS_OR_EQUALS == storage_op:
+            self.result.append(Task.creation_time <= creation_time)
+
+        elif TaskFilter.OP_LESS == storage_op:
+            self.result.append(Task.creation_time < creation_time)
+
+        elif TaskFilter.OP_NOT_EQUALS == storage_op:
+            self.result.append(Task.creation_time != creation_time)
+
+        else:
+            raise db_e.InvalidFilterOperator(db_e.FilterMessages.
+                                             FILTER_DOES_NOT_EXISTS)
+
+        return self
+
     def comment_substring(self, substring, op=PrimaryFilter.OP_AND):
         if self.result:
             self.ops.append(op)

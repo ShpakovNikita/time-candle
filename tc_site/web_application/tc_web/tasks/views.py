@@ -43,7 +43,6 @@ def add_task(request, project_id=None, task_id=None):
                                                   PICKER_FORMAT)
                 deadline_time = deadline_time.strftime(FORMAT)
 
-            print(deadline_time, type(deadline_time))
             try:
 
                 # this try is needed inside other try in order to skip adding
@@ -150,7 +149,6 @@ def change_task(request, task_id):
                 deadline_time = datetime.strptime(deadline_time.lower(),
                                                   PICKER_FORMAT)
                 deadline_time = deadline_time.strftime(FORMAT)
-                print('deadline!', deadline_time)
 
             if not comment:
                 comment = None

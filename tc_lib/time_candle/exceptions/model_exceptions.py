@@ -61,3 +61,15 @@ class ProjectMessages(Enum):
     # This is pre defined messages that will be associated with projects all
     # over the project
     DO_NOT_HAVE_RIGHTS = 'You don\'t have rights to modify this project'
+
+
+# Login related things
+class InvalidParentError(AppException):
+    def __init__(self, errors=None, message='The parent is invalid! {}'):
+        super().__init__(errors, message)
+
+
+class ParentMessages(Enum):
+    # This is pre defined messages that will be associated with parent tasks all
+    # over the project
+    PARENT_HAS_PERIOD = 'You cannot create child task for the period task'

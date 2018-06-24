@@ -92,7 +92,7 @@ class Message(BaseModel):
     content = CharField()
 
     # user's uid
-    user = CharField()
+    uid = CharField()
 
 
 class Project(BaseModel):

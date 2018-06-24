@@ -45,7 +45,7 @@ class Message:
         """
         logger.debug('convert storage to model message')
 
-        message = cls(uid=obj.user,
+        message = cls(uid=obj.uid,
                       mid=obj.mid,
                       content=obj.content)
 

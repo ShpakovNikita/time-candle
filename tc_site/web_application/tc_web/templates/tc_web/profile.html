@@ -29,5 +29,11 @@
     <!-- Card body -->
 
 </div>
+
+<div class="row">
+    {% for message in messages %}
+        {% include 'tc_web/message_card.html' with message=message %}
+    {% endfor %}
+</div>
 <!-- Card -->
 {% endblock %}

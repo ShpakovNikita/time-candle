@@ -23,6 +23,7 @@ class UserLogic(Logic):
                             uid=external_id,
                             nickname=nickname,
                             about=about)
+
         self.user_adapter.save(user)
         self.queue.append(
             external_id, UserMessages.USER_JOINED.format(login))
