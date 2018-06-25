@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.http import Http404
 from time_candle.controller.commands import Controller
-from tc_web import config
+from main_system import config
 from django.contrib.auth.decorators import login_required
 
 

@@ -17,6 +17,11 @@ def err404(request, exception):
         request, 'tc_web/404.html', status=404)
 
 
+def err500(request, exception):
+    return render(
+        request, 'tc_web/500.html', status=500)
+
+
 def index(request):
     # we always init our search form
     for link in ['search']:

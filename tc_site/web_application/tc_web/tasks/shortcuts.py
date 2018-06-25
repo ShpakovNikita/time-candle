@@ -12,7 +12,7 @@ from tc_web import logger
 def task_card_post_form(request, controller):
     logger.debug('post_check')
     if request.method == 'POST':
-        logger.debug(request.POST)
+        logger.debug('post form: %s', request.POST)
         if 'delete' in request.POST:
             controller.remove_task(request.POST['delete'])
             return redirect(request.META.get('HTTP_REFERER'))
@@ -27,7 +27,7 @@ def task_card_post_form(request, controller):
 # tasks with filter
 def tasks_query_get_form(request, controller, default_query=''):
     if request.method == "GET":
-        logger.debug(request.GET)
+        logger.debug('request form: %s', request.GET)
         if 'show_me' in request.GET:
             if not default_query:
                 query_form = request.GET['show_me']
@@ -72,12 +72,9 @@ def init_tasks(request, controller, tasks_list):
         else:
             task.deadline = ''
 
-        print(task.realization_time)
         # convert from milliseconds to datetime
         if task.realization_time is not None:
-            print('hoh', task.realization_time)
             task.realization_time = get_datetime(task.realization_time)
-            print('heh', task.realization_time)
         else:
             task.realization_time = ''
 

@@ -1,12 +1,17 @@
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect, reverse
-from main_system import forms
 from time_candle.controller.commands import Controller
-from tc_web import config
+from main_system import (
+    config,
+    forms,
+    logger,
+)
 
 
 def signup(request):
+    logger.debug('signup')
     if request.method == 'POST':
+        logger.debug('post form: %s', request.POST)
         if config.DATABASE_CONFIG:
             controller = Controller(uid=request.user.id,
                                     psql_config=config.DATABASE_CONFIG)
@@ -18,7 +23,6 @@ def signup(request):
         if form.is_valid():
             user = form.save()
             username = form.cleaned_data.get('username')
-            print(user.id)
             controller.add_user(username, user.id)
 
             raw_password = form.cleaned_data.get('password1')

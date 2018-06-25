@@ -28,41 +28,13 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 LOGIN_REDIRECT_URL = '/tc_web/'
 
 # Time zone change
 TIME_ZONE = 'Europe/Moscow'
 
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error when DEBUG=False.
-# See http://docs.djangoproject.com/en/dev/topics/logging for
-# more details on how to customize your logging configuration.
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
-    },
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    }
-}
 
 # Application definition
 INSTALLED_APPS = [
@@ -80,7 +52,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -112,14 +83,10 @@ WSGI_APPLICATION = 'main_system.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
-
 DATABASES = {
-'default': {'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'mydb',
-            'USER': 'shaft',
-            'HOST': '/var/run/postgresql',
-            'PASSWORD': '',
-            'PORT': '5432'}
+    'default': dj_database_url.config(
+        default='postgres://hicxmadptdigzw:c700b29bc7775f349fa9d1246847a874905f9fbd0a2976c508c211987d2739ae@ec2-54-228-181-43.eu-west-1.compute.amazonaws.com:5432/ddeov1tnkuco57'
+    )
 }
 
 
@@ -164,4 +131,11 @@ STATICFILES_DIRS = (
     os.path.join(PROJECT_ROOT, 'static'),
 )
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+try:
+    from .local import *
+
+except ImportError:
+    pass

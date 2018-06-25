@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 import os
 import sys
+import time_candle.app_logger
+from main_system import config
+
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "main_system.settings")

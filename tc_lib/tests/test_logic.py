@@ -191,7 +191,6 @@ class TestTaskLogic(unittest.TestCase):
 
         self.controller.change_task(1, time='2077-01-01 20:00:00')
         task_1 = self.controller.get_tasks('tids: ' + str(_TASKS[0].tid))[0]
-        print('desu!', task_1.deadline)
         self.controller.change_task(1, status=Status.EXPIRED)
 
     def test_change_status_dependency(self):

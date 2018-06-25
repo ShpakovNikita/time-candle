@@ -8,7 +8,6 @@ from django.urls import reverse
 from time_candle.exceptions import AppException
 from time_candle.model.time_formatter import FORMAT
 from tc_web.tasks import forms
-from tc_web import config
 from tc_web.tasks import shortcuts
 from tc_web import shortcuts as base
 from django.contrib.auth.models import User
@@ -188,7 +187,6 @@ def change_task(request, task_id):
         task = controller.get_tasks('tids: ' + str(task_id))[0]
         shortcuts.init_tasks(request, controller, [task])
         context['task'] = task
-        form.fields['comment'].widget.attrs.update({'value': task.comment})
         logger.debug('task\'s deadline time is: %s', task.deadline)
 
         if not task.deadline:

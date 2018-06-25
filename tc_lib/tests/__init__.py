@@ -206,7 +206,6 @@ def _init_task_table():
 
 def _init_project_table():
     for project in _PROJECTS:
-        print(project.admin_uid)
         Project.create(admin=project.admin_uid,
                        description=project.description,
                        title=project.title)

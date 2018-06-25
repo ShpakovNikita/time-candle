@@ -38,4 +38,4 @@ USERS_DATABASE_FILE = 'users.db'
 USERS_DATABASE_PATH = os.path.join(BASE_DIR, USERS_DATABASE_FILE)
 
 # This is the logging flag
-ENABLED = True
+ENABLED = False

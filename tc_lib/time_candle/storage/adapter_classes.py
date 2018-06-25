@@ -247,7 +247,6 @@ class Adapter:
         if not Task.table_exists():
             Task.create_table()
         if not Message.table_exists():
-            print(123)
             Message.create_table()
 
         logger.debug("Database tables initialized")

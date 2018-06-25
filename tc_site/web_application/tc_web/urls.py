@@ -1,6 +1,5 @@
 from django.urls import path
 from django.conf.urls import include, url
-from tc_web import startup
 from tc_web import views
 from tc_web.tasks import views as task_views
 from tc_web.projects import views as project_views
@@ -57,6 +56,3 @@ urlpatterns = [
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns += staticfiles_urlpatterns()
-
-# one time on runserver startup function
-startup.start_up()

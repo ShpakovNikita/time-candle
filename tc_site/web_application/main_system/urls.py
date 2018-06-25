@@ -17,9 +17,15 @@ from django.contrib import admin
 from django.urls import include, path
 from django.conf.urls import url
 from django.contrib.auth import views as auth_views
-from main_system import views
+from main_system import (
+    views,
+    startup,
+)
+from . import settings
+import django.views.static
 
 handler404 = 'tc_web.views.err404'
+handler500 = 'tc_web.views.err500'
 
 urlpatterns = [
     url(r'^login/$', auth_views.login, name='login'),
@@ -33,3 +39,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index)
 ]
+
+if not settings.DEBUG:
+    urlpatterns.append(path('static/<path>.', django.views.static.serve,
+                            {'document_root': settings.STATIC_ROOT}))
+
+
+startup.start_up()
