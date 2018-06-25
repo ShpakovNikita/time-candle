@@ -38,8 +38,6 @@ TIME_ZONE = 'Europe/Moscow'
 
 # Application definition
 INSTALLED_APPS = [
-    'bootstrap3',
-    'bootstrap3_datetime',
     'main_system.apps.AuthConfig',
     'tc_web.apps.TCWebConfig',
     'django.contrib.admin',

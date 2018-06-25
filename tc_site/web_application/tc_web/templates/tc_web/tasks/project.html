@@ -12,7 +12,7 @@
                   </div>
 
                   <div class="col-sm-4">
-                      <h4 class="card-title text-center">Admin: <a href="{% url 'tc_web:profile' project.admin_uid %}" class="grey-text"> {{ project.admin.username }}</a><span class="grey-text">; id {{ project.pid }}</span></h4>
+                      <h4 class="card-title text-center">Admin: <a href="{% url 'tc_web:profile' project.admin_uid %}" class="grey-text"> {{ project.admin_name }}</a><span class="grey-text">; id {{ project.pid }}</span></h4>
                   </div>
               </div>
               <p class="card-text mb-2 ml-4">{{ project.description|default:"No comments provided" }}</p>

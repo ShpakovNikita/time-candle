@@ -49,7 +49,7 @@ class UserLogic(Logic):
             user.about = about
 
         self.user_adapter.save(user)
-        self.queue.append(uid, UserMessages.USER_JOINED)
+        self.queue.append(uid, UserMessages.PROFILE_CHANGED)
 
         self.queue.flush()
 

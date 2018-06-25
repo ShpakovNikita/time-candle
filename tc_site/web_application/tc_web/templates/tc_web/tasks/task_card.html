@@ -34,7 +34,6 @@
                     </div>
 
                     {% if task.status == 3 %}
-                        <div class="col-sm-3 text-center"><i class="fa fa-check pr-1"></i></div>
                     {% elif task.has_rights %}
                         <div class="col-sm-3">
                             <form method="post" id="check">
@@ -87,7 +86,16 @@
                             </ul>
                     {% endif %}
                 </div>
-                {% if task.pid %}
+                {% if project %}
+                  <div class="row">
+                        <div class="col-sm-6 mt-2">
+                            <a href="{% url 'tc_web:profile' user_id=task.creator_uid %}" class="btn btn-sm btn-unique" style="margin-bottom: -10px; width: 110%">Maker:{{ project.admin_name|truncatechars:10 }}</a>
+                        </div>
+                        <div class="col-sm-6 mt-2">
+                            <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-unique" style=" margin-bottom: -10px; width: 100%">Exec:{{ task.receiver_name|truncatechars:11 }}</a>
+                        </div>
+                    </div>
+                {% elif task.pid %}
                     <div class="row">
                         <div class="col-sm-6 mt-2">
                             <a href="{% url 'tc_web:project' project_id=task.pid %}" class="btn btn-sm btn-red" style="margin-bottom: -10px; width: 110%">Proj:{{ task.project_name|truncatechars:11 }}</a>

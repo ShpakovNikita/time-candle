@@ -4,11 +4,13 @@ from django.shortcuts import (
     redirect,
 )
 from django.urls import reverse
-from time_candle.exceptions import AppException
-from tc_web.projects import forms
-from tc_web.projects import shortcuts
-from tc_web import shortcuts as base
 from django.contrib.auth.models import User
+from time_candle.exceptions import AppException
+from tc_web.projects import (
+    forms,
+    shortcuts,
+)
+from tc_web import shortcuts as base
 from tc_web import logger
 
 

@@ -59,7 +59,7 @@ class TaskLogic(Logic):
             logger.debug('pid is not none')
             if task_uid != self.uid:
                 logger.debug('the receiver is not us')
-                if self.project_adapter.has_rights(pid):
+                if not self.project_adapter.has_rights(pid):
                     raise m_e.InvalidLoginError(
                         m_e.ProjectMessages.DO_NOT_HAVE_RIGHTS)
             else:

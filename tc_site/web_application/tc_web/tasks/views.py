@@ -5,12 +5,14 @@ from django.shortcuts import (
 )
 from time_candle.enums.status import Status
 from django.urls import reverse
+from django.contrib.auth.models import User
 from time_candle.exceptions import AppException
 from time_candle.model.time_formatter import FORMAT
-from tc_web.tasks import forms
-from tc_web.tasks import shortcuts
+from tc_web.tasks import (
+    forms,
+    shortcuts,
+)
 from tc_web import shortcuts as base
-from django.contrib.auth.models import User
 from tc_web import logger
 from datetime import datetime
 
@@ -62,6 +64,9 @@ def add_task(request, project_id=None, task_id=None):
                     errors.value = 'User does not exists in this project'
                     logger.warning(errors.value)
                     raise AppException(errors)
+
+                logger.debug('receiver id: %s, creator is: %s', receiver_uid,
+                             request.user.id)
 
                 controller.add_task(title=title,
                                     time=deadline_time,
@@ -242,6 +247,12 @@ def project(request, project_id):
         # and the project itself for more information on the page
         selected_project = controller.get_project(project_id)
         selected_project.admin = User.objects.get(id=selected_project.admin_uid)
+
+        # just for more usable naming we will init admin name in the other way:
+        if selected_project.admin_uid == request.user.id:
+            selected_project.admin_name = 'You'
+        else:
+            selected_project.admin_name = selected_project.admin.username
 
     except AppException as e:
         logger.debug(e.errors.value)

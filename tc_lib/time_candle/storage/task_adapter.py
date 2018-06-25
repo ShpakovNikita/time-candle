@@ -323,22 +323,16 @@ class TaskAdapter(PrimaryAdapter):
             raise db_e.InvalidTidError(
                 db_e.TaskMessages.TASK_DOES_NOT_EXISTS)
 
-        try:
-            if task.creator == self.uid and task.receiver == self.uid:
-                pass
-
-            elif task.project:
-                project = Project.select().where(
-                    Project.pid == task.project).get()
-                return project.admin == self.uid
-
-            else:
-                Task.select().where(Task.creator == self.uid).get()
-
+        if task.receiver == self.uid:
             return True
 
-        except DoesNotExist:
-            return False
+        elif task.project:
+            project = Project.select().where(
+                Project.pid == task.project).get()
+            return project.admin == self.uid
+
+        else:
+            return task.creator == self.uid
 
     def save(self, obj):
         """
