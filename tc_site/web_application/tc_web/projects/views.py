@@ -36,6 +36,7 @@ def projects(request):
         # if we can redirect, then do it, else just render or render with errors
         # our template
         if redirect_view:
+            logger.debug('redirect due to changes...')
             return redirect_view
 
         # adding some fields for better view
@@ -48,6 +49,7 @@ def projects(request):
         # the errors doesn't
         shortcuts.init_projects(request, controller, projects_list)
 
+    logger.debug('all projects rendered')
     return render(request, 'tc_web/projects/projects.html', context)
 
 
@@ -69,6 +71,7 @@ def add_project(request):
             controller.add_project(title=title,
                                    description=description,
                                    members=[])
+            logger.debug('project added')
 
             return redirect(reverse('tc_web:projects'))
 
@@ -100,9 +103,11 @@ def change_project(request, project_id):
 
             try:
                 controller.change_project(project_id, title, description)
+                logger.debug('project changed')
 
                 return redirect(reverse('tc_web:projects'))
             except AppException as e:
+                logger.debug(e.errors.value)
                 context['errors'] = e.errors.value
 
     else:
@@ -125,6 +130,7 @@ def change_project(request, project_id):
 
     # if you are not admin and there was no errors for you before
     if request.user.id != project.admin_uid and not context['errors']:
+        logger.debug('dont have rights for changing the project')
         context['errors'] = 'You know that you cannot do that, right?'
 
     return render(request, 'tc_web/projects/change_project.html', context)
@@ -161,6 +167,7 @@ def add_user(request, project_id):
                 raise AppException(errors)
 
             controller.add_user_to_project(user_id, project_id)
+            logger.debug('user to project was added')
 
             return redirect(reverse('tc_web:project', args=(project_id,)))
 

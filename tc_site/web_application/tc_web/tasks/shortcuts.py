@@ -10,16 +10,18 @@ from tc_web import logger
 
 # use it do define all post forms related to tasks
 def task_card_post_form(request, controller):
-    logger.debug('post_check')
+    logger.debug('tasks post check')
     if request.method == 'POST':
         logger.debug('post form: %s', request.POST)
         if 'delete' in request.POST:
             controller.remove_task(request.POST['delete'])
+            logger.debug('task by id %s removed', request.POST['delete'])
             return redirect(request.META.get('HTTP_REFERER'))
 
         elif 'check' in request.POST:
             controller.change_task(
                 request.POST['check'], status=Status.DONE)
+            logger.debug('task by id %s checked', request.POST['check'])
             return redirect(request.META.get('HTTP_REFERER'))
 
 

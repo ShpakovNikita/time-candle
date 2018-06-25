@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.http import Http404
 from time_candle.controller.commands import Controller
 from main_system import config
+from tc_web import logger
 from django.contrib.auth.decorators import login_required
 
 
@@ -37,12 +38,16 @@ def get_controller(request):
     if config.DATABASE_CONFIG:
         controller = Controller(uid=request.user.id,
                                 psql_config=config.DATABASE_CONFIG)
+        logger.debug('controller was gotten by config (psql)')
+
     elif config.DATABASE_PATH:
         controller = Controller(uid=request.user.id,
                                 db_file=config.DATABASE_PATH)
+        logger.debug('controller was gotten by file (sqlite3)')
     else:
         controller = Controller(uid=request.user.id,
                                 connect_url=config.DATABASE_URL)
+        logger.debug('controller was gotten by url')
 
     return controller
 

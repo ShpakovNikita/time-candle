@@ -50,6 +50,7 @@ def add_task(request, project_id=None, task_id=None):
                 try:
                     if 'search_receiver' in request.POST \
                             and request.POST['search_receiver']:
+                        logger.debug('getting receiver...')
                         receiver_uid = User.objects.get(
                             username=request.POST['search_receiver']).id
                     else:
@@ -71,6 +72,8 @@ def add_task(request, project_id=None, task_id=None):
                                     comment=comment,
                                     pid=project_id,
                                     receiver_uid=receiver_uid)
+                logger.debug('task was added')
+
                 # for better user experience we are checking where to go: to the
                 # project if task is project's or to the tasks page
                 if project_id is not None:
@@ -97,6 +100,7 @@ def add_task(request, project_id=None, task_id=None):
         try:
             context['project'] = controller.get_project(project_id)
         except AppException:
+            logger.debug('trying to reach unavailable project')
             raise Http404
 
     return render(request, 'tc_web/tasks/add_task.html', context)
@@ -171,6 +175,8 @@ def change_task(request, task_id):
                                        status=status,
                                        time=deadline_time,
                                        comment=comment)
+                logger.debug('task was changed')
+
                 return redirect(reverse('tc_web:tasks'))
 
             except AppException as e:
@@ -225,6 +231,7 @@ def project(request, project_id):
         shortcuts.sort_filter(request, tasks_list)
     except AppException as e:
         context['errors'] = e.errors.value
+        logger.debug(e.errors.values)
         tasks_list = controller.get_tasks('projects: ' + str(project_id))
         shortcuts.sort_filter(request, tasks_list)
 
@@ -236,7 +243,8 @@ def project(request, project_id):
         selected_project = controller.get_project(project_id)
         selected_project.admin = User.objects.get(id=selected_project.admin_uid)
 
-    except AppException:
+    except AppException as e:
+        logger.debug(e.errors.value)
         raise Http404
 
     try:
@@ -257,6 +265,8 @@ def project(request, project_id):
     context['tasks_list'] = tasks_list
     context['users_list'] = users_list
     context['project'] = selected_project
+
+    logger.debug('project by id %s rendered', project_id)
 
     return render(request, 'tc_web/tasks/project.html', context)
 
@@ -283,6 +293,7 @@ def tasks(request):
         context['errors'] = e.errors.value
         tasks_list = controller.get_tasks()
         shortcuts.sort_filter(request, tasks_list)
+        logger.debug(e.errors.value)
 
     shortcuts.sort_filter(request, tasks_list)
 
@@ -303,4 +314,5 @@ def tasks(request):
 
     context['tasks_list'] = tasks_list
 
+    logger.debug('all tasks rendered')
     return render(request, 'tc_web/tasks/tasks.html', context)

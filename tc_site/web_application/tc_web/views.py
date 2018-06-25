@@ -13,11 +13,13 @@ import json
 
 
 def err404(request, exception):
+    logger.debug('Http404 error raised')
     return render(
         request, 'tc_web/404.html', status=404)
 
 
 def err500(request, exception):
+    logger.debug('Http500 error raised')
     return render(
         request, 'tc_web/500.html', status=500)
 
@@ -53,6 +55,7 @@ def profile(request, user_id):
     context['screen_user'] = screen_user
 
     if user_id == request.user.id:
+        logger.debug('rendering delete button')
 
         if request.method == 'POST':
             logger.debug(request.POST)
@@ -60,6 +63,7 @@ def profile(request, user_id):
                 controller.remove_message(request.POST['delete'])
                 return redirect(request.META.get('HTTP_REFERER'))
 
+        logger.debug('getting our messages')
         messages = controller.get_messages()
         context['messages'] = messages
 
@@ -68,6 +72,8 @@ def profile(request, user_id):
 
 # function for autocomplete user search
 def get_users(request):
+    logger.debug('ajax request to get all users has been sent')
+
     if request.is_ajax():
         q = request.GET.get('term', '')
         re = '^' + q + '+'
@@ -84,12 +90,16 @@ def get_users(request):
         data = 'fail'
 
     mimetype = 'application/json'
+    logger.debug('ajax request was accepted')
     return HttpResponse(data, mimetype)
 
 
 # function for autocomplete project user search
 def get_project_users(request, project_id):
+    logger.debug('ajax request to get project users has been sent')
     controller = shortcuts.get_controller(request)
+    logger.debug('users were taken from controller')
+
     if request.is_ajax():
         q = request.GET.get('term', '')
         users = controller.get_users(project_id)
@@ -106,6 +116,7 @@ def get_project_users(request, project_id):
         data = 'fail'
 
     mimetype = 'application/json'
+    logger.debug('ajax request was accepted')
     return HttpResponse(data, mimetype)
 
 
@@ -117,6 +128,7 @@ def change_profile(request, user_id):
             return redirect_link
 
     if request.user.id != user_id:
+        logger.debug('trying to change not yours profile')
         raise Http404
 
     controller = shortcuts.get_controller(request)
@@ -128,6 +140,7 @@ def change_profile(request, user_id):
             nickname = form.cleaned_data.get('nickname')
             controller.change_user(user_id, nickname, about)
 
+            logger.debug('user was changed')
             return redirect(reverse('tc_web:profile', args=(user_id,)))
 
     else:
