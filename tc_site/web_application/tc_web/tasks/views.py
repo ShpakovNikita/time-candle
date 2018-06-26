@@ -15,10 +15,13 @@ from tc_web.tasks import (
 from tc_web import shortcuts as base
 from tc_web import logger
 from datetime import datetime
+from django.contrib.auth.decorators import login_required
+
 
 PICKER_FORMAT = '%m/%d/%Y %I:%M %p'
 
 
+@login_required
 def add_task(request, project_id=None, task_id=None):
     # we always init our search form
     for link in ['search']:
@@ -111,6 +114,7 @@ def add_task(request, project_id=None, task_id=None):
     return render(request, 'tc_web/tasks/add_task.html', context)
 
 
+@login_required
 def show_task(request, task_id):
     # we always init our search form
     for link in ['search']:
@@ -134,6 +138,7 @@ def show_task(request, task_id):
     return render(request, 'tc_web/tasks/show_task.html', context)
 
 
+@login_required
 def change_task(request, task_id):
     # we always init our search form
     for link in ['search']:
@@ -215,11 +220,8 @@ def change_task(request, task_id):
     return render(request, 'tc_web/tasks/change_task.html', context)
 
 
+@login_required
 def project(request, project_id):
-    if not request.user.is_authenticated:
-        logger.warning('user is not authenticated')
-        raise Http404
-
     # we always init our search form
     for link in ['search', 'search_user']:
         redirect_link = base.search_user_forms(request, link)
@@ -282,11 +284,8 @@ def project(request, project_id):
     return render(request, 'tc_web/tasks/project.html', context)
 
 
+@login_required
 def tasks(request):
-    if not request.user.is_authenticated:
-        logger.warning('user is not authenticated')
-        return redirect('/login/')
-
     # we always init our search form
     for link in ['search']:
         redirect_link = base.search_user_forms(request, link)

@@ -12,13 +12,11 @@ from tc_web.projects import (
 )
 from tc_web import shortcuts as base
 from tc_web import logger
+from django.contrib.auth.decorators import login_required
 
 
+@login_required
 def projects(request):
-    if not request.user.is_authenticated:
-        logger.warning('user is not authenticated')
-        return redirect('/login/')
-
     # we always init our search form
     for link in ['search']:
         redirect_link = base.search_user_forms(request, link)
@@ -55,6 +53,7 @@ def projects(request):
     return render(request, 'tc_web/projects/projects.html', context)
 
 
+@login_required
 def add_project(request):
     # we always init our search form
     for link in ['search']:
@@ -83,6 +82,7 @@ def add_project(request):
     return render(request, 'tc_web/projects/add_project.html', {'form': form})
 
 
+@login_required
 def change_project(request, project_id):
     # we always init our search form
     for link in ['search']:
@@ -138,6 +138,7 @@ def change_project(request, project_id):
     return render(request, 'tc_web/projects/change_project.html', context)
 
 
+@login_required
 def add_user(request, project_id):
     # we always init our search form
     for link in ['search']:

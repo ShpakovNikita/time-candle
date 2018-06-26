@@ -10,6 +10,7 @@ from tc_web import logger
 from tc_web import shortcuts
 from django.contrib.auth.models import User
 import json
+from django.contrib.auth.decorators import login_required
 
 
 def err404(request, exception):
@@ -120,6 +121,7 @@ def get_project_users(request, project_id):
     return HttpResponse(data, mimetype)
 
 
+@login_required
 def change_profile(request, user_id):
     # we always init our search form
     for link in ['search']:
@@ -127,10 +129,7 @@ def change_profile(request, user_id):
         if redirect_link:
             return redirect_link
 
-    if request.user.id != user_id:
-        logger.debug('trying to change not yours profile')
-        raise Http404
-
+    context = {}
     controller = shortcuts.get_controller(request)
 
     if request.method == 'POST':
@@ -138,10 +137,13 @@ def change_profile(request, user_id):
         if form.is_valid():
             about = form.cleaned_data.get('about')
             nickname = form.cleaned_data.get('nickname')
-            controller.change_user(user_id, nickname, about)
+            try:
+                controller.change_user(user_id, nickname, about)
+                logger.debug('user was changed')
+                return redirect(reverse('tc_web:profile', args=(user_id,)))
 
-            logger.debug('user was changed')
-            return redirect(reverse('tc_web:profile', args=(user_id,)))
+            except AppException as e:
+                context['errors'] = e.errors.value
 
     else:
         form = forms.ChangeProfileForm()
@@ -151,4 +153,6 @@ def change_profile(request, user_id):
         form.fields['nickname'].widget.attrs.update({'value': user.nickname})
         form.fields['about'].widget.attrs.update({'value': user.about})
 
-    return render(request, 'tc_web/change_profile.html', {'form': form})
+    context['form'] = form
+
+    return render(request, 'tc_web/change_profile.html', context)

@@ -279,6 +279,7 @@ class Controller:
         """
         This function adds user to the database, if there is no users with given
         login
+        :type external_id: String or Int
         :type login: String
         :type nickname: String
         :type about: String
@@ -290,7 +291,10 @@ class Controller:
         if not about:
             about = 'Hello, it\'s me, ' + nickname
 
-        v.check_name(nickname)
+        try:
+            v.check_name(nickname)
+        except v_e.InvalidNameError:
+            nickname = 'NoName'
 
         self.user_logic.add_user(login,
                                  external_id,
@@ -305,6 +309,9 @@ class Controller:
         :param about: User's additional info
         :return: None
         """
+        if nickname is not None:
+            v.check_name(nickname)
+
         self.user_logic.change_user(uid, nickname, about)
 
     def get_messages(self):

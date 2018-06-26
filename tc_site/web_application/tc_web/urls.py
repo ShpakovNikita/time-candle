@@ -1,5 +1,5 @@
 from django.urls import path
-from django.conf.urls import include, url
+from django.conf.urls import url
 from tc_web import views
 from tc_web.tasks import views as task_views
 from tc_web.projects import views as project_views

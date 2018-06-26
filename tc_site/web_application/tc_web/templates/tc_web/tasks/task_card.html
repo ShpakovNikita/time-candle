@@ -92,7 +92,7 @@
                             <a href="{% url 'tc_web:profile' user_id=task.creator_uid %}" class="btn btn-sm btn-unique" style="margin-bottom: -10px; width: 110%">Maker:{{ project.admin_name|truncatechars:10 }}</a>
                         </div>
                         <div class="col-sm-6 mt-2">
-                            <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-unique" style=" margin-bottom: -10px; width: 100%">Exec:{{ task.receiver_name|truncatechars:11 }}</a>
+                            <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-unique" style=" margin-bottom: -10px; width: 100%">Exec:{{ task.receiver_name|truncatechars:9 }}</a>
                         </div>
                     </div>
                 {% elif task.pid %}
@@ -101,7 +101,7 @@
                             <a href="{% url 'tc_web:project' project_id=task.pid %}" class="btn btn-sm btn-red" style="margin-bottom: -10px; width: 110%">Proj:{{ task.project_name|truncatechars:11 }}</a>
                         </div>
                         <div class="col-sm-6 mt-2">
-                            <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-unique" style=" margin-bottom: -10px; width: 100%">Exec:{{ task.receiver_name|truncatechars:11 }}</a>
+                            <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-unique" style=" margin-bottom: -10px; width: 100%">Exec:{{ task.receiver_name|truncatechars:9 }}</a>
                         </div>
                     </div>
                 {% else %}

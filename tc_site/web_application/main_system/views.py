@@ -1,4 +1,5 @@
 from django.contrib.auth import login, authenticate
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, reverse
 from time_candle.controller.commands import Controller
 from main_system import (
@@ -6,6 +7,7 @@ from main_system import (
     forms,
     logger,
 )
+from time_candle.exceptions import AppException
 
 
 def signup(request):
@@ -22,8 +24,19 @@ def signup(request):
         form = forms.SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
+            logger.debug('Django user added')
             username = form.cleaned_data.get('username')
-            controller.add_user(username, user.id)
+
+            try:
+                controller.add_user(username, user.id)
+                logger.debug('Time-candle user added')
+
+            except AppException as e:
+                # delete django user
+                User.objects.get(username=username).delete()
+                logger.debug(e.errors.value)
+                return render(request, 'registration/signup.html',
+                              {'form': form})
 
             raw_password = form.cleaned_data.get('password1')
 

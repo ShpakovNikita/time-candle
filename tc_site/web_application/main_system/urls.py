@@ -28,12 +28,12 @@ handler404 = 'tc_web.views.err404'
 handler500 = 'tc_web.views.err500'
 
 urlpatterns = [
-    url(r'^login/$', auth_views.login, name='login'),
-    url(r'^logout/$',
+    url(r'^accounts/login/$', auth_views.login, name='login'),
+    url(r'^accounts/logout/$',
         auth_views.logout,
         {'next_page': '/'},
         name='logout'),
-    url(r'^signup/$', views.signup, name='signup'),
+    url(r'^accounts/signup/$', views.signup, name='signup'),
 
     path('tc_web/', include('tc_web.urls')),
     path('admin/', admin.site.urls),
