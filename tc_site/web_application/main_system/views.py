@@ -6,10 +6,12 @@ from main_system import (
     config,
     forms,
     logger,
+    decorators,
 )
 from time_candle.exceptions import AppException
 
 
+@decorators.startup_page_init('search')
 def signup(request):
     logger.debug('signup')
     if request.method == 'POST':

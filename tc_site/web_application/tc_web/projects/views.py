@@ -10,20 +10,16 @@ from tc_web.projects import (
     forms,
     shortcuts,
 )
-from tc_web import shortcuts as base
+from main_system import decorators
+from main_system import shortcuts as base_shortcuts
 from tc_web import logger
 from django.contrib.auth.decorators import login_required
 
 
 @login_required
+@decorators.startup_page_init('search')
 def projects(request):
-    # we always init our search form
-    for link in ['search']:
-        redirect_link = base.search_user_forms(request, link)
-        if redirect_link:
-            return redirect_link
-
-    controller = base.get_controller(request)
+    controller = base_shortcuts.get_controller(request)
     projects_list = controller.get_projects('')
 
     context = {
@@ -54,20 +50,15 @@ def projects(request):
 
 
 @login_required
+@decorators.startup_page_init('search')
 def add_project(request):
-    # we always init our search form
-    for link in ['search']:
-        redirect_link = base.search_user_forms(request, link)
-        if redirect_link:
-            return redirect_link
-
     if request.method == 'POST':
         form = forms.ProjectForm(request.POST)
         if form.is_valid():
             title = form.cleaned_data.get('title')
             description = form.cleaned_data.get('description')
 
-            controller = base.get_controller(request)
+            controller = base_shortcuts.get_controller(request)
 
             controller.add_project(title=title,
                                    description=description,
@@ -83,15 +74,10 @@ def add_project(request):
 
 
 @login_required
+@decorators.startup_page_init('search')
 def change_project(request, project_id):
-    # we always init our search form
-    for link in ['search']:
-        redirect_link = base.search_user_forms(request, link)
-        if redirect_link:
-            return redirect_link
-
     context = {'errors': None}
-    controller = base.get_controller(request)
+    controller = base_shortcuts.get_controller(request)
 
     if request.method == 'POST':
         form = forms.ProjectForm(request.POST)
@@ -139,15 +125,10 @@ def change_project(request, project_id):
 
 
 @login_required
+@decorators.startup_page_init('search')
 def add_user(request, project_id):
-    # we always init our search form
-    for link in ['search']:
-        redirect_link = base.search_user_forms(request, link)
-        if redirect_link:
-            return redirect_link
-
     context = {}
-    controller = base.get_controller(request)
+    controller = base_shortcuts.get_controller(request)
 
     if request.method == 'POST':
 

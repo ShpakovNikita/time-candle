@@ -361,12 +361,17 @@ def run():
         elif parsed.action == 'watch':
             print_functions.watch()
 
+        return 0
+
     except (AppException, AuthenticationError) as e:
         if config.VERBOSE:
             logger.exception('Error occured:')
             print('Message text: {}'.format(e.errors.value))
+
         else:
             print(e.message.format(e.errors.value))
+
+        return 1
 
 
 """

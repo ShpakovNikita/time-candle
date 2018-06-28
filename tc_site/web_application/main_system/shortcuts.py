@@ -1,21 +1,13 @@
 from copy import copy
+from main_system import (
+    config,
+    logger,
+)
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.http import Http404
 from time_candle.controller.commands import Controller
-from main_system import config
-from tc_web import logger
-from django.contrib.auth.decorators import login_required
-
-
-# merge to object's fields and return one merged object
-def merge_instances(obj_1, obj_2):
-    buff_obj = copy(obj_1)
-    for key, value in obj_2.__dict__.items():
-        setattr(buff_obj, key, value)
-
-    return buff_obj
 
 
 # initialize form for user search
@@ -34,6 +26,15 @@ def search_user_forms(request, search_field='search', redirect_flag=True):
                 return profile_uid
 
 
+# merge to object's fields and return one merged object
+def merge_instances(obj_1, obj_2):
+    buff_obj = copy(obj_1)
+    for key, value in obj_2.__dict__.items():
+        setattr(buff_obj, key, value)
+
+    return buff_obj
+
+
 def get_controller(request):
     if config.DATABASE_CONFIG:
         controller = Controller(uid=request.user.id,
@@ -50,10 +51,3 @@ def get_controller(request):
         logger.debug('controller was gotten by url')
 
     return controller
-
-
-def search_users(func):
-    def wrap(request, *args, **kwargs):
-
-        return func(request, *args, **kwargs)
-    return wrap

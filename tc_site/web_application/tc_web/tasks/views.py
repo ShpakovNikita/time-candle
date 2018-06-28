@@ -12,8 +12,9 @@ from tc_web.tasks import (
     forms,
     shortcuts,
 )
-from tc_web import shortcuts as base
 from tc_web import logger
+from main_system import decorators
+from main_system import shortcuts as base_shortcuts
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
 
@@ -22,15 +23,10 @@ PICKER_FORMAT = '%m/%d/%Y %I:%M %p'
 
 
 @login_required
+@decorators.startup_page_init('search')
 def add_task(request, project_id=None, task_id=None):
-    # we always init our search form
-    for link in ['search']:
-        redirect_link = base.search_user_forms(request, link)
-        if redirect_link:
-            return redirect_link
-
     context = {}
-    controller = base.get_controller(request)
+    controller = base_shortcuts.get_controller(request)
 
     if request.method == 'POST':
         form = forms.AddTask(request.POST)
@@ -115,15 +111,10 @@ def add_task(request, project_id=None, task_id=None):
 
 
 @login_required
+@decorators.startup_page_init('search')
 def show_task(request, task_id):
-    # we always init our search form
-    for link in ['search']:
-        redirect_link = base.search_user_forms(request, link)
-        if redirect_link:
-            return redirect_link
-
     context = {}
-    controller = base.get_controller(request)
+    controller = base_shortcuts.get_controller(request)
 
     # check if we can see this page
     try:
@@ -139,15 +130,10 @@ def show_task(request, task_id):
 
 
 @login_required
+@decorators.startup_page_init('search')
 def change_task(request, task_id):
-    # we always init our search form
-    for link in ['search']:
-        redirect_link = base.search_user_forms(request, link)
-        if redirect_link:
-            return redirect_link
-
     context = {}
-    controller = base.get_controller(request)
+    controller = base_shortcuts.get_controller(request)
 
     if request.method == 'POST':
         form = forms.ChangeTask(request.POST)
@@ -187,7 +173,16 @@ def change_task(request, task_id):
                                        comment=comment)
                 logger.debug('task was changed')
 
-                return redirect(reverse('tc_web:tasks'))
+                # for better user experience we are checking where to go: to the
+                # project if task is project's or to the tasks page
+                project_id = controller.get_tasks(
+                    'tids: ' + str(task_id))[0].pid
+
+                if project_id is not None:
+                    return redirect(
+                        reverse('tc_web:project', args=(project_id,)))
+                else:
+                    return redirect(reverse('tc_web:tasks'))
 
             except AppException as e:
                 context['errors'] = e.errors.value
@@ -221,15 +216,10 @@ def change_task(request, task_id):
 
 
 @login_required
+@decorators.startup_page_init('search')
 def project(request, project_id):
-    # we always init our search form
-    for link in ['search', 'search_user']:
-        redirect_link = base.search_user_forms(request, link)
-        if redirect_link:
-            return redirect_link
-
     context = {}
-    controller = base.get_controller(request)
+    controller = base_shortcuts.get_controller(request)
 
     try:
         # loading selected tasks
@@ -285,16 +275,10 @@ def project(request, project_id):
 
 
 @login_required
+@decorators.startup_page_init('search')
 def tasks(request):
-    # we always init our search form
-    for link in ['search']:
-        redirect_link = base.search_user_forms(request, link)
-        if redirect_link:
-            return redirect_link
-
     context = {}
-
-    controller = base.get_controller(request)
+    controller = base_shortcuts.get_controller(request)
 
     # loading selected tasks
     try:

@@ -5,9 +5,14 @@ from django.http import (
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from time_candle.exceptions import AppException
-from tc_web import forms
-from tc_web import logger
-from tc_web import shortcuts
+from tc_web import (
+    forms,
+    logger,
+)
+from main_system import (
+    shortcuts,
+    decorators,
+)
 from django.contrib.auth.models import User
 import json
 from django.contrib.auth.decorators import login_required
@@ -25,23 +30,13 @@ def err500(request, exception):
         request, 'tc_web/500.html', status=500)
 
 
+@decorators.startup_page_init('search')
 def index(request):
-    # we always init our search form
-    for link in ['search']:
-        redirect_link = shortcuts.search_user_forms(request, link)
-        if redirect_link:
-            return redirect_link
-
     return render(request, 'tc_web/index.html')
 
 
+@decorators.startup_page_init('search')
 def profile(request, user_id):
-    # we always init our search form
-    for link in ['search']:
-        redirect_link = shortcuts.search_user_forms(request, link)
-        if redirect_link:
-            return redirect_link
-
     controller = shortcuts.get_controller(request)
     context = {}
 
@@ -122,13 +117,8 @@ def get_project_users(request, project_id):
 
 
 @login_required
+@decorators.startup_page_init('search')
 def change_profile(request, user_id):
-    # we always init our search form
-    for link in ['search']:
-        redirect_link = shortcuts.search_user_forms(request, link)
-        if redirect_link:
-            return redirect_link
-
     context = {}
     controller = shortcuts.get_controller(request)
 
