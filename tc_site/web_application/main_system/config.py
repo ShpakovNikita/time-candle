@@ -1,6 +1,5 @@
-"""This is the config file for the command line interface"""
+"""This is the config file for web interface"""
 import os
-import platform
 
 
 DEPLOY = False

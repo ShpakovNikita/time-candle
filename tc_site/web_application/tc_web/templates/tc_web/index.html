@@ -12,44 +12,91 @@
         <h2 class="card-title text-center">Versions</h2>
         <div class="container">
             <div class="text-center">
-                <img src="{% static 'img/mobile_and_desktop.png' %}" class="img-fluid z-depth-2" alt="placeholder.">
+                <img src="{% static 'img/monitor.png' %}" class="img-fluid z-depth-2" alt="placeholder.">
             </div>
             <hr>
             <h5 class="card-text">In current state we have a web application that you are using right now, and a console application, that you may find in the lowest link below. Also here you may find API for Time Candle and use it for free in any cases.</h5>
         </div>
-        <h2 class="card-title text-center">Guidelines</h2>
-        <hr>
-        <div class="container">
-            <h5 class="card-text">
-                Also Time Candle has querying algorithms that provides a tool for advanced task search. Use the following filters for it:
-                parents: tasks with specified parents.
-                tids: tasks with specified tids
-                receiver: tasks with specified receivers pay ids
-                titles: Strings for tasks titles
-                Supported operators: AND, OR, (, ).
-                Special filters:
-                parents: None - prints only personal tasks
-                deadline_time:
-                 - range filter: (example) '2010-10-10 20:20:20' .. '2012-10-10 20:20:20'
-                 - compare filter: (example) > '2010-10-10 20:20:20'
-                (operators supported:
-                >, >=, ==, <=, <, !=
-                )
 
-                creation_time: - same as deadline_time
-                Examples:
-                (parents: 1 5 3 OR tids: 4 6 7) AND titles: new work candy
-                deadline_time: '2010-10-10 20:20:20' .. '2012-10-10 20:20:20'
-                creation_time: > '2010-10-10 20:20:20'
-            </h5>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title text-center">Quering</h2>
+                <hr>
+                <h5 class="card-text">
+                    Also Time Candle has querying algorithms that provides a tool for advanced task search. Use the following filters for it:
+                </h5>
+                <ul class="list-group">
+                    <li class="list-group-item">tids: tasks with specified tids</li>
+                    <li class="list-group-item">receivers: tasks with specified receivers pay ids</li>
+                    <li class="list-group-item">titles: Strings for tasks titles</li>
+                    <li class="list-group-item">parents: tasks with specified parents</li>
+                    <li class="list-group-item">deadline_time: tasks with deadline in range
+                    (operators supported:
+                    >, >=, ==, <=, <, !=
+                    )
+                    </li>
+                    <li class="list-group-item">creation_time: - same as deadline_time</li>
+                    <p class="card-title text-center h4 mt-2">Special filters:</p>
+                    <li class="list-group-item">parents: None - prints only personal tasks</li>
+                    <p class="card-title text-center h4 mt-2">Supported operators:</p>
+                    <li class="list-group-item">AND, OR, (, )</li>
+                    <p class="card-title text-center h4 mt-2">Time filters:</p>
+                    <li class="list-group-item">range filter: (example) '2010-10-10 20:20:20' .. '2012-10-10 20:20:20'</li>
+                    <li class="list-group-item">compare filter: (example) > '2010-10-10 20:20:20'</li>
+                    <p class="card-title text-center h4 mt-2">Examples:</p>
+                    <li class="list-group-item">deadline_time: '2010-10-10 20:20:20' .. '2012-10-10 20:20:20'</li>
+                    <li class="list-group-item">creation_time: > '2010-10-10 20:20:20'</li>
+                    <li class="list-group-item">(parents: 1 5 3 OR tids: 4 6 7) AND titles: new work candy</li>
+                    <li class="list-group-item">titles: "New work"</li>
+                </ul>
+            </div>
         </div>
-        <hr>
-        <h2 class="card-title text-center">TODO</h2>
-        <hr>
-        <div class="container">
-            <h5 class="card-text">
-                Complete query guideline and query itself, more beautiful and 'material' show forms + index base view
-            </h5>
+    </div>
+
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title text-center">Basics</h2>
+                <hr>
+                <h5 class="card-text">
+                    Time candle is a task tracker, as you know. So this is the base tutorial it.
+                </h5>
+                <h3 class="card-title text-center">Tasks</h3>
+                <hr>
+                <div class="text-center">
+                    <img src="{% static 'img/task.png' %}" class="img-fluid z-depth-2" alt="placeholder.">
+                </div>
+                <hr>
+                <h5 class="card-text">
+                    In the hat you may see it's title, and red button with the cross. If you have rights to modify it, you may delete it by pressing this button. In other case it will be grey, showing, that you cannot delete it.
+                </h5>
+                <hr>
+                <h5 class="card-text">
+                    In the main body you may see at least two badges, that shows you it's status and priority. Also you may see group button that will show you child tasks and badge with parent mark (by clicking on it you will see the parent task). Also you may do task by clicking on the check button (if you have rights). Also depends on project/child task you may see it's project or links on users.
+                </h5>
+                <hr>
+                <h5 class="card-text">
+                    In the bottom of the card you may see tasks deadline and show link, where you may find task's full info. Also if you have rights you may edit task or add a child sub task to it.
+                </h5>
+                <hr>
+                <h5 class="card-text">
+                    Task can be added by clicking the red plus button at the bottom of the page.
+                </h5>
+                <h3 class="card-title text-center">Projects</h3>
+                <hr>
+                <div class="text-center">
+                    <img src="{% static 'img/project.png' %}" class="img-fluid z-depth-2" alt="placeholder.">
+                </div>
+                <hr>
+                <h5 class="card-text">
+                    Here almost everything is similar to the tasks. More info about project you may find by check tasks button. Project can be added by clicking big red plus button. Also on the project page you may add task to the project or user, clicking matching buttons.
+                </h5>
+            </div>
         </div>
     </div>
 </div>
