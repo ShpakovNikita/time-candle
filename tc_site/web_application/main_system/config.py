@@ -3,10 +3,12 @@ import os
 import platform
 
 
-if platform.system() == 'Linux':
+DEPLOY = False
+
+if not DEPLOY:
     BASE_DIR = os.path.join(os.environ['HOME'], 'appdata/web')
 else:
-    BASE_DIR = 'appdata/web'
+    BASE_DIR = '.'
 
 
 # This is the log file name
@@ -31,8 +33,5 @@ DATABASE_URL = 'postgres://hicxmadptdigzw:c700b29bc7775f349fa9d1246847a874905f9f
 # This is the logging flag
 ENABLED = True
 
-try:
+if not DEPLOY:
     from .local import *
-
-except ImportError:
-    pass

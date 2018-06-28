@@ -297,9 +297,9 @@ class ProjectAdapter(PrimaryAdapter):
             UserProjectRelation.delete(). \
                 where(UserProjectRelation.project == pid).execute()
 
-            Project.delete().where(Project.pid == pid).execute()
-
             Task.delete().where(Task.project == pid).execute()
+
+            Project.delete().where(Project.pid == pid).execute()
 
             logger.debug('project fully removed')
 
