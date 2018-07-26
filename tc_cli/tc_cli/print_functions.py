@@ -1,6 +1,7 @@
 from time_candle.enums.priority import priority_dict
 from time_candle.enums.status import status_dict
 import time_candle.model.time_formatter
+import subprocess
 import os
 
 
@@ -48,8 +49,10 @@ def print_user(user):
 def cow_print_user(user):
     info = ('login: {}, nickname: {}, about: {}, id: {}'.
             format(user.login, user.nickname, user.about, user.uid))
-
-    os.system('cowsay ' + '"' + info + '"')
+    try:
+        subprocess.call(['cowsay ' + '"' + info + '"'])
+    except OSError:
+        print(info)
 
 
 def print_projects(projects):
