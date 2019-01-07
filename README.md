@@ -45,5 +45,3 @@ Also note that you may configure app by settings file, passing needed path's for
 Tested on linux platform.
 
 For information about how to use library in your own application check the commands module of controller package  
-
-Made by Paul Fon Boudervill.

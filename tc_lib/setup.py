@@ -5,7 +5,7 @@ setup(
     version="0.3",
     license='MIT',
     description='little and unuseful time tracker',
-    author='Paul Fon Boudervill',
+    author='ShpakovNikita',
     author_email='shpakovnikita1998@gmail.com',
     packages=find_packages(),
     include_package_data=False,
