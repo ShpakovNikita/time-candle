@@ -30,13 +30,13 @@ handler500 = 'tc_web.views.err500'
 
 urlpatterns = [
     url(r'^accounts/login/$',
-        decorators.startup_page_init('search')(auth_views.login),
+        decorators.startup_page_init('search')(auth_views.LoginView.as_view()),
         name='login'),
     url(r'^accounts/logout/$',
-        auth_views.logout,
+        auth_views.LogoutView.as_view(),
         {'next_page': '/'},
         name='logout'),
-    url(r'^accounts/signup/$', views.signup, name='signup'),
+    url(r'^accounts/signup/$', views.signup.as_view(), name='signup'),
 
     path('tc_web/', include('tc_web.urls')),
     path('admin/', admin.site.urls),
