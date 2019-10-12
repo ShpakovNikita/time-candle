@@ -36,7 +36,7 @@ urlpatterns = [
         auth_views.LogoutView.as_view(),
         {'next_page': '/'},
         name='logout'),
-    url(r'^accounts/signup/$', views.signup.as_view(), name='signup'),
+    url(r'^accounts/signup/$', views.signup, name='signup'),
 
     path('tc_web/', include('tc_web.urls')),
     path('admin/', admin.site.urls),

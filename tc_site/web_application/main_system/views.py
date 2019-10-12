@@ -13,12 +13,16 @@ from time_candle.exceptions import AppException
 
 @decorators.startup_page_init('search')
 def signup(request):
-    logger.debug('signup')
+    print('signup')
     if request.method == 'POST':
-        logger.debug('post form: %s', request.POST)
+        print('post form: %s', request.POST)
         if config.DATABASE_CONFIG:
             controller = Controller(uid=request.user.id,
                                     psql_config=config.DATABASE_CONFIG)
+        elif config.DATABASE_PATH:
+            print(config.DATABASE_PATH)
+            controller = Controller(uid=request.user.id,
+                                    db_file=config.DATABASE_PATH)
         else:
             controller = Controller(uid=request.user.id,
                                     connect_url=config.DATABASE_URL)
@@ -26,17 +30,17 @@ def signup(request):
         form = forms.SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            logger.debug('Django user added')
+            print('Django user added')
             username = form.cleaned_data.get('username')
 
             try:
                 controller.add_user(username, user.id)
-                logger.debug('Time-candle user added')
+                print('Time-candle user added')
 
             except AppException as e:
                 # delete django user
                 User.objects.get(username=username).delete()
-                logger.debug(e.errors.value)
+                print(e.errors.value)
                 return render(request, 'registration/signup.html',
                               {'form': form})
 

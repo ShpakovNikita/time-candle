@@ -9,7 +9,7 @@ import time_candle.model.time_formatter as formatter
 
 
 # TODO: Mock. It is really hard to implement here. Like very-very-very hard.
-# Assume that we tested or storage module very well
+# Assume that we tested our storage module very well
 
 
 class TestTaskLogic(unittest.TestCase):

@@ -7,7 +7,7 @@ header,
 }
 
 #intro {
-    background: url("../img/svg/background.svg")no-repeat center center fixed;
+    background-color: light-grey;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;

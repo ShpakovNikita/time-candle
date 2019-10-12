@@ -26,13 +26,6 @@ LOGGED_USER_PATH = os.path.join(BASE_DIR, LOGGED_USER_FILE)
 DATABASE_FILE = 'data.db'
 DATABASE_PATH = os.path.join(BASE_DIR, DATABASE_FILE)
 
-DATABASE_CONFIG = {
-            'NAME': 'test',
-            'USER': 'shaft',
-            'HOST': '/var/run/postgresql',
-            'PASSWORD': '',
-            'PORT': '5432'}
-
 # This is the user (cli) database file name
 USERS_DATABASE_FILE = 'users.db'
 USERS_DATABASE_PATH = os.path.join(BASE_DIR, USERS_DATABASE_FILE)

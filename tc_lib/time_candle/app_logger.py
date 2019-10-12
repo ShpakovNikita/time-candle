@@ -24,24 +24,14 @@ def custom_logger(logger_name):
     """
     global _loggers
 
-    if not _loggers:
-        try:
-            logging.config.fileConfig(_LOG_CONF)
-        except (MissingSectionHeaderError, KeyError):
-            logger = logging.getLogger('nani')
-            logger.disabled = True
-            return logger
-
     if logger_name not in [lg.name for lg in _loggers]:
         logger = logging.getLogger(logger_name)
 
-        if _LOG_FILE:
-            formatter = logging.Formatter(_DEFAULT_FORMATTER, _DEFAULT_TIME)
-            fh = logging.FileHandler(_LOG_FILE)
-            fh.setFormatter(formatter)
-            fh.setLevel(_LOG_LEVEL)
-            logger.addHandler(fh)
-
+        formatter = logging.Formatter(_DEFAULT_FORMATTER, _DEFAULT_TIME)
+        fh = logging.FileHandler(_LOG_FILE)
+        fh.setFormatter(formatter)
+        fh.setLevel(_LOG_LEVEL)
+        logger.addHandler(fh)
         _loggers.append(logger)
 
     else:
