@@ -2,45 +2,31 @@
 
 {% block content %}
 <!-- Card -->
-<div class="card">
-
-    <!-- Card body -->
-    <div class="card-body">
-
         <!-- Material form register -->
+        <div class="row">
+        <div class="span4"></div>
+        <div class="span4">
+        <h3>Profile</h3>
 
-        <p class="h4 text-center py-4">Profile</p>
-
-        <h3><i class="fa fa-user prefix grey-text"> User id: </i> {{ screen_user.id }}</h3>
-        <h3><i class="fa fa-hand-peace-o prefix grey-text"> Login: </i> {{ screen_user.login }}</h3>
-        <h3><i class="fa fa-group prefix grey-text"> Nickname: </i> {{ screen_user.nickname }}</h3>
-        <h3><i class="fa fa-envelope prefix grey-text"> Email: </i> {{ screen_user.email }}</h3>
-        <h3><i class="fa fa-comment prefix grey-text"> About: </i> {{ screen_user.about }}</h3>
+        <p><i class="fa fa-user prefix grey-text"> User id: </i> {{ screen_user.id }}</p>
+        <p><i class="fa fa-hand-peace-o prefix grey-text"> Login: </i> {{ screen_user.login }}</p>
+        <p><i class="fa fa-group prefix grey-text"> Nickname: </i> {{ screen_user.nickname }}</p>
+        <p><i class="fa fa-envelope prefix grey-text"> Email: </i> {{ screen_user.email }}</p>
+        <p><i class="fa fa-comment prefix grey-text"> About: </i> {{ screen_user.about }}</p>
 
         <hr>
+
         {% if user.id == screen_user.id %}
-            <div class="row justify-content-sm-center mt-2 mr-3">
-                <div class="col-sm-5">
-                    <div class="text-center">
-                        <a class="btn btn-unique" style="width: 30%" onClick="javascript:history.go(-1);">Back</a>
-                    </div>
-                </div>
-                <div class="col-sm-5">
-                    <p class="text-center"><a href="{% url 'tc_web:change_profile' user.id %}" class="btn btn-unique">Change</a></p>
-                </div>
-            </div>
+            <a class="btn btn-primary btn-large" onClick="javascript:history.go(-1);">Back</a>
+<a href="{% url 'tc_web:change_profile' user.id %}" class="btn btn-primary btn-large">Change</a>
+
         {% else %}
-            <div class="text-center py-4 mt-3">
-                <a class="btn btn-unique" onClick="javascript:history.go(-1);">Back</a>
-            </div>
+                <a class="btn btn-primary btn-large" onClick="javascript:history.go(-1);">Back</a>
         {% endif %}
-
-        <!-- Material form register -->
-
-    </div>
-    <!-- Card body -->
-
 </div>
+        <!-- Material form register -->
+<hr>
+    </div>
 
 <div class="row">
     {% for message in messages %}

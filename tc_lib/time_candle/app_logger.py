@@ -28,10 +28,12 @@ def custom_logger(logger_name):
         logger = logging.getLogger(logger_name)
 
         formatter = logging.Formatter(_DEFAULT_FORMATTER, _DEFAULT_TIME)
-        fh = logging.FileHandler(_LOG_FILE)
-        fh.setFormatter(formatter)
-        fh.setLevel(_LOG_LEVEL)
-        logger.addHandler(fh)
+        if _LOG_FILE:
+            fh = logging.FileHandler(_LOG_FILE)
+            fh.setFormatter(formatter)
+            fh.setLevel(_LOG_LEVEL)
+            logger.addHandler(fh)
+
         _loggers.append(logger)
 
     else:

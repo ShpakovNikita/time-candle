@@ -1,58 +1,44 @@
 
 <!--Grid column-->
-<div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+<div class="span4">
 
     <!--Card-->
-    <div class="card">
-        <!--Card content-->
-        <div class="card-body">
+    <div class="hero-unit">
             <!--Title-->
-            <div class="row" style="margin-bottom: -20px">
-                <div class="col-sm-9">
-                    <h4 class="card-title">{{ project.title|truncatechars:18 }}</h4>
-                </div>
-                <div class="col-sm-3">
+            <div class="row">
+                <div class="row" style="clear: both">
                     {% if project.has_rights %}
                     <form id="del" method="post">
+                        <h4 style="float: left; margin-left: 20%">{{ project.title|truncatechars:18 }}</h4>
                         {% csrf_token %}
                         <button value={{ project.pid }} type="submit" name='delete' onclick="return confirm('Are you sure?')"
-                            class="btn btn-red btn-sm" style="margin-top: -3px"><i
+                            class="btn btn-red btn-small" style="float: right; margin-top: 10px"><i
                             class="fa fa-times"></i></button>
 
                     </form>
                     {% else %}
-                        <a disabled="disabled" class="btn btn-grey btn-sm" style="margin-top: -3px"><i
+                                        <h4 class="card-title">{{ project.title|truncatechars:18 }}</h4>
+                        <a disabled="disabled" class="btn btn-grey btn-small pull-right"><i
                             class="fa fa-times"></i></a>
                     {% endif %}
                 </div>
             </div>
             <hr>
             <!--Text-->
-            <div class="row">
-                <div class="col-sm-12">
+            <div class="text-center">
                     <p class="card-text">{{ project.description|default:"No description provided"|truncatechars:45 }}</p>
-                </div>
             </div>
-            <div class="row mt-2">
-                <div class="col-sm-6">
-                    <a href="{% url 'tc_web:project' project.pid %}" class="btn btn-sm btn-red" style="margin-bottom: -10px; width: 110%">Check tasks</a>
-                </div>
-                <div class="col-sm-6">
-                    <a href="{% url 'tc_web:profile' project.admin_uid %}" class="btn btn-sm btn-unique" style=" margin-bottom: -10px; width: 100%">Admin:{{ project.admin_name|truncatechars:9 }}</a>
-                </div>
-            </div>
-            <!--TODO: REAL url-->
-        </div>
-    <!-- Card footer -->
-        <div class="rounded-bottom mdb-color darken-1 text-center pt-3">
-            <ul class="list-unstyled list-inline font-small">
-                {% if project.admin_uid == user.id %}
-                <li class="list-inline-item pr-2"><a href="{% url 'tc_web:change_project' project.pid %}" class="white-text"><i class="fa fa-arrow-right pr-1"></i>change</a></li>
+            <div class="text-center">
+                    <a href="{% url 'tc_web:project' project.pid %}" class="btn btn-small btn-warning" >Check tasks</a>
+
+                    <a href="{% url 'tc_web:profile' project.admin_uid %}" class="btn btn-small btn-success" >Admin:{{ project.admin_name|truncatechars:9 }}</a>
+                    {% if project.admin_uid == user.id %}
+                <a href="{% url 'tc_web:change_project' project.pid %}" class="btn btn-primary btn-small"><i class="fa fa-arrow-right pr-1"></i>change</a>
                 {% else %}
-                    <li class="list-inline-item pr-2"><a class="white-text"> </a></li>
+                <a class="white-text"> </a>
                 {% endif %}
-            </ul>
-        </div>
-    </div>
+            </div>
+
     <!--/.Card-->
+        </div>
 </div>

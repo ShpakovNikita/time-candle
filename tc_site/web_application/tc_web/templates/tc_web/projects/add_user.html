@@ -5,7 +5,7 @@
     <div class="col-lg-4 col-md-8 col-sm-12">
         <div class="card">
             <div class="card-body">
-                <p class="h4 text-center">Add user</p>
+                <h3 class="text-center">Add user</h3>
                 <form method="post" class="text-center">
                     {% csrf_token %}
                     <div class="fieldWrapper" style="z-index: 10000">
@@ -15,13 +15,9 @@
                     </div>
 
                     <hr>
-                    <div class="row justify-content-sm-center mt-2">
-                        <div class="col-sm-5">
-                            <a class="btn btn-unique" onClick="javascript:history.go(-1);">Back</a>
-                        </div>
-                        <div class="col-sm-5">
-                            <button type="submit" class="btn btn-unique">Add</button>
-                        </div>
+                    <div class="text-center">
+                            <a class="btn btn-primary btn-large" onClick="javascript:history.go(-1);">Back</a>
+                            <button type="submit" class="btn btn-primary btn-large">Add</button>
                     </div>
                 </form>
             </div>

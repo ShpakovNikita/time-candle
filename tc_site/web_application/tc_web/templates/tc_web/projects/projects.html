@@ -11,7 +11,7 @@
 
      <!--Card content-->
      <div class="card-body">
-         <h4 class="card-title text-center">No projects available</h4>
+         <h3 class="card-title text-center">No projects available</h3>
      </div>
  </div>
 {% endif %}
@@ -19,26 +19,20 @@
 {% endblock %}
 
 {% block add_buttons %}
-<div class="fixed-action-btn" style="bottom: 45px; right: 24px; z-index: 1000">
-    <a class="btn-floating btn-lg red" href="{% url 'tc_web:add_project' %}">
+<div class="fixed-action-btn" style="margin-left: 2%; bottom: 45px; right: 24px; z-index: 1000">
+    <a class="btn-floating btn-large btn-success" href="{% url 'tc_web:add_project' %}">
         <i class="fa fa-plus"></i>
     </a>
 </div>
 {% endblock %}
 
 {% block links %}
-<ul class="navbar-nav mr-auto">
-    {% if user.is_authenticated %}
-    <li class="nav-item">
-        <a class="nav-link"
-           href="{% url 'tc_web:tasks' %}">Tasks</a>
-    </li>
-    <li class="nav-item active">
-        <a class="nav-link" href="{% url 'tc_web:projects' %}">Projects</a>
-    </li>
-    {% endif %}
-
-</ul>
+    <ul class="nav">
+        {% if user.is_authenticated %}
+        <li><a href="{% url 'tc_web:tasks' %}">Tasks</a></li>
+        <li class="active"><a href="{% url 'tc_web:projects' %}">Projects</a></li>
+        {% endif %}
+    </ul>
 {% endblock %}
 
 {% block errors %}

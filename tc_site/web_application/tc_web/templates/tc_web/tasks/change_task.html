@@ -6,7 +6,7 @@
         <div class="card">
             <div class="card-body">
                 <!-- Tasks hat -->
-                <p class="h4 card-title mb-4 ml-4">{{ task.title }} <span class="grey-text">id{{ task.tid }}</span></p>
+                <h3>{{ task.title }} <span class="grey-text">id{{ task.tid }}</span></h3>
                 <hr>
                 <!-- Tasks hat -->
 
@@ -57,7 +57,7 @@
                 <!-- Time checking -->
                 <div class="row ml-4">
                     <div class="col-sm-6">
-                        <p class="h5 mb-1">Creation time: </p>
+                        <h5>Creation time: </h5>
                     </div>
 
                     <div class="col-sm-6">
@@ -150,12 +150,13 @@
                         <label class="grey-text h5" for="{{ form.priority.id_for_label }}">{{ form.priority.label_tag }}</label>
                         <div class="container bm-2">
                             {% for value, text in form.priority.field.choices %}
+                            <label class="radio-inline">
                             {% if value == task.priority %}
-                                <input type="radio" name="priority" id="priority_{{ forloop.counter }}" checked="checked" value="{{ value }}"></input>
+                                <input type="radio" name="priority" id="priority_{{ forloop.counter }}" checked="checked" value="{{ value }}">{{ text }}</input>
                             {% else %}
-                                <input type="radio" name="priority" id="priority_{{ forloop.counter }}" value="{{ value }}"></input>
+                                <input type="radio" name="priority" id="priority_{{ forloop.counter }}" value="{{ value }}">{{ text }}</input>
                             {% endif %}
-                            <label for="priority_{{ forloop.counter }}">{{ text }}</label>
+                            </label>
                             {% endfor %}
                         </div>
                     </div>
@@ -165,27 +166,23 @@
                         <label class="grey-text h5" for="{{ form.status.id_for_label }}">{{ form.status.label_tag }}</label>
                         <div class="container bm-2">
                             {% for value, text in form.status.field.choices %}
+                            <label class="radio-inline">
                             {% if value == task.status %}
-                                <input type="radio" name="status" id="status_{{ forloop.counter }}" checked="checked" value="{{ value }}"></input>
+                                <input type="radio" name="status" id="status_{{ forloop.counter }}" checked="checked" value="{{ value }}">{{ text }}</input>
                             {% else %}
-                                <input type="radio" name="status" id="status_{{ forloop.counter }}" value="{{ value }}"></input>
+                                <input type="radio" name="status" id="status_{{ forloop.counter }}" value="{{ value }}">{{ text }}</input>
                             {% endif %}
-                            <label for="status_{{ forloop.counter }}">{{ text }}</label>
+                            </label>
                             {% endfor %}
                         </div>
                     </div>
 
                     <hr>
-                    <div class="row justify-content-sm-center mt-2 mr-3">
-                        <div class="col-sm-5">
-                            <div class="text-center">
-                                <a class="btn btn-unique" style="width: 60%" onClick="javascript:history.go(-1);">Back</a>
-                            </div>
-                        </div>
+                    <div class="text-center">
+                            <a class="btn btn-large btn-primary" onClick="javascript:history.go(-1);">Back</a>
                     {% if task.has_rights %}
-                        <div class="col-sm-5">
-                            <p class="text-center"><button type="submit" class="btn btn-unique">Commit</button></p>
-                        </div>
+                            <button type="submit" class="btn btn-large btn-primary" >Commit</button>
+
                     {% endif %}
                 </div>
                 </form>

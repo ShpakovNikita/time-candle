@@ -2,10 +2,10 @@
 
 {% block content %}
 <div class="row justify-content-md-center">
-    <div class="col-md-4 col-sm-12">
+    <div class="col-md-4 col-sm-8">
         <div class="card">
             <div class="card-body">
-                <p class="h4 text-center mb-4">Change profile</p>
+                <h3 class="h4 text-center mb-4">Change profile</h3>
                 <br>
                 <form method="post" class="text-center">
                     {% csrf_token %}
@@ -25,14 +25,9 @@
                         </div>
                     </div>
                     <hr>
-                    <div class="row justify-content-sm-center mt-2">
-                        <div class="col-sm-5">
-                            <a class="btn btn-unique" onClick="javascript:history.go(-1);">Back</a>
-                        </div>
-                        <div class="col-sm-5">
-                            <button type="submit" class="btn btn-unique">Commit</button>
-                        </div>
-                    </div>
+                            <a class="btn btn-primary btn-large" onClick="javascript:history.go(-1);">Back</a>
+
+                            <button type="submit" class="btn btn-primary btn-large">Commit</button>
                 </form>
             </div>
         </div>

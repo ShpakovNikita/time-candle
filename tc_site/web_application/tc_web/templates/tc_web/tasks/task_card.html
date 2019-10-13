@@ -1,27 +1,25 @@
 
     <!--Grid column-->
-    <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+<div class="span4">
 
-        <!--Card-->
-        <div class="card">
+    <!--Card-->
+    <div class="hero-unit">
             <!--Card content-->
             <div class="card-body">
                 <!--Title-->
                 <div class="row" style="margin-bottom: -20px">
-                    <div class="col-sm-9">
-                        <p class="card-title h4">{{ task.title|truncatechars:18 }}
-                        </p>
-                    </div>
 
-                    <div class="col-sm-3">
+                <div class="row" style="clear: both">
+                                            <h4 class="card-title" style="float: left; margin-left: 20%">{{ task.title|truncatechars:18 }}
+                        </h4>
                         {% if task.has_rights %}
                             <form id="del_{{ task.tid }}" method="post">
                             {% csrf_token %}
                                 <button value={{ task.tid }} name='delete' onclick="return clicked(event, 'del_{{ task.tid }}')"
-                                     class="btn btn-red btn-sm" style="margin-top: -3px"><i class="fa fa-times"></i></button>
+                                     class="btn btn-red btn-sm" style="float: right"><i class="fa fa-times"></i></button>
                             </form>
                         {% else %}
-                            <a disabled="disabled" class="btn btn-grey btn-sm" style="margin-top: -3px"><i
+                            <a disabled="disabled" class="btn btn-grey btn-sm" style="float: right; margin-top: -3px"><i
                                 class="fa fa-times"></i></a>
                         {% endif %}
                     </div>
@@ -32,23 +30,6 @@
                     <div class="col-sm-9">
                         <p class="card-text">{{ task.comment|default:"No comments provided"|truncatechars:26 }}</p>
                     </div>
-
-                    {% if task.status == 3 %}
-                    {% elif task.has_rights %}
-                        <div class="col-sm-3">
-                            <form method="post" id="check">
-                                {% csrf_token %}
-                                <button value={{ task.tid }} type="submit" name='check' onclick="document.getElementById('check').submit();"
-                                    class="btn btn-red btn-sm" style="margin-top: -100px; margin-bottom: -100px"><i
-                                    class="fa fa-check"></i></button>
-                            </form>
-                        </div>
-                    {% else %}
-                        <div class="col-sm-3">
-                            <a disabled="disabled" class="btn btn-grey btn-sm" style="margin-top: -100px; margin-bottom: -100px"><i
-                                class="fa fa-check"></i></a>
-                        </div>
-                    {% endif %}
                 </div>
                 <div class="row ml-0 mt-2">
                     {% if task.status == 3 %}
@@ -74,68 +55,44 @@
                     {% if task.parent %}
                         <a style="width: 22%; margin-right: -1px" class="badge hoverable badge-pill blue trigger ml-1" href="{% url 'tc_web:show_task' task.parent %}">PARENT<i class="fa fa-arrow-up"></i></a>
                     {% endif %}
-                    {% if task.childs %}
-
-                            <a style="width: 13%" class="ml-1 trigger hoverable badge badge-pill blue dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa fa-group"></i>
-                            </a>
-                            <ul class="dropdown-menu" style="overflow-y: scroll; overflow-x: hidden; max-height: 300px; width: 200px">
-                                {% for child_task in task.childs %}
-                                    {% include "tc_web/tasks/tree_view_template.html" with node=child_task %}
-                                {% endfor %}
-                            </ul>
-                    {% endif %}
                 </div>
                 {% if project %}
-                  <div class="row">
-                        <div class="col-sm-6 mt-2">
-                            <a href="{% url 'tc_web:profile' user_id=task.creator_uid %}" class="btn btn-sm btn-unique" style="margin-bottom: -10px; width: 110%">Maker:{{ project.admin_name|truncatechars:10 }}</a>
-                        </div>
-                        <div class="col-sm-6 mt-2">
-                            <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-unique" style=" margin-bottom: -10px; width: 100%">Exec:{{ task.receiver_name|truncatechars:9 }}</a>
-                        </div>
+                  <div class="text-canter" style="margin-bottom: 5px">
+                            <a href="{% url 'tc_web:profile' user_id=task.creator_uid %}" class="btn btn-sm btn-success">Maker:{{ project.admin_name|truncatechars:10 }}</a>
+                            <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-warning">Exec:{{ task.receiver_name|truncatechars:9 }}</a>
                     </div>
                 {% elif task.pid %}
-                    <div class="row">
-                        <div class="col-sm-6 mt-2">
-                            <a href="{% url 'tc_web:project' project_id=task.pid %}" class="btn btn-sm btn-red" style="margin-bottom: -10px; width: 110%">Proj:{{ task.project_name|truncatechars:11 }}</a>
-                        </div>
-                        <div class="col-sm-6 mt-2">
-                            <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-unique" style=" margin-bottom: -10px; width: 100%">Exec:{{ task.receiver_name|truncatechars:9 }}</a>
-                        </div>
+                    <div class="text-center" style="margin-bottom: 5px">
+                            <a href="{% url 'tc_web:project' project_id=task.pid %}" class="btn btn-sm btn-primary">Proj:{{ task.project_name|truncatechars:11 }}</a>
+                            <a href="{% url 'tc_web:profile' user_id=task.uid %}" class="btn btn-sm btn-success">Exec:{{ task.receiver_name|truncatechars:9 }}</a>
                     </div>
                 {% else %}
-                <div class="row">
-                    <div class="col-sm-12 mt-2">
-                        <a class="btn btn-sm btn-red" href="{% url 'tc_web:profile' user_id=user.id  %}" style="width: 95%; margin-bottom: -10px">Personal task</a>
-                    </div>
+                <div class="text-center" style="margin-bottom: 5px">
+                        <a class="btn btn-sm btn-success" href="{% url 'tc_web:profile' user_id=user.id  %}">Personal task</a>
                 </div>
                 {% endif %}
             </div>
             <!-- Card footer -->
-            <div class="rounded-bottom mdb-color darken-1 text-center pt-3">
-                <ul class="list-unstyled list-inline font-small">
-                    <li class="list-inline-item pr-2">
+            <div class="text-center">
                         {% if task.deadline %}
-                        <a class="white-text"><i class="fa fa-clock-o pr-1"></i>{{task.deadline|date:"d M, H:i"}}</a>
+                        <a style="margin-left: -10px" class="white-text btn-small"><i class="fa fa-clock-o pr-1"></i>{{task.deadline|date:"d M, H:i"}}</a>
                         {% else %}
-                        <a class="white-text"><i class="fa fa-clock-o pr-1"></i>No deadline</a>
+                        <a style="margin-left: -10px" class="white-text btn-small"><i class="fa fa-clock-o pr-1"></i>No deadline</a>
                         {% endif %}
-                    </li>
-                    <li class="list-inline-item pr-2"><a href="{% url 'tc_web:show_task' task_id=task.tid  %}" class="white-text"><i class="fa fa-arrow-right pr-1"></i>show</a></li>
                     {% if task.has_rights %}
-                        <li class="list-inline-item pr-2"><a href="{% url 'tc_web:change_task' task_id=task.tid  %}" class="white-text"><i class="fa fa-edit pr-1"></i>edit</a></li>
+                        <a href="{% url 'tc_web:change_task' task_id=task.tid  %}" class="btn-small btn-primary">edit</a>
                     {% endif %}
                     {% if task.pid %}
                         {% if task.has_rights %}
-                        <li class="list-inline-item pr-2"><a href="{% url 'tc_web:add_child_project_task' project_id=task.pid task_id=task.tid  %}" class="white-text"><i class="fa fa-plus pr-1"></i>child</a></li>
+                        <a href="{% url 'tc_web:add_child_project_task' project_id=task.pid task_id=task.tid  %}" class="btn-small btn-primary"><i class="fa fa-plus pr-1"></i>child</a>
                         {% endif %}
                     {% else %}
                         {% if task.has_rights %}
-                            <li class="list-inline-item pr-2"><a href="{% url 'tc_web:add_child_task' task_id=task.tid  %}" class="white-text"><i class="fa fa-plus pr-1"></i>child</a></li>
+                        <a href="{% url 'tc_web:add_child_task' task_id=task.tid  %}" class="btn-small btn-primary"><i class="fa fa-plus pr-1"></i>child</a>
                         {% endif %}
                     {% endif %}
-                </ul>
+                        <a href="{% url 'tc_web:show_task' task.tid %}" class="btn-small btn-primary">show</a>
+
             </div>
         </div>
         <!--/.Card-->

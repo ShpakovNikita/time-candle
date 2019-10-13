@@ -4,20 +4,14 @@
         <!--Card content-->
         <div class="card-body">
             <!--Title-->
-            <div class="row">
-                <div class="col-sm-11 col-md-10 col-sm-8">
-                    <h5 class="card-title">{{ message.content| truncatechars:200 }}</h5>
-                    <hr>
-                </div>
-                <div class="col-sm-1 col-md-2 col-sm-4">
                     <form id="del" method="post">
+                        <p>{{ message.content| truncatechars:200 }}</p>
                         {% csrf_token %}
                         <button value={{ message.mid }} type="submit" name='delete'
-                            class="btn btn-red btn-sm"><i
+                            class="btn btn-red btn-sm pull-right"><i
                             class="fa fa-times"></i></button>
                     </form>
-                </div>
-            </div>
         </div>
+    <hr>
     </div>
 </div>

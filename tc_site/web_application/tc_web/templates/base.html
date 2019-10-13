@@ -11,7 +11,8 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- Bootstrap core CSS -->
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet" media="screen">
+    <link href="{% static 'css/bootstrap-responsive.css' %}" rel="stylesheet" media="screen">
     <!-- Custom styles (optional) -->
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
     <!-- Datetimepicker -->
@@ -41,79 +42,65 @@
     <!--Navbar-->
     {% block special %}
     {% endblock %}
-    <nav style="z-index: 10000" class="navbar navbar-expand-lg navbar-dark mdb-color scrolling-navbar fixed-top">
+    <div style="z-index: 10000" class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
         <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="{% url 'tc_web:index' %}">Q-Ban</a>
+          <div class="nav-collapse collapse">
+              {% block links %}
+            <ul class="nav">
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'tc_web:tasks' %}">Tasks</a></li>
+                <li><a href="{% url 'tc_web:projects' %}">Projects</a></li>
+                {% endif %}
 
-            <!-- Navbar brand -->
-        <a href="{% url 'tc_web:index' %}" class="navbar-brand text-white">Q-Ban</a>
+            </ul>
+              {% endblock %}
 
-            <!-- Collapse button -->
-            <button class="navbar-toggler" type="button" data-toggle="collapse"
-                    data-target="#basicExampleNav"
-                    aria-controls="basicExampleNav"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <!-- Collapsible content -->
-            <div class="collapse navbar-collapse"  id="basicExampleNav">
-
-                <!-- Links -->
-                {% block links %}
-                <ul class="navbar-nav mr-auto">
-                    {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link"
-                           href="{% url 'tc_web:tasks' %}">Tasks</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tc_web:projects' %}">Projects</a>
-                    </li>
-                    {% endif %}
-
+            {% block navbar %}
+            {% endblock %}
+            <ul class="nav pull-right">
+                {% if user.is_authenticated %}
+                  <li class="dropdown">
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'tc_web:change_profile' user.id %}">Settings</a></li>
+                        <li><a href="{% url 'tc_web:profile' user.id %}">Profile</a></li>
+                    </ul>
+                  </li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ user.username }}@{{ user.id }} <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <li><a href="{% url 'tc_web:change_profile' user.id %}">Settings</a></li>
+                    <li><a href="{% url 'tc_web:profile' user.id %}">Profile</a></li>
                 </ul>
-                {% endblock %}
-                <!-- Links -->
+              </li>
+                <li class="nav-item">
+                    <a class="nav-link mr-2" href="{% url 'logout' %}">Log out</a>
+                </li>
+                {% else %}
+                <li>
+                    <a href="{% url 'login' %}">Log in</a>
+                </li>
+                <li>
+                    <a class="mr-2" href="{% url 'signup' %}">Sign up</a>
+                </li>
+                {% endif %}
 
-                {% block navbar %}
-                {% endblock %}
+            </ul>
+              <form class="navbar-search form-inline pull-right">
+                <input id="search" name="search" class="search-query" style="z-index: 10000" type="text"
+                       placeholder="Search users" aria-label="Search">
+              </form>
 
-                <!-- Links -->
-                <ul class="navbar-nav ml-auto">
-                    {% if user.is_authenticated %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa fa-user"></i>{{ user.username }}@{{ user.id }}</a>
-                        <div class="dropdown-menu dropdown-menu-right dropdown-info" aria-labelledby="navbarDropdownMenuLink-4">
-                            <a class="dropdown-item" href="{% url 'tc_web:change_profile' user.id %}">Settings</a>
-                            <a class="dropdown-item" href="{% url 'tc_web:profile' user.id %}">Profile</a>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link mr-2" href="{% url 'logout' %}">Log out</a>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Log in</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link mr-2" href="{% url 'signup' %}">Sign up</a>
-                    </li>
-                    {% endif %}
-
-                </ul>
-                <!-- Links -->
-
-                <form class="form-inline">
-                        <input id="search" name="search" class="grey lighten-5 form-control mr-sm-2" style="z-index: 10000" type="text"
-
-                               placeholder="Search users" aria-label="Search">
-
-                </form>
-            </div>
-            <!-- Collapsible content -->
+          </div><!--/.nav-collapse -->
         </div>
-    </nav>
+      </div>
+    </div>
     <!--/.Navbar-->
 
     {% block sidebar %}
@@ -147,43 +134,13 @@
 {% block add_buttons %}
 {% endblock %}
 <!--Footer-->
-<footer class="page-footer text-center text-md-left font-small mdb-color pt-4 mt-4">
+<hr class="featurette-divider">
 
-    <!--Footer Links-->
-    <div class="container text-center text-md-left">
-        <div class="row">
-
-            <!--First column-->
-            <div class="col-md-6 pb-3">
-                <h5 class="text-uppercase">Dev Links</h5>
-                <p>This is the links that you are looking for:</p>
-            </div>
-            <!--/.First column-->
-
-            <!--Second column-->
-            <div class="col-md-6 pb-3">
-                <ul class="list-unstyled">
-                    <li>
-                        <a class="h5" href="https://github.com/ShpakovNikita"><i class="fa fa-github"></i> github</a>
-                    </li>
-                    <li>
-                        <a class="h5" href="https://vk.com/id89463323"><i class="fa fa-vk"></i> vk</a>
-                    </li>
-                </ul>
-            </div>
-            <!--/.Second column-->
-        </div>
-    </div>
-    <!--/.Footer Links-->
-
-    <!--Copyright-->
-    <div class="footer-copyright py-3 text-center">
-        © 2018 Copyright:
-        <a href="https://bitbucket.org/shpakov_nikita/">
-            Paul Fon Boudervill </a>
-    </div>
-    <!--/.Copyright-->
-
+<footer class="footer">
+  <div class="container">
+      <a class="pull-right" href="https://github.com/ShpakovNikita">github</a>
+      <p>© 2018 Copyright: Paul Fon Boudervill</p>
+  </div>
 </footer>
 <!--/.Footer-->
 
