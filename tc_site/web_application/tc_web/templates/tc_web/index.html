@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% block content %}
+<canvas id="oilcanvas" style="margin-top: -250px" width="1800" height="500">
+</canvas>
 <div class="hero-unit">
 <h1>Q-Ban!</h1>
 <hr>
@@ -67,3 +69,90 @@
 </div>
 {% endblock %}
 
+{% block shaders %}
+<script id="jetbrains-fragment" type="x-shader/x-fragment">
+					uniform float time;
+					uniform float ratioXtoY;
+					uniform vec3 colorBegin;
+					uniform vec3 colorEnd;
+					uniform float alpha;
+					uniform float kConst;
+					varying vec2 vUv;
+
+					struct Sphere
+					{
+						vec2 position;
+						float radius;
+					};
+
+					#define SPHERES_COUNT 5
+					uniform Sphere spheres[SPHERES_COUNT];
+
+					vec3 alpha_blend(vec3 start, vec3 end, float a)
+					{
+						return a * end + (1.0 - a) * start;
+					}
+
+					float sdf_smin(float a, float b)
+					{
+						float k = kConst * 100.0;
+						float res = exp(-k*a) + exp(-k*b);
+						return -log(max(0.0001,res)) / k;
+					}
+
+					float sdf_sphere(vec2 p, Sphere s)
+					{
+						return distance(p, s.position) - s.radius;
+					}
+
+					vec4 layer(vec2 uv)
+					{
+						float mins[SPHERES_COUNT];
+						Sphere s;
+						for (int i = 0; i < SPHERES_COUNT; ++i)
+						{
+							s = spheres[i];
+							mins[i] = sdf_sphere(uv, s);
+						}
+
+						float trueMin = mins[0];
+						for (int i = 0; i < SPHERES_COUNT - 1; ++i)
+						{
+							trueMin = sdf_smin(trueMin, mins[i + 1]);
+						}
+
+						if (0.0 >= trueMin)
+						{
+							return vec4(alpha_blend(colorBegin, colorEnd, uv.y), alpha);
+						}
+						else
+						{
+							return vec4(0.0, 0.0, 0.0, 0.0);
+						}
+					}
+
+					void main()
+					{
+						vec3 col;
+						gl_FragColor = layer(vec2(vUv.x * ratioXtoY, vUv.y));
+					}
+				</script>
+				<script id="jetbrains-vertex" type="x-shader/x-vertex">
+					uniform float time;
+					varying vec2 vUv;
+
+					void main()
+					{
+						vec4 mvPosition = modelViewMatrix * vec4(position, 1.);
+						gl_Position = projectionMatrix * mvPosition;
+						vUv = uv;
+					}
+				</script>
+{% endblock %}
+
+{% block scripts %}
+		<script src="{% static 'js/vendor/three.min.js' %}"></script>
+		<script src="{% static 'js/vendor/Sky.js' %}"></script>
+		<script src="{% static 'js/vendor/TweenMax.min.js' %}"></script>
+		<script src="{% static 'js/test.js' %}"></script>
+{% endblock %}
