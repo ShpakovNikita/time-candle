@@ -1,5 +1,5 @@
 ![Heroku](https://heroku-badge.herokuapp.com/?app=timecandle)
-# Time Candle. #
+# Q-Ban. #
 ##### little app about your time and life #####
 This is a very simple task-tracker application that can help you to manage your time. User friendly interface provides you to create tasks and projects and use them very fast with your friends and colleagues.
 ## Architecture ##
